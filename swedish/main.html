@@ -1,9 +1,47 @@
 <!DOCTYPE html>
 <html lang="de">
-<head><script src="foxora-start/password-recovery.js?v=1"></script>
+<head><script>
+(()=>{'use strict';
+ const query=new URLSearchParams(location.search);
+ // Older redirects included #Konto before Supabase's own fragment.
+ const fragment=new URLSearchParams(location.hash.replace(/^#(?:Konto[#&])?/,''));
+ const arrival=query.get('reset')==='1'||query.get('type')==='recovery'||fragment.get('type')==='recovery';
+ const state={arrival,pending:arrival,valid:false,error:null,userId:null};
+ const key='foxora:password-recovery:v1';
+ const cleanURL=()=>{const url=new URL(location.href);for(const k of ['access_token','refresh_token','token_hash','code','type','error','error_code','error_description'])url.searchParams.delete(k);url.searchParams.set('reset','1');url.hash='Konto';history.replaceState(null,'',url.href);};
+ const notify=()=>window.dispatchEvent(new CustomEvent('frrecoverychange'));
+ const remember=session=>{if(!session?.user?.id)return;state.userId=session.user.id;state.valid=true;state.pending=false;state.error=null;try{sessionStorage.setItem(key,JSON.stringify({userId:state.userId,until:Date.now()+3600000}));}catch(_){};};
+ function mark(event,session){if(event==='PASSWORD_RECOVERY'){state.arrival=true;window.FRRecoveryArrival=true;remember(session);notify();}if(event==='SIGNED_OUT'){state.valid=false;state.userId=null;try{sessionStorage.removeItem(key);}catch(_){};notify();}}
+ async function initialize(client){
+  if(!state.arrival)return;
+  try{
+   const err=fragment.get('error_description')||query.get('error_description')||fragment.get('error')||query.get('error');if(err)throw new Error('Der Passwort-Link ist abgelaufen oder ungültig. Fordere einen neuen Link an.');
+   let result;const access=fragment.get('access_token')||query.get('access_token'),refresh=fragment.get('refresh_token')||query.get('refresh_token');
+   if(access||refresh){if(!access||!refresh)throw new Error('Der Passwort-Link ist unvollständig. Fordere einen neuen Link an.');result=await client.auth.setSession({access_token:access,refresh_token:refresh});}
+   else if(query.get('token_hash'))result=await client.auth.verifyOtp({token_hash:query.get('token_hash'),type:'recovery'});
+   else if(query.get('code'))result=await client.auth.exchangeCodeForSession(query.get('code'));
+   else{
+    const {data,error}=await client.auth.getSession();if(error)throw error;
+    let previous;try{previous=JSON.parse(sessionStorage.getItem(key));}catch(_){}
+    if(!previous||previous.until<Date.now()||previous.userId!==data.session?.user?.id)throw new Error('Dieser Link enthält keine gültige Passwort-Freigabe. Fordere eine neue Passwort-Mail an und öffne deren Bestätigungslink.');
+    result={data,error:null};
+   }
+   if(result.error)throw result.error;
+   const session=result.data?.session;if(!session?.user?.id)throw new Error('Der Passwort-Link konnte nicht bestätigt werden. Fordere einen neuen Link an.');
+   const checked=await client.auth.getUser();if(checked.error||checked.data?.user?.id!==session.user.id)throw new Error('Der Passwort-Link konnte nicht bestätigt werden. Fordere einen neuen Link an.');
+   remember(session);
+  }catch(_){state.valid=false;state.userId=null;state.error='Der Passwort-Link ist ungültig, abgelaufen oder konnte nicht geprüft werden. Fordere eine neue Passwort-Mail an und öffne den neuesten Link. Du musst dich dafür nicht zuerst anmelden.';try{sessionStorage.removeItem(key);}catch(_){};}
+  finally{state.pending=false;cleanURL();notify();}
+ }
+ function complete(){state.arrival=false;state.pending=false;state.valid=false;state.userId=null;window.FRRecoveryArrival=false;try{sessionStorage.removeItem(key);}catch(_){};}
+ window.FRRecovery=Object.assign(state,{initialize,mark,complete});window.FRRecoveryArrival=arrival;
+ if(arrival){document.documentElement.classList.add('foxora-recovery');const style=document.createElement('style');style.textContent='html.foxora-recovery #accountForm,html.foxora-recovery #accountSignedIn{display:none!important}html.foxora-recovery #accountResetForm{display:block!important}';document.head.appendChild(style);}
+})();
+
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Foxora · Griechisch lernen</title>
+<title>Foxora · Schwedisch lernen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&amp;family=Jost:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 <style>
@@ -453,7 +491,7 @@
 @media(max-width:700px){.fox-guide{right:8px;bottom:8px}.fox-guide img{width:100px;height:auto}.fox-bubble{max-width:180px;font-size:.74rem;padding:.7rem .8rem}}
 
 </style>
-<link rel="manifest" href="manifest.webmanifest">
+
 <script>
 window.FRInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', event => {
@@ -466,11 +504,239 @@ window.addEventListener('appinstalled', () => {
  const hint = document.getElementById('installAppHint'); if (hint) hint.textContent = 'Die App wurde installiert.';
 });
 </script>
-<link rel="icon" type="image/png" href="favicon.png?v=foxora1">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=foxora1">
+<link rel="icon" type="image/png" href="../english/favicon.png?v=foxora1">
+<link rel="apple-touch-icon" href="../english/apple-touch-icon.png?v=foxora1">
 <meta name="theme-color" content="#0D1433">
 
-<script src="greek-catalog.js"></script><script src="greek-learning-core.js?v=exact-main1"></script>
+<script>
+window.SV_CATALOG=[{"file": "schwedisch-vara-ha-1-oberstufe.html", "title": "Vara & Ha", "level": 1, "module": "sv_vara-ha_1", "kind": "lesson", "goal": "Personen vorstellen und Besitz ausdrücken."}, {"file": "schwedisch-praesens-1-oberstufe.html", "title": "Präsens", "level": 1, "module": "sv_praesens_1", "kind": "lesson", "goal": "Gewohnheiten und regelmässige Abläufe beschreiben."}, {"file": "schwedisch-satzbau-1-oberstufe.html", "title": "Satzbau &amp; Wortstellung", "level": 1, "module": "sv_satzbau_1", "kind": "lesson", "goal": "Hauptsätze, Fragen und Nebensätze mit passender Wortstellung bilden."}, {"file": "schwedisch-preteritum-1-oberstufe.html", "title": "Preteritum", "level": 1, "module": "sv_preteritum_1", "kind": "lesson", "goal": "Abgeschlossene Ereignisse erzählen."}, {"file": "schwedisch-plusquamperfekt-1-oberstufe.html", "title": "Plusquamperfekt", "level": 1, "module": "sv_plusquamperfekt_1", "kind": "lesson", "goal": "Vorzeitigkeit mit hade und dem Supinum ausdrücken."}, {"file": "schwedisch-perfekt-1-oberstufe.html", "title": "Perfekt", "level": 1, "module": "sv_perfekt_1", "kind": "lesson", "goal": "Erfahrungen und Ergebnisse mit Bezug zur Gegenwart ausdrücken."}, {"file": "schwedisch-zukunft-1-oberstufe.html", "title": "Zukunft: ska & kommer att", "level": 1, "module": "sv_zukunft_1", "kind": "lesson", "goal": "Pläne und Vorhersagen formulieren."}, {"file": "schwedisch-modalverben-1-oberstufe.html", "title": "Modalverben", "level": 1, "module": "sv_modalverbsv_1", "kind": "lesson", "goal": "Fähigkeiten, Regeln und Ratschläge ausdrücken."}, {"file": "schwedisch-konditional-1-oberstufe.html", "title": "Konditional &amp; Bedingungen", "level": 1, "module": "sv_konditional_1", "kind": "lesson", "goal": "Bedingungen und mögliche Folgen ausdrücken."}, {"file": "schwedisch-artikel-plural-1-oberstufe.html", "title": "Artikel & Mehrzahl", "level": 1, "module": "sv_artikel-plural_1", "kind": "lesson", "goal": "Nomen mit passenden Artikeln und Mengen verwenden."}, {"file": "schwedisch-adjektive-adverbien-1-oberstufe.html", "title": "Adjektive & Adverbien", "level": 1, "module": "sv_adjektive-adverbisv_1", "kind": "lesson", "goal": "Eigenschaften und Handlungen genauer beschreiben."}, {"file": "schwedisch-pronomen-praepositionen-1-oberstufe.html", "title": "Pronomen & Präpositionen", "level": 1, "module": "sv_pronomen-praepositionsv_1", "kind": "lesson", "goal": "Personen, Besitz, Ort und Zeit ausdrücken."}, {"file": "schwedisch-fragen-verneinung-1-oberstufe.html", "title": "Fragen & Verneinung", "level": 1, "module": "sv_fragen-verneinung_1", "kind": "lesson", "goal": "Informationen erfragen und Aussagen verneinen."}, {"file": "schwedisch-alltag-familie-1-oberstufe.html", "title": "Familie", "level": 1, "module": "sv_alltag_familie_1", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Familie bilden."}, {"file": "schwedisch-alltag-essen-1-oberstufe.html", "title": "Essen & Trinken", "level": 1, "module": "sv_alltag_esssv_1", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Essen & Trinken bilden."}, {"file": "schwedisch-alltag-hobbys-1-oberstufe.html", "title": "Hobbys & Freizeit", "level": 1, "module": "sv_alltag_hobbys_1", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Hobbys & Freizeit bilden."}, {"file": "schwedisch-alltag-schule-1-oberstufe.html", "title": "Schule & Lernen", "level": 1, "module": "sv_alltag_schule_1", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Schule & Lernen bilden."}, {"file": "schwedisch-alltag-einkaufen-1-oberstufe.html", "title": "Einkaufen", "level": 1, "module": "sv_alltag_einkaufsv_1", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Einkaufen bilden."}, {"file": "schwedisch-alltag-reisen-1-oberstufe.html", "title": "Reisen & Unterwegs", "level": 1, "module": "sv_alltag_reissv_1", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Reisen & Unterwegs bilden."}, {"file": "schwedisch-grammatik-pruefung-1-oberstufe.html", "title": "Gesamtprüfung Grammatik", "level": 1, "module": "sv_exam_grammatik_1", "kind": "exam"}, {"file": "schwedisch-alltag-pruefung-1-oberstufe.html", "title": "Gesamtprüfung Bezug zum Alltag", "level": 1, "module": "sv_exam_alltag_1", "kind": "exam"}, {"file": "schwedisch-vara-ha-2-oberstufe.html", "title": "Vara & Ha", "level": 2, "module": "sv_vara-ha_2", "kind": "lesson", "goal": "Personen vorstellen und Besitz ausdrücken."}, {"file": "schwedisch-praesens-2-oberstufe.html", "title": "Präsens", "level": 2, "module": "sv_praesens_2", "kind": "lesson", "goal": "Gewohnheiten und regelmässige Abläufe beschreiben."}, {"file": "schwedisch-satzbau-2-oberstufe.html", "title": "Satzbau &amp; Wortstellung", "level": 2, "module": "sv_satzbau_2", "kind": "lesson", "goal": "Hauptsätze, Fragen und Nebensätze mit passender Wortstellung bilden."}, {"file": "schwedisch-preteritum-2-oberstufe.html", "title": "Preteritum", "level": 2, "module": "sv_preteritum_2", "kind": "lesson", "goal": "Abgeschlossene Ereignisse erzählen."}, {"file": "schwedisch-plusquamperfekt-2-oberstufe.html", "title": "Plusquamperfekt", "level": 2, "module": "sv_plusquamperfekt_2", "kind": "lesson", "goal": "Vorzeitigkeit mit hade und dem Supinum ausdrücken."}, {"file": "schwedisch-perfekt-2-oberstufe.html", "title": "Perfekt", "level": 2, "module": "sv_perfekt_2", "kind": "lesson", "goal": "Erfahrungen und Ergebnisse mit Bezug zur Gegenwart ausdrücken."}, {"file": "schwedisch-zukunft-2-oberstufe.html", "title": "Zukunft: ska & kommer att", "level": 2, "module": "sv_zukunft_2", "kind": "lesson", "goal": "Pläne und Vorhersagen formulieren."}, {"file": "schwedisch-modalverben-2-oberstufe.html", "title": "Modalverben", "level": 2, "module": "sv_modalverbsv_2", "kind": "lesson", "goal": "Fähigkeiten, Regeln und Ratschläge ausdrücken."}, {"file": "schwedisch-konditional-2-oberstufe.html", "title": "Konditional &amp; Bedingungen", "level": 2, "module": "sv_konditional_2", "kind": "lesson", "goal": "Bedingungen und mögliche Folgen ausdrücken."}, {"file": "schwedisch-artikel-plural-2-oberstufe.html", "title": "Artikel & Mehrzahl", "level": 2, "module": "sv_artikel-plural_2", "kind": "lesson", "goal": "Nomen mit passenden Artikeln und Mengen verwenden."}, {"file": "schwedisch-adjektive-adverbien-2-oberstufe.html", "title": "Adjektive & Adverbien", "level": 2, "module": "sv_adjektive-adverbisv_2", "kind": "lesson", "goal": "Eigenschaften und Handlungen genauer beschreiben."}, {"file": "schwedisch-pronomen-praepositionen-2-oberstufe.html", "title": "Pronomen & Präpositionen", "level": 2, "module": "sv_pronomen-praepositionsv_2", "kind": "lesson", "goal": "Personen, Besitz, Ort und Zeit ausdrücken."}, {"file": "schwedisch-fragen-verneinung-2-oberstufe.html", "title": "Fragen & Verneinung", "level": 2, "module": "sv_fragen-verneinung_2", "kind": "lesson", "goal": "Informationen erfragen und Aussagen verneinen."}, {"file": "schwedisch-alltag-familie-2-oberstufe.html", "title": "Familie", "level": 2, "module": "sv_alltag_familie_2", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Familie bilden."}, {"file": "schwedisch-alltag-essen-2-oberstufe.html", "title": "Essen & Trinken", "level": 2, "module": "sv_alltag_esssv_2", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Essen & Trinken bilden."}, {"file": "schwedisch-alltag-hobbys-2-oberstufe.html", "title": "Hobbys & Freizeit", "level": 2, "module": "sv_alltag_hobbys_2", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Hobbys & Freizeit bilden."}, {"file": "schwedisch-alltag-schule-2-oberstufe.html", "title": "Schule & Lernen", "level": 2, "module": "sv_alltag_schule_2", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Schule & Lernen bilden."}, {"file": "schwedisch-alltag-einkaufen-2-oberstufe.html", "title": "Einkaufen", "level": 2, "module": "sv_alltag_einkaufsv_2", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Einkaufen bilden."}, {"file": "schwedisch-alltag-reisen-2-oberstufe.html", "title": "Reisen & Unterwegs", "level": 2, "module": "sv_alltag_reissv_2", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Reisen & Unterwegs bilden."}, {"file": "schwedisch-grammatik-pruefung-2-oberstufe.html", "title": "Gesamtprüfung Grammatik", "level": 2, "module": "sv_exam_grammatik_2", "kind": "exam"}, {"file": "schwedisch-alltag-pruefung-2-oberstufe.html", "title": "Gesamtprüfung Bezug zum Alltag", "level": 2, "module": "sv_exam_alltag_2", "kind": "exam"}, {"file": "schwedisch-vara-ha-3-oberstufe.html", "title": "Vara & Ha", "level": 3, "module": "sv_vara-ha_3", "kind": "lesson", "goal": "Personen vorstellen und Besitz ausdrücken."}, {"file": "schwedisch-praesens-3-oberstufe.html", "title": "Präsens", "level": 3, "module": "sv_praesens_3", "kind": "lesson", "goal": "Gewohnheiten und regelmässige Abläufe beschreiben."}, {"file": "schwedisch-satzbau-3-oberstufe.html", "title": "Satzbau &amp; Wortstellung", "level": 3, "module": "sv_satzbau_3", "kind": "lesson", "goal": "Hauptsätze, Fragen und Nebensätze mit passender Wortstellung bilden."}, {"file": "schwedisch-preteritum-3-oberstufe.html", "title": "Preteritum", "level": 3, "module": "sv_preteritum_3", "kind": "lesson", "goal": "Abgeschlossene Ereignisse erzählen."}, {"file": "schwedisch-plusquamperfekt-3-oberstufe.html", "title": "Plusquamperfekt", "level": 3, "module": "sv_plusquamperfekt_3", "kind": "lesson", "goal": "Vorzeitigkeit mit hade und dem Supinum ausdrücken."}, {"file": "schwedisch-perfekt-3-oberstufe.html", "title": "Perfekt", "level": 3, "module": "sv_perfekt_3", "kind": "lesson", "goal": "Erfahrungen und Ergebnisse mit Bezug zur Gegenwart ausdrücken."}, {"file": "schwedisch-zukunft-3-oberstufe.html", "title": "Zukunft: ska & kommer att", "level": 3, "module": "sv_zukunft_3", "kind": "lesson", "goal": "Pläne und Vorhersagen formulieren."}, {"file": "schwedisch-modalverben-3-oberstufe.html", "title": "Modalverben", "level": 3, "module": "sv_modalverbsv_3", "kind": "lesson", "goal": "Fähigkeiten, Regeln und Ratschläge ausdrücken."}, {"file": "schwedisch-konditional-3-oberstufe.html", "title": "Konditional &amp; Bedingungen", "level": 3, "module": "sv_konditional_3", "kind": "lesson", "goal": "Bedingungen und mögliche Folgen ausdrücken."}, {"file": "schwedisch-artikel-plural-3-oberstufe.html", "title": "Artikel & Mehrzahl", "level": 3, "module": "sv_artikel-plural_3", "kind": "lesson", "goal": "Nomen mit passenden Artikeln und Mengen verwenden."}, {"file": "schwedisch-adjektive-adverbien-3-oberstufe.html", "title": "Adjektive & Adverbien", "level": 3, "module": "sv_adjektive-adverbisv_3", "kind": "lesson", "goal": "Eigenschaften und Handlungen genauer beschreiben."}, {"file": "schwedisch-pronomen-praepositionen-3-oberstufe.html", "title": "Pronomen & Präpositionen", "level": 3, "module": "sv_pronomen-praepositionsv_3", "kind": "lesson", "goal": "Personen, Besitz, Ort und Zeit ausdrücken."}, {"file": "schwedisch-fragen-verneinung-3-oberstufe.html", "title": "Fragen & Verneinung", "level": 3, "module": "sv_fragen-verneinung_3", "kind": "lesson", "goal": "Informationen erfragen und Aussagen verneinen."}, {"file": "schwedisch-alltag-familie-3-oberstufe.html", "title": "Familie", "level": 3, "module": "sv_alltag_familie_3", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Familie bilden."}, {"file": "schwedisch-alltag-essen-3-oberstufe.html", "title": "Essen & Trinken", "level": 3, "module": "sv_alltag_esssv_3", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Essen & Trinken bilden."}, {"file": "schwedisch-alltag-hobbys-3-oberstufe.html", "title": "Hobbys & Freizeit", "level": 3, "module": "sv_alltag_hobbys_3", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Hobbys & Freizeit bilden."}, {"file": "schwedisch-alltag-schule-3-oberstufe.html", "title": "Schule & Lernen", "level": 3, "module": "sv_alltag_schule_3", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Schule & Lernen bilden."}, {"file": "schwedisch-alltag-einkaufen-3-oberstufe.html", "title": "Einkaufen", "level": 3, "module": "sv_alltag_einkaufsv_3", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Einkaufen bilden."}, {"file": "schwedisch-alltag-reisen-3-oberstufe.html", "title": "Reisen & Unterwegs", "level": 3, "module": "sv_alltag_reissv_3", "kind": "lesson", "goal": "Passende Aussagen verstehen und eigene Sätze zu Reisen & Unterwegs bilden."}, {"file": "schwedisch-grammatik-pruefung-3-oberstufe.html", "title": "Gesamtprüfung Grammatik", "level": 3, "module": "sv_exam_grammatik_3", "kind": "exam"}, {"file": "schwedisch-alltag-pruefung-3-oberstufe.html", "title": "Gesamtprüfung Bezug zum Alltag", "level": 3, "module": "sv_exam_alltag_3", "kind": "exam"}];
+</script><script>
+(() => {
+ 'use strict';
+ if (window.__foxoraSwedishCoreStarted) return;
+ window.__foxoraSwedishCoreStarted = true;
+/* French learning progress: local event log and account-specific cloud sync. */
+(() => {
+  'use strict';
+  const URL = 'https://npbiccwpyetefnlmjihd.supabase.co';
+  const KEY = 'sb_publishable_b3PsFQ0rO-lYqbbr05e2Qg_-sGGgjSp';
+  const TABLE = 'fr_learning_events';
+  const PREFIX = 'sv_learning_events_v1:';
+  let actor = 'guest', client = null, syncing = false, initialized = false;
+  let resyncRequested = false;
+  let status = 'Lernspeicher wird geladen …';
+  const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch (_) { return null; } };
+  const events = () => { const value=read(PREFIX+actor); return Array.isArray(value)?value:[]; };
+  function write(value) {
+    try { localStorage.setItem(PREFIX+actor,JSON.stringify(value)); }
+    catch (_) { status='Der Browser konnte den Fortschritt nicht speichern.'; }
+  }
+  function notify() { window.dispatchEvent(new CustomEvent('frlearningchange')); }
+  const ordered = () => events().sort((a,b)=>a.at.localeCompare(b.at)||a.id.localeCompare(b.id));
+  function summary() {
+    // Preserve existing guest totals until the first new event. Account data stays separate.
+    const list=ordered(), old=null;
+    const result={xp:0,total:0,correct:0,streak:0,day:{answered:0,correct:0},daily:{},modules:{},history:[]};
+    if(old && !list.length) return {...result,...old,day:old.daily?.[dayKey()]||result.day};
+    const rounds={};
+    for(const e of list) {
+      const m=result.modules[e.module] ||= {questions:{},answered:0,correct:0,completed:0};
+      if(e.kind==='answer') {
+        result.total++; result.correct+=e.ok?1:0; result.xp+=e.ok?10:2;
+        const daily=result.daily[e.date] ||= {answered:0,correct:0};daily.answered++;daily.correct+=e.ok?1:0;
+        m.answered++;m.correct+=e.ok?1:0;
+        const q=m.questions[e.question] ||= {strength:0,wrong:0};
+        q.strength=e.ok?Math.min(3,q.strength+1):0;q.wrong+=e.ok?0:1;q.last=e.at;q.text=e.text;
+        q.due=new Date(Date.parse(e.at)+(e.ok?[0,1,3,7][q.strength]:0)*86400000).toISOString();
+        const round=rounds[e.module] ||= {answered:0,correct:0};round.answered++;round.correct+=e.ok?1:0;
+      } else if(e.kind==='finish') {
+        const round=rounds[e.module]||{answered:0,correct:0};
+        result.history.push({module:e.module,date:e.date,pct:e.pct,at:e.at,...round,wrong:round.answered-round.correct});
+        m.completed++;m.lastScore=e.pct;m.best=Math.max(m.best||0,e.pct);rounds[e.module]={answered:0,correct:0};
+      }
+    }
+    result.day=result.daily[dayKey()]||result.day;
+    let cursor=new Date();cursor.setHours(12,0,0,0);
+    if(!result.daily[dayKey(cursor)])cursor.setDate(cursor.getDate()-1);
+    while(result.daily[dayKey(cursor)]){result.streak++;cursor.setDate(cursor.getDate()-1);}
+    return result;
+  }
+  function add(data) {
+    if(!initialized) return;
+    const now=new Date();
+    const event={id:crypto.randomUUID(),at:now.toISOString(),date:dayKey(now),...data};
+    const list=events();list.push(event);write(list);notify();void sync();
+  }
+  async function sync() {
+    if(!client || actor==='guest')return;
+    if(syncing){resyncRequested=true;return;}
+    const owner=actor;syncing=true;
+    try {
+      // Idempotent immutable events avoid overwriting another device's progress.
+      const list=events();
+      for(let i=0;i<list.length;i+=100) {
+        const {error}=await client.from(TABLE).upsert(list.slice(i,i+100).map(e=>({user_id:owner,event_id:e.id,payload:e})),{onConflict:'user_id,event_id',ignoreDuplicates:true});
+        if(error)throw error;
+      }
+      const remote=[];
+      for(let offset=0;;offset+=1000) {
+        const {data,error}=await client.from(TABLE).select('payload').eq('user_id',owner).order('event_id').range(offset,offset+999);
+        if(error)throw error;remote.push(...data.map(row=>row.payload).filter(e=>typeof e?.module==='string'&&e.module.startsWith('sv_')));if(data.length<1000)break;
+      }
+      if(actor!==owner)return;
+      const merged=new Map([...remote,...events()].map(e=>[e.id,e]));write([...merged.values()]);status='Fortschritt mit deinem Konto synchronisiert.';
+    } catch (_) {
+      if(actor===owner)status='Lokal gespeichert. Cloud-Synchronisierung nicht möglich: Internetverbindung und Supabase-Einrichtung prüfen.';
+    } finally { syncing=false;notify();if(resyncRequested){resyncRequested=false;setTimeout(()=>{void sync();},0);} }
+  }
+  function loadSDK() {
+    if(window.supabase)return Promise.resolve(window.supabase);
+    return new Promise((resolve,reject)=>{
+      const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      script.onload=()=>resolve(window.supabase);script.onerror=reject;document.head.appendChild(script);
+    });
+  }
+  let readyResolve;
+  const ready=new Promise(resolve=>readyResolve=resolve);
+  const api={ready,summary,get events(){return ordered();},level:xp=>Math.floor(Math.max(0,xp)/100)+1,
+    get client(){return client;},get status(){return status;},get account(){return actor;},sync,
+    record(module,id,ok,review=false,text='',details=null) {
+      add({kind:'answer',module,question:String(id),ok:!!ok,review:!!review,text:String(text).slice(0,500),...(details ? {details:Object.fromEntries(['own','right','prompt','explanation','topic','file','type'].map(k=>[k,String(details[k]??'').replace(/<[^>]*>/g,'').slice(0,800)]).concat([['unanswered',!!details.unanswered]]))} : {})});
+    },
+    finish(module,pct){add({kind:'finish',module,pct:Math.min(100,Math.max(0,Number(pct)||0))});},
+    dueScore(module,id){const q=summary().modules[module]?.questions?.[String(id)];return !q?100:q.strength===0?200:Date.parse(q.due)<=Date.now()?120-q.strength:10-q.strength;},
+    moduleData(module) {
+      const m=summary().modules[module];
+      if(!m)return actor==='guest'?(read(module)||{}):{};
+      return {totalAttempts:m.answered,totalCorrect:m.correct,completed:m.completed,lastScore:m.lastScore,best:m.best,
+        mastery:Object.fromEntries(Object.entries(m.questions).map(([id,q])=>[id,q.strength])),
+        wrongIds:Object.entries(m.questions).filter(([,q])=>q.wrong>0&&q.strength<2).map(([id])=>Number(id))};
+    },
+    saveModuleData(module,data){try{localStorage.setItem('sv_module_cache_v1:'+actor+':'+module,JSON.stringify(data));}catch(_){}},
+  };
+  window.FRLearning=api;
+  (async()=>{
+    try {
+      const sdk=await loadSDK();client=sdk.createClient(URL,KEY,{auth:{detectSessionInUrl:!window.FRRecovery?.arrival}});
+      client.auth.onAuthStateChange((event,session)=>{window.FRRecovery?.mark(event,session);});
+      if(window.FRRecovery?.arrival)await window.FRRecovery.initialize(client);
+      const {data,error}=await client.auth.getSession();if(error)throw error;
+      actor=data.session?.user?.id||'guest';initialized=true;
+      status=actor==='guest'?'Fortschritt wird auf diesem Gerät gespeichert.':'Fortschritt wird synchronisiert …';
+      if(window.FRRecovery?.arrival)void sync();else await sync();
+      client.auth.onAuthStateChange((_event,session)=>{
+        const next=session?.user?.id||'guest';if(next===actor)return;
+        actor=next;status=actor==='guest'?'Gastmodus: lokal gespeichert.':'Fortschritt wird synchronisiert …';
+        notify();setTimeout(()=>{void sync();},0);
+      });
+    } catch (_) {initialized=true;status='Offline: Fortschritt wird lokal als Gast gespeichert.';}
+    finally {readyResolve();notify();}
+  })();
+  window.addEventListener('online',()=>{void sync();});
+  window.addEventListener('storage',event=>{if(event.key===PREFIX+actor)notify();});
+})();
+
+/* Premium: Anmeldung prüfen und die Supabase-Funktionen aufrufen. */
+(() => {
+  'use strict';
+  const base = 'https://npbiccwpyetefnlmjihd.supabase.co/functions/v1/';
+  const key = 'sb_publishable_b3PsFQ0rO-lYqbbr05e2Qg_-sGGgjSp';
+
+  async function call(name, body = {}) {
+    await window.FRLearning.ready;
+    const client = window.FRLearning.client;
+    if (!client) throw new Error('Die Anmeldung konnte nicht geladen werden. Lade die Seite neu.');
+    const { data, error } = await client.auth.getSession();
+    if (error || !data.session) throw new Error('Bitte melde dich zuerst an.');
+
+    let response;
+    try {
+      response = await fetch(base + name, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + data.session.access_token,
+          apikey: key,
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (_) {
+      throw new Error('Die Premium-Funktion ist nicht erreichbar. Prüfe deine Internetverbindung und die Supabase-Einrichtung.');
+    }
+
+    let result;
+    try { result = await response.json(); }
+    catch (_) { throw new Error('Die Premium-Funktion hat eine ungültige Antwort gesendet.'); }
+    if (!response.ok) {
+      throw new Error(result?.error || result?.message || 'Premium-Anfrage fehlgeschlagen (HTTP ' + response.status + ').');
+    }
+    return result;
+  }
+
+  async function redirect(name) {
+    const result = await call(name);
+    let destination;
+    try { destination = new URL(result.url); }
+    catch (_) { throw new Error('Stripe hat keinen gültigen Zahlungslink zurückgegeben.'); }
+    if (destination.protocol !== 'https:' ||
+        !['checkout.stripe.com', 'billing.stripe.com'].includes(destination.hostname)) {
+      throw new Error('Stripe hat einen unerwarteten Zahlungslink zurückgegeben.');
+    }
+    window.location.assign(destination.href);
+  }
+
+  window.FRPremium = {
+    call,
+    status: () => call('premium-access', { action: 'status' }),
+    checkout: () => redirect('create-checkout'),
+    portal: () => redirect('customer-portal'),
+    protectedFile: file => /^schwedisch-(?:[a-z]+(?:-[a-z]+)*-[23]-oberstufe(?:-mit-gemischten-schreibuebungen)?|pruefung-[123]-oberstufe)\.html$/.test(file) || file === 'schwedisch-15-minuten-lerneinheit.html',
+  };
+})();
+
+
+// Personal greeting in existing fox bubbles on every page using learning-core.
+(() => {
+ let name = '';
+ let observer;
+ function paint() {
+  observer?.disconnect();
+  document.querySelectorAll('#foxBubble, .fox-bubble').forEach(bubble => {
+   const previous = bubble.querySelector('[data-fox-name]');
+   if (previous && previous.textContent === name + ', ' && name) return;
+   if (previous) previous.remove();
+   if (name && bubble.textContent.trim()) {
+    const greeting = document.createElement('span');
+    greeting.dataset.foxName = '1';
+    greeting.textContent = name + ', ';
+    bubble.prepend(greeting);
+   }
+  });
+  if (document.body) observer.observe(document.body, {childList:true,subtree:true,characterData:true});
+ }
+ function sessionName(session) {
+  const value = session?.user?.user_metadata?.name;
+  name = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ').slice(0,60) : '';
+  paint();
+ }
+ async function start() {
+  observer = new MutationObserver(paint);
+  paint();
+  await window.FRLearning.ready;
+  const client = window.FRLearning.client;
+  if (!client) return;
+  client.auth.onAuthStateChange((_event,session) => sessionName(session));
+  const {data} = await client.auth.getSession();
+  sessionName(data.session);
+ }
+ window.addEventListener('frpremiumlessonloaded', paint);
+ if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => start().catch(()=>{}), {once:true});
+ else start().catch(()=>{});
+})();
+})();
+
+</script>
 
 <style id="fox-hover-swap-style">
 .fox-guide img{transition:transform .25s cubic-bezier(.4,0,.2,1),filter .2s ease,opacity .15s ease!important}
@@ -668,11 +934,11 @@ window.addEventListener('appinstalled', () => {
 @media(prefers-reduced-motion:reduce){.entry-card{transition:none}.entry-card:hover{transform:none}}
 </style><style id="foxora-welcome-reference">
 #hero{padding:150px clamp(20px,5vw,70px) 45px;min-height:0}.welcome-content{max-width:1200px;text-align:left}.welcome-top{display:grid;grid-template-columns:1.12fr 1fr;align-items:center;gap:30px}.welcome-copy .hero-title{font-size:clamp(40px,4.8vw,68px);line-height:1.12;margin:0 0 20px}.welcome-copy .hero-sub{margin:0 0 28px;max-width:none;font-size:20px}.welcome-start{display:inline-flex;align-items:center;justify-content:center;gap:24px;padding:17px 26px;border:1px solid var(--gold);border-radius:5px;background:var(--gold);color:var(--navy);text-decoration:none;font-family:var(--font-display);font-size:24px;font-weight:600;transition:background .2s,transform .2s}.welcome-start:hover{background:var(--gold-lt);transform:translateY(-2px)}.welcome-note{font-size:13px;color:var(--ice);margin-top:13px}
-.welcome-mascot{display:flex;align-items:flex-end;justify-content:center;gap:8px;min-width:0;position:relative}.welcome-fox{width:46%;max-width:245px;height:auto;object-fit:contain;filter:drop-shadow(0 12px 18px #0005);flex-shrink:1}.welcome-bubble{position:relative;background:#fff9ec;color:var(--navy);border:1px solid #d4af6099;border-radius:18px;padding:25px 22px;flex:1;max-width:280px;box-shadow:0 12px 25px #0003}.welcome-bubble:before{content:'';position:absolute;left:-10px;top:50%;width:18px;height:18px;background:#fff9ec;transform:rotate(45deg);border-left:1px solid #d4af6099;border-bottom:1px solid #d4af6099}.welcome-eyebrow{font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin:0 0 25px;color:#566078}.geia-sou-line{display:flex;align-items:center;justify-content:space-between;gap:12px}.geia-sou-line strong{font-family:var(--font-display);font-size:36px;white-space:nowrap}.geia-sou-line button{display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#e6eafa;color:#1c3674;width:44px;height:44px;flex-shrink:0;cursor:pointer;transition:background .2s}.geia-sou-line button:hover{background:#d2dcf7}.geia-sou-translation{font-size:20px;margin:4px 0 22px;color:#566078}.geia-sou-level{font-size:12px;border-top:1px solid #b7944033;padding-top:14px;margin:0;color:#566078}#geia-souStatus{font-size:12px;line-height:1.5;color:#566078;margin-top:12px}
-.welcome-paths{margin:45px auto 0}.welcome-paths h2{font:400 clamp(30px,3.4vw,44px)/1.2 var(--font-display);text-align:center;margin:0 0 8px}.welcome-paths>p{text-align:center;color:var(--ice);font-size:14px;margin:0 0 20px}.welcome-path-list{display:grid;gap:12px}.welcome-path{display:flex;align-items:center;gap:22px;padding:19px 25px;border:1px solid #c0d4f240;border-radius:8px;background:#121e4744;color:#fff;text-decoration:none}.welcome-path:hover{border-color:#b7944080;background:#ffffff06}.welcome-path>span:nth-child(2),.welcome-path summary>span:nth-child(2){flex:1}.welcome-path strong{display:block;font:600 25px/1.2 var(--font-display)}.welcome-path small{display:block;color:var(--ice);font-size:14px;margin-top:7px}.welcome-path-icon{width:48px;height:48px;display:flex;justify-content:center;align-items:center;border:1px solid #b7944040;border-radius:50%;color:var(--gold);font-size:24px;flex-shrink:0}.welcome-path-arrow{margin-left:auto;font-size:23px;color:var(--ice)}details.welcome-path{display:block;padding:0}details.welcome-path>summary{display:flex;align-items:center;gap:22px;padding:19px 25px;cursor:pointer;list-style:none;color:#fff}details.welcome-path>summary::-webkit-details-marker{display:none}details.welcome-path[open] .welcome-path-arrow{transform:rotate(180deg)}.welcome-path-menu{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 25px 20px 95px}.welcome-path-menu a{display:flex;justify-content:space-between;gap:12px;padding:13px 16px;border:1px solid #b7944066;border-radius:5px;color:var(--gold-lt);text-decoration:none;font-size:14px}.welcome-path-menu a:hover{background:#b7944015}.welcome-paths .welcome-premium{margin:23px 0 0;font-size:12px}.welcome-premium a{color:var(--gold-lt)}.welcome-start:focus-visible,.welcome-path:focus-visible,.welcome-path-menu a:focus-visible,#geia-souPlay:focus-visible{outline:2px solid var(--gold-lt);outline-offset:4px}
-@media(max-width:1050px){#hero{padding-top:185px}.welcome-top{gap:20px}.welcome-bubble{padding:22px 16px}.geia-sou-line strong{font-size:30px}}@media(max-width:750px){.welcome-top{grid-template-columns:1fr}.welcome-copy{text-align:center}.welcome-copy .hero-sub{font-size:17px}.welcome-start{font-size:21px}.welcome-mascot{max-width:500px;margin:20px auto 0;width:100%}.welcome-fox{max-width:210px}.welcome-paths{margin-top:32px}.welcome-path strong{font-size:22px}.welcome-path small{font-size:13px}.welcome-path,details.welcome-path>summary{padding:16px;gap:14px}.welcome-path-menu{padding:0 16px 16px;grid-template-columns:1fr}}@media(max-width:600px){#hero{padding-top:220px}.welcome-copy .hero-title{font-size:40px}.welcome-bubble{padding:20px 15px}.geia-sou-line strong{font-size:28px}.welcome-eyebrow{margin-bottom:17px}.geia-sou-line button{width:38px;height:38px}.welcome-path-icon{width:38px;height:38px;font-size:20px}}
+.welcome-mascot{display:flex;align-items:flex-end;justify-content:center;gap:8px;min-width:0;position:relative}.welcome-fox{width:46%;max-width:245px;height:auto;object-fit:contain;filter:drop-shadow(0 12px 18px #0005);flex-shrink:1}.welcome-bubble{position:relative;background:#fff9ec;color:var(--navy);border:1px solid #d4af6099;border-radius:18px;padding:25px 22px;flex:1;max-width:280px;box-shadow:0 12px 25px #0003}.welcome-bubble:before{content:'';position:absolute;left:-10px;top:50%;width:18px;height:18px;background:#fff9ec;transform:rotate(45deg);border-left:1px solid #d4af6099;border-bottom:1px solid #d4af6099}.welcome-eyebrow{font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin:0 0 25px;color:#566078}.hej-line{display:flex;align-items:center;justify-content:space-between;gap:12px}.hej-line strong{font-family:var(--font-display);font-size:36px;white-space:nowrap}.hej-line button{display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#e6eafa;color:#1c3674;width:44px;height:44px;flex-shrink:0;cursor:pointer;transition:background .2s}.hej-line button:hover{background:#d2dcf7}.hej-translation{font-size:20px;margin:4px 0 22px;color:#566078}.hej-level{font-size:12px;border-top:1px solid #b7944033;padding-top:14px;margin:0;color:#566078}#hejStatus{font-size:12px;line-height:1.5;color:#566078;margin-top:12px}
+.welcome-paths{margin:45px auto 0}.welcome-paths h2{font:400 clamp(30px,3.4vw,44px)/1.2 var(--font-display);text-align:center;margin:0 0 8px}.welcome-paths>p{text-align:center;color:var(--ice);font-size:14px;margin:0 0 20px}.welcome-path-list{display:grid;gap:12px}.welcome-path{display:flex;align-items:center;gap:22px;padding:19px 25px;border:1px solid #c0d4f240;border-radius:8px;background:#121e4744;color:#fff;text-decoration:none}.welcome-path:hover{border-color:#b7944080;background:#ffffff06}.welcome-path>span:nth-child(2),.welcome-path summary>span:nth-child(2){flex:1}.welcome-path strong{display:block;font:600 25px/1.2 var(--font-display)}.welcome-path small{display:block;color:var(--ice);font-size:14px;margin-top:7px}.welcome-path-icon{width:48px;height:48px;display:flex;justify-content:center;align-items:center;border:1px solid #b7944040;border-radius:50%;color:var(--gold);font-size:24px;flex-shrink:0}.welcome-path-arrow{margin-left:auto;font-size:23px;color:var(--ice)}details.welcome-path{display:block;padding:0}details.welcome-path>summary{display:flex;align-items:center;gap:22px;padding:19px 25px;cursor:pointer;list-style:none;color:#fff}details.welcome-path>summary::-webkit-details-marker{display:none}details.welcome-path[open] .welcome-path-arrow{transform:rotate(180deg)}.welcome-path-menu{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 25px 20px 95px}.welcome-path-menu a{display:flex;justify-content:space-between;gap:12px;padding:13px 16px;border:1px solid #b7944066;border-radius:5px;color:var(--gold-lt);text-decoration:none;font-size:14px}.welcome-path-menu a:hover{background:#b7944015}.welcome-paths .welcome-premium{margin:23px 0 0;font-size:12px}.welcome-premium a{color:var(--gold-lt)}.welcome-start:focus-visible,.welcome-path:focus-visible,.welcome-path-menu a:focus-visible,#hejPlay:focus-visible{outline:2px solid var(--gold-lt);outline-offset:4px}
+@media(max-width:1050px){#hero{padding-top:185px}.welcome-top{gap:20px}.welcome-bubble{padding:22px 16px}.hej-line strong{font-size:30px}}@media(max-width:750px){.welcome-top{grid-template-columns:1fr}.welcome-copy{text-align:center}.welcome-copy .hero-sub{font-size:17px}.welcome-start{font-size:21px}.welcome-mascot{max-width:500px;margin:20px auto 0;width:100%}.welcome-fox{max-width:210px}.welcome-paths{margin-top:32px}.welcome-path strong{font-size:22px}.welcome-path small{font-size:13px}.welcome-path,details.welcome-path>summary{padding:16px;gap:14px}.welcome-path-menu{padding:0 16px 16px;grid-template-columns:1fr}}@media(max-width:600px){#hero{padding-top:220px}.welcome-copy .hero-title{font-size:40px}.welcome-bubble{padding:20px 15px}.hej-line strong{font-size:28px}.welcome-eyebrow{margin-bottom:17px}.hej-line button{width:38px;height:38px}.welcome-path-icon{width:38px;height:38px;font-size:20px}}
 @media(prefers-reduced-motion:reduce){.welcome-start{transition:none}.welcome-start:hover{transform:none}}
-</style><style id="foxora-paris-background">#hero .hero-bg{background:linear-gradient(90deg,rgba(13,20,51,.3),rgba(13,20,51,.12)),url("athen-hintergrund.png") center top/cover no-repeat}#hero .hero-orb{display:none}</style><style id="foxora-learning-path-icons">.welcome-path-icon{width:52px;height:52px;border:1px solid #B7944055;background:#0d143322;color:#D4AF60;box-shadow:inset 0 0 0 3px #ffffff02}.welcome-path-icon svg{display:block;width:28px;height:28px;flex-shrink:0}.welcome-path:hover .welcome-path-icon{border-color:#D4AF6099;background:#b7944010}@media(max-width:600px){.welcome-path-icon{width:42px;height:42px}.welcome-path-icon svg{width:24px;height:24px}}</style><style id="foxora-fox-ground">
+</style><style id="foxora-paris-background">#hero .hero-bg{background:linear-gradient(90deg,rgba(13,20,51,.3),rgba(13,20,51,.12)),url("stockholm-hintergrund.png") center top/cover no-repeat}#hero .hero-orb{display:none}</style><style id="foxora-learning-path-icons">.welcome-path-icon{width:52px;height:52px;border:1px solid #B7944055;background:#0d143322;color:#D4AF60;box-shadow:inset 0 0 0 3px #ffffff02}.welcome-path-icon svg{display:block;width:28px;height:28px;flex-shrink:0}.welcome-path:hover .welcome-path-icon{border-color:#D4AF6099;background:#b7944010}@media(max-width:600px){.welcome-path-icon{width:42px;height:42px}.welcome-path-icon svg{width:24px;height:24px}}</style><style id="foxora-fox-ground">
 .welcome-fox-ground{position:relative;isolation:isolate;width:46%;max-width:245px;flex:0 1 245px;align-self:flex-end;margin-bottom:0}
 .welcome-fox-ground:before{content:'';position:absolute;z-index:-1;left:-12%;bottom:-9px;width:124%;height:38px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(3,8,22,.75) 0%,rgba(7,13,33,.48) 38%,rgba(14,25,53,.18) 65%,transparent 78%);filter:blur(5px);pointer-events:none}
 .welcome-fox-ground:after{content:'';position:absolute;left:13%;bottom:0;width:74%;height:13px;border-radius:50%;background:radial-gradient(ellipse,rgba(2,6,17,.58),transparent 72%);filter:blur(2px);pointer-events:none;z-index:-1}
@@ -687,7 +953,7 @@ window.addEventListener('appinstalled', () => {
 .welcome-path:hover{background:rgba(18,30,71,.98);border-color:rgba(212,175,96,.72)}
 .welcome-path-menu a{background:rgba(13,20,51,.96);border-color:rgba(212,175,96,.65)}
 .welcome-path-menu a:hover,.welcome-path-menu a:focus-visible{background:#26345d;color:#fff;border-color:var(--gold-lt)}
-</style><style id="foxora-greek-greeting">.geia-sou-line strong{font-size:30px}@media(max-width:600px){.geia-sou-line strong{font-size:23px;white-space:normal}}</style></head>
+</style></head>
 <body>
 
 
@@ -701,7 +967,7 @@ window.addEventListener('appinstalled', () => {
     <li><a href="#Fortschritt">Mein Fortschritt</a></li>
   <li class="foxora-more-item"><details class="foxora-more-switcher"><summary>Mehr <span class="foxora-chevron" aria-hidden="true">⌄</span></summary><div class="foxora-more-menu" aria-label="Weitere Bereiche"><a href="#theorie">Theorie</a><a href="#Pruefung">Prüfung</a><a href="#lernwerkstatt">Lernwerkstatt</a></div></details></li></ul></div>
   <div class="nav-account-actions">
-<details class="foxora-language-switcher"><summary aria-label="Griechisch – Sprache wechseln"><span class="foxora-language-label"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0.0" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="6.666666666666667" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="13.333333333333334" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="20.0" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="26.666666666666668" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="33.333333333333336" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="40.0" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="46.666666666666664" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="53.333333333333336" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="0" width="34" height="34" fill="#0d5eaf"/><rect x="13.6" y="0" width="6.8" height="34" fill="#fff"/><rect x="0" y="13.6" width="34" height="6.8" fill="#fff"/></svg></span> Griechisch</span><span class="foxora-chevron" aria-hidden="true">⌄</span></summary><div class="foxora-language-menu" aria-label="Alle Sprachen"><a href="../main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="30" height="60" fill="#002395"/><rect x="30" y="0" width="30" height="60" fill="#fff"/><rect x="60" y="0" width="30" height="60" fill="#ed2939"/></svg></span> Französisch</a><a href="../english/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#012169"/><path d="M0 0l90 60M90 0L0 60" stroke="#fff" stroke-width="12"/><path d="M0 0l90 60M90 0L0 60" stroke="#c8102e" stroke-width="4"/><rect x="36" y="0" width="18" height="60" fill="#fff"/><rect x="0" y="21" width="90" height="18" fill="#fff"/><rect x="40" y="0" width="10" height="60" fill="#c8102e"/><rect x="0" y="25" width="90" height="10" fill="#c8102e"/></svg></span> Englisch</a><a href="../italian/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="30" height="60" fill="#009246"/><rect x="30" y="0" width="30" height="60" fill="#fff"/><rect x="60" y="0" width="30" height="60" fill="#ce2b37"/></svg></span> Italienisch</a><a href="../spanish/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#aa151b"/><rect x="0" y="15" width="90" height="30" fill="#f1bf00"/><path d="M23 23h10v13q-5 8-10 0z" fill="#aa151b" stroke="#fff" stroke-width="1.5"/><path d="M23 21h10" stroke="#aa151b" stroke-width="3"/></svg></span> Spanisch</a><a href="../portuguese/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="36" height="60" fill="#006600"/><rect x="36" y="0" width="54" height="60" fill="#ff0000"/><circle cx="36" cy="30" r="13" fill="none" stroke="#ffcc00" stroke-width="3"/><path d="M29 21h14v15q-7 10-14 0z" fill="#fff" stroke="#c00" stroke-width="3"/><path d="M33 26h6v9h-6z" fill="#036"/></svg></span> Portugiesisch</a><a href="main.html" aria-current="page"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0.0" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="6.666666666666667" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="13.333333333333334" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="20.0" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="26.666666666666668" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="33.333333333333336" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="40.0" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="46.666666666666664" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="53.333333333333336" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="0" width="34" height="34" fill="#0d5eaf"/><rect x="13.6" y="0" width="6.8" height="34" fill="#fff"/><rect x="0" y="13.6" width="34" height="6.8" fill="#fff"/></svg></span> Griechisch</a><a href="../dutch/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="20" fill="#ae1c28"/><rect x="0" y="20" width="90" height="20" fill="#fff"/><rect x="0" y="40" width="90" height="20" fill="#21468b"/></svg></span> Niederländisch</a><a href="../swedish/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#006aa7"/><rect x="27" y="0" width="12" height="60" fill="#fecc00"/><rect x="0" y="24" width="90" height="12" fill="#fecc00"/></svg></span> Schwedisch</a><a href="../turkish/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#e30a17"/><circle cx="36" cy="30" r="16" fill="#fff"/><circle cx="40" cy="30" r="13" fill="#e30a17"/><path d="M57 21l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#fff"/></svg></span> Türkisch</a><a href="../korean/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#fff"/><circle cx="45" cy="30" r="15" fill="#cd2e3a"/><path d="M30 30a15 15 0 0 0 30 0a7.5 7.5 0 0 0-15 0a7.5 7.5 0 0 1-15 0" fill="#0047a0"/><g transform="translate(19 15) rotate(-55)"><rect x="-7" y="-5" width="14" height="2.4" fill="#000"/><rect x="-7" y="-1" width="14" height="2.4" fill="#000"/><rect x="-7" y="3" width="14" height="2.4" fill="#000"/></g><g transform="translate(71 15) rotate(55)"><rect x="-7" y="-5" width="6" height="2.4" fill="#000"/><rect x="1" y="-5" width="6" height="2.4" fill="#000"/><rect x="-7" y="-1" width="14" height="2.4" fill="#000"/><rect x="-7" y="3" width="6" height="2.4" fill="#000"/><rect x="1" y="3" width="6" height="2.4" fill="#000"/></g><g transform="translate(19 45) rotate(55)"><rect x="-7" y="-5" width="14" height="2.4" fill="#000"/><rect x="-7" y="-1" width="6" height="2.4" fill="#000"/><rect x="1" y="-1" width="6" height="2.4" fill="#000"/><rect x="-7" y="3" width="14" height="2.4" fill="#000"/></g><g transform="translate(71 45) rotate(-55)"><rect x="-7" y="-5" width="6" height="2.4" fill="#000"/><rect x="1" y="-5" width="6" height="2.4" fill="#000"/><rect x="-7" y="-1" width="6" height="2.4" fill="#000"/><rect x="1" y="-1" width="6" height="2.4" fill="#000"/><rect x="-7" y="3" width="6" height="2.4" fill="#000"/><rect x="1" y="3" width="6" height="2.4" fill="#000"/></g></svg></span> Koreanisch</a><a href="../japanese/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#fff"/><circle cx="45" cy="30" r="18" fill="#bc002d"/></svg></span> Japanisch</a><a href="../german/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="20" fill="#000"/><rect x="0" y="20" width="90" height="20" fill="#dd0000"/><rect x="0" y="40" width="90" height="20" fill="#ffce00"/></svg></span> Deutsch</a></div></details>
+<details class="foxora-language-switcher"><summary aria-label="Schwedisch – Sprache wechseln"><span class="foxora-language-label"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#006aa7"/><rect x="27" y="0" width="12" height="60" fill="#fecc00"/><rect x="0" y="24" width="90" height="12" fill="#fecc00"/></svg></span> Schwedisch</span><span class="foxora-chevron" aria-hidden="true">⌄</span></summary><div class="foxora-language-menu" aria-label="Alle Sprachen"><a href="../main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="30" height="60" fill="#002395"/><rect x="30" y="0" width="30" height="60" fill="#fff"/><rect x="60" y="0" width="30" height="60" fill="#ed2939"/></svg></span> Französisch</a><a href="../english/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#012169"/><path d="M0 0l90 60M90 0L0 60" stroke="#fff" stroke-width="12"/><path d="M0 0l90 60M90 0L0 60" stroke="#c8102e" stroke-width="4"/><rect x="36" y="0" width="18" height="60" fill="#fff"/><rect x="0" y="21" width="90" height="18" fill="#fff"/><rect x="40" y="0" width="10" height="60" fill="#c8102e"/><rect x="0" y="25" width="90" height="10" fill="#c8102e"/></svg></span> Englisch</a><a href="../italian/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="30" height="60" fill="#009246"/><rect x="30" y="0" width="30" height="60" fill="#fff"/><rect x="60" y="0" width="30" height="60" fill="#ce2b37"/></svg></span> Italienisch</a><a href="../spanish/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#aa151b"/><rect x="0" y="15" width="90" height="30" fill="#f1bf00"/><path d="M23 23h10v13q-5 8-10 0z" fill="#aa151b" stroke="#fff" stroke-width="1.5"/><path d="M23 21h10" stroke="#aa151b" stroke-width="3"/></svg></span> Spanisch</a><a href="../portuguese/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="36" height="60" fill="#006600"/><rect x="36" y="0" width="54" height="60" fill="#ff0000"/><circle cx="36" cy="30" r="13" fill="none" stroke="#ffcc00" stroke-width="3"/><path d="M29 21h14v15q-7 10-14 0z" fill="#fff" stroke="#c00" stroke-width="3"/><path d="M33 26h6v9h-6z" fill="#036"/></svg></span> Portugiesisch</a><a href="../greek/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0.0" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="6.666666666666667" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="13.333333333333334" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="20.0" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="26.666666666666668" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="33.333333333333336" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="40.0" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="46.666666666666664" width="90" height="6.666666666666667" fill="#fff"/><rect x="0" y="53.333333333333336" width="90" height="6.666666666666667" fill="#0d5eaf"/><rect x="0" y="0" width="34" height="34" fill="#0d5eaf"/><rect x="13.6" y="0" width="6.8" height="34" fill="#fff"/><rect x="0" y="13.6" width="34" height="6.8" fill="#fff"/></svg></span> Griechisch</a><a href="../dutch/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="20" fill="#ae1c28"/><rect x="0" y="20" width="90" height="20" fill="#fff"/><rect x="0" y="40" width="90" height="20" fill="#21468b"/></svg></span> Niederländisch</a><a href="main.html" aria-current="page"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#006aa7"/><rect x="27" y="0" width="12" height="60" fill="#fecc00"/><rect x="0" y="24" width="90" height="12" fill="#fecc00"/></svg></span> Schwedisch</a><a href="../turkish/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#e30a17"/><circle cx="36" cy="30" r="16" fill="#fff"/><circle cx="40" cy="30" r="13" fill="#e30a17"/><path d="M57 21l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#fff"/></svg></span> Türkisch</a><a href="../korean/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#fff"/><circle cx="45" cy="30" r="15" fill="#cd2e3a"/><path d="M30 30a15 15 0 0 0 30 0a7.5 7.5 0 0 0-15 0a7.5 7.5 0 0 1-15 0" fill="#0047a0"/><g transform="translate(19 15) rotate(-55)"><rect x="-7" y="-5" width="14" height="2.4" fill="#000"/><rect x="-7" y="-1" width="14" height="2.4" fill="#000"/><rect x="-7" y="3" width="14" height="2.4" fill="#000"/></g><g transform="translate(71 15) rotate(55)"><rect x="-7" y="-5" width="6" height="2.4" fill="#000"/><rect x="1" y="-5" width="6" height="2.4" fill="#000"/><rect x="-7" y="-1" width="14" height="2.4" fill="#000"/><rect x="-7" y="3" width="6" height="2.4" fill="#000"/><rect x="1" y="3" width="6" height="2.4" fill="#000"/></g><g transform="translate(19 45) rotate(55)"><rect x="-7" y="-5" width="14" height="2.4" fill="#000"/><rect x="-7" y="-1" width="6" height="2.4" fill="#000"/><rect x="1" y="-1" width="6" height="2.4" fill="#000"/><rect x="-7" y="3" width="14" height="2.4" fill="#000"/></g><g transform="translate(71 45) rotate(-55)"><rect x="-7" y="-5" width="6" height="2.4" fill="#000"/><rect x="1" y="-5" width="6" height="2.4" fill="#000"/><rect x="-7" y="-1" width="6" height="2.4" fill="#000"/><rect x="1" y="-1" width="6" height="2.4" fill="#000"/><rect x="-7" y="3" width="6" height="2.4" fill="#000"/><rect x="1" y="3" width="6" height="2.4" fill="#000"/></g></svg></span> Koreanisch</a><a href="../japanese/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#fff"/><circle cx="45" cy="30" r="18" fill="#bc002d"/></svg></span> Japanisch</a><a href="../german/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="20" fill="#000"/><rect x="0" y="20" width="90" height="20" fill="#dd0000"/><rect x="0" y="40" width="90" height="20" fill="#ffce00"/></svg></span> Deutsch</a></div></details>
     <a href="#Premium" class="account-link nav-cta" id="premiumNav">Premium</a>
     <a href="#Konto" class="account-link nav-cta" id="accountNav">Anmelden</a>
   </div>
@@ -716,12 +982,12 @@ window.addEventListener('appinstalled', () => {
 
   <div class="hero-content welcome-content">
 <div class="welcome-top">
-<div class="welcome-copy"><h1 class="hero-title">Dein <em>Griechisch.</em><br>Schritt für Schritt.</h1><p class="hero-sub">Verstehen, üben und im Alltag anwenden.</p><a class="welcome-start" href="griechisch-eimai-exo-1-oberstufe.html">Starte deine erste Lektion <span aria-hidden="true">→</span></a><p class="welcome-note">Niveau 1 kostenlos · Starte mit den Grundlagen</p></div>
-<div class="welcome-mascot"><div class="welcome-fox-ground"><img class="welcome-fox" src="fuchs-mit-standflaeche.png" alt="Griechischer Lernfuchs"></div><div class="welcome-bubble"><p class="welcome-eyebrow">Deine erste Lektion</p><div class="geia-sou-line"><strong lang="el">Γεια σου!</strong><button type="button" id="geia-souPlay" aria-label="Γεια σου anhören" title="Γεια σου anhören"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9z" fill="currentColor"/><path d="M16 8q5 4 0 8M19 5q8 7 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div><p class="geia-sou-translation">Hallo!</p><p class="geia-sou-level">📖 Niveau 1 · Grundlagen</p><p id="geia-souStatus" role="status" hidden></p><audio id="geia-souAudio" preload="none" src="audio/jetzt-anwenden/geia-sou.mp3"></audio></div></div>
+<div class="welcome-copy"><h1 class="hero-title">Dein <em>Schwedisch.</em><br>Schritt für Schritt.</h1><p class="hero-sub">Verstehen, üben und im Alltag anwenden.</p><a class="welcome-start" href="schwedisch-vara-ha-1-oberstufe.html">Starte deine erste Lektion <span aria-hidden="true">→</span></a><p class="welcome-note">Niveau 1 kostenlos · Starte mit den Grundlagen</p></div>
+<div class="welcome-mascot"><div class="welcome-fox-ground"><img class="welcome-fox" src="fuchs-mit-standflaeche.png" alt="Schwedischer Lernfuchs"></div><div class="welcome-bubble"><p class="welcome-eyebrow">Deine erste Lektion</p><div class="hej-line"><strong lang="sv">Hej!</strong><button type="button" id="hejPlay" aria-label="Hej anhören" title="Hej anhören"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9z" fill="currentColor"/><path d="M16 8q5 4 0 8M19 5q8 7 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div><p class="hej-translation">Hallo!</p><p class="hej-level">📖 Niveau 1 · Grundlagen</p><p id="hejStatus" role="status" hidden></p><audio id="hejAudio" preload="none" src="audio/jetzt-anwenden/hej.mp3"></audio></div></div>
 </div>
 <div class="welcome-paths"><h2>Oder wähle deinen Lernweg</h2><p>Alles Weitere findest du hier.</p><div class="welcome-path-list">
 <details class="welcome-path welcome-grammar"><summary><span class="welcome-path-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1m0-14c3-2 6-2 9-1v14c-3-1-6-1-9 1V6z"/></svg></span><span><strong>Grammatik &amp; Theorie</strong><small>Regeln verstehen und gezielt üben</small></span><span class="welcome-path-arrow" aria-hidden="true">⌄</span></summary><div class="welcome-path-menu"><a href="#Grammatik">Grammatikübungen <span aria-hidden="true">→</span></a><a href="#theorie">Theorie &amp; Übersichten <span aria-hidden="true">→</span></a></div></details>
-<a class="welcome-path" href="#Alltag"><span class="welcome-path-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M6.5 21v-4a5.5 5.5 0 0 1 11 0v4"/><path d="M5 5a2.5 2.5 0 1 0 0 5m14-5a2.5 2.5 0 1 1 0 5M3 13a4 4 0 0 0-2 3v4m20-7a4 4 0 0 1 2 3v4"/></svg></span><span><strong>Griechisch im Alltag</strong><small>Familie, Schule, Einkaufen und Reisen</small></span><span class="welcome-path-arrow" aria-hidden="true">→</span></a>
+<a class="welcome-path" href="#Alltag"><span class="welcome-path-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M6.5 21v-4a5.5 5.5 0 0 1 11 0v4"/><path d="M5 5a2.5 2.5 0 1 0 0 5m14-5a2.5 2.5 0 1 1 0 5M3 13a4 4 0 0 0-2 3v4m20-7a4 4 0 0 1 2 3v4"/></svg></span><span><strong>Schwedisch im Alltag</strong><small>Familie, Schule, Einkaufen und Reisen</small></span><span class="welcome-path-arrow" aria-hidden="true">→</span></a>
 <a class="welcome-path" href="#lernwerkstatt"><span class="welcome-path-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="15" rx="2"/><path d="M8 7V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M7 17h5"/></svg></span><span><strong>Karteikarten &amp; Prüfungstraining</strong><small>Wiederholen und dein Wissen testen</small></span><span class="welcome-path-arrow" aria-hidden="true">→</span></a>
 </div><p class="welcome-premium">Weitere Niveaus und Funktionen mit <a href="#Premium">Premium</a>.</p></div>
 </div></section>
@@ -731,26 +997,26 @@ window.addEventListener('appinstalled', () => {
 
 <!-- Spi -->
 <section id="theorie" style="background:#F5F7FC;color:#0D1433">
-<div class="Spi-header reveal"><p class="section-label">Theorie</p><h2 class="section-title" style="color:#0D1433">Griechisch <em>verstehen</em></h2><div class="gold-bar"></div><p class="section-body" style="color:#2E406B">Öffne die Theoriekarten und wähle dein Thema. Die Grammatiktheorie bietet drei Niveaus; die Übersichten helfen beim Nachschlagen.</p></div>
-<div class="exercise-categories" style="grid-template-columns:1fr"><article class="topic-card"><div class="topic-top"><h3>Theorie &amp; Übersichten</h3></div><p>Grammatik verstehen, Zahlen nachschlagen und wichtige Verbformen wiederholen.</p><button class="level-btn category-button" id="chooseTheory" aria-controls="Theoriekarten" aria-expanded="false">Theoriekarten öffnen →</button></article></div><div id="Theoriekarten" class="exercise-panel" hidden><div class="Spi-grid"><a href="griechisch-theorie-eimai-exo.html" class="service-card reveal"><div class="service-num">01</div><div class="service-title">🔤 Είμαι &amp; Έχω</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-arthra-plithyntikos.html" class="service-card reveal"><div class="service-num">02</div><div class="service-title">📘 Artikel &amp; Plural</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-epitheta.html" class="service-card reveal"><div class="service-num">03</div><div class="service-title">🎨 Adjektive &amp; Vergleiche</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-antonimies.html" class="service-card reveal"><div class="service-num">04</div><div class="service-title">👤 Pronomen</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-modales.html" class="service-card reveal"><div class="service-num">05</div><div class="service-title">🚫 Können, Müssen &amp; Ratschläge</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-erotiseis-arnisi.html" class="service-card reveal"><div class="service-num">06</div><div class="service-title">❓ Fragen &amp; Verneinung</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-protheseis.html" class="service-card reveal"><div class="service-num">07</div><div class="service-title">📍 Präpositionen</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-ypothetikes.html" class="service-card reveal"><div class="service-num">08</div><div class="service-title">💭 Wünsche &amp; Hypothesen</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-aoristos.html" class="service-card reveal"><div class="service-num">09</div><div class="service-title">⏮️ Αόριστος · Abgeschlossene Vergangenheit</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-paratatikos.html" class="service-card reveal"><div class="service-num">10</div><div class="service-title">🕰️ Παρατατικός · Hintergrund &amp; Gewohnheiten</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-mellontas.html" class="service-card reveal"><div class="service-num">11</div><div class="service-title">⏭️ Μέλλοντας · Zukunft</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Regeln, Beispiele, Merksätze und typische Fehler.</div></a><a href="griechisch-theorie-enestotas.html" class="service-card reveal"><div class="service-num">12</div><div class="service-title">⚡ Ενεστώτας · Gegenwart</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Bildung des Präsens, regelmässige und unregelmässige Verbformen.</div></a>
-<a href="griechisch-unregelmaessige-verben-liste.html" class="service-card reveal">
+<div class="Spi-header reveal"><p class="section-label">Theorie</p><h2 class="section-title" style="color:#0D1433">Schwedisch <em>verstehen</em></h2><div class="gold-bar"></div><p class="section-body" style="color:#2E406B">13 Themen statt 39 einzelner Seiten: Öffne ein Thema und wechsle dort direkt zwischen Niveau 1, 2 und 3.</p></div>
+<div class="Spi-grid"><a href="schwedisch-theorie-vara-ha.html" class="service-card reveal"><div class="service-num">01</div><div class="service-title">🔤 Vara &amp; Ha</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Personen vorstellen und Besitz ausdrücken.</div></a><a href="schwedisch-theorie-artikel-plural.html" class="service-card reveal"><div class="service-num">02</div><div class="service-title">📘 Artikel &amp; Mehrzahl</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Nomen mit passenden Artikeln und Mengen verwenden.</div></a><a href="schwedisch-theorie-adjektive-adverbien.html" class="service-card reveal"><div class="service-num">03</div><div class="service-title">🎨 Adjektive &amp; Adverbien</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Eigenschaften und Handlungen genauer beschreiben.</div></a><a href="schwedisch-theorie-pronomen-praepositionen.html" class="service-card reveal"><div class="service-num">04</div><div class="service-title">👤 Pronomen &amp; Präpositionen</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Personen, Besitz, Ort und Zeit ausdrücken.</div></a><a href="schwedisch-theorie-fragen-verneinung.html" class="service-card reveal"><div class="service-num">05</div><div class="service-title">🚫 Fragen &amp; Verneinung</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Informationen erfragen und Aussagen verneinen.</div></a><a href="schwedisch-theorie-satzbau.html" class="service-card reveal"><div class="service-num">06</div><div class="service-title">❓ Satzbau &amp; Wortstellung</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Hauptsätze, Fragen und Nebensätze mit passender Wortstellung bilden.</div></a><a href="schwedisch-theorie-zukunft.html" class="service-card reveal"><div class="service-num">07</div><div class="service-title">📍 Zukunft: ska &amp; kommer att</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Pläne und Vorhersagen formulieren.</div></a><a href="schwedisch-theorie-konditional.html" class="service-card reveal"><div class="service-num">08</div><div class="service-title">💭 Konditional &amp; Bedingungen</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Bedingungen und mögliche Folgen ausdrücken.</div></a><a href="schwedisch-theorie-preteritum.html" class="service-card reveal"><div class="service-num">09</div><div class="service-title">⏮️ Preteritum</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Abgeschlossene Ereignisse erzählen.</div></a><a href="schwedisch-theorie-plusquamperfekt.html" class="service-card reveal"><div class="service-num">10</div><div class="service-title">🕰️ Plusquamperfekt</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Vorzeitigkeit mit hade und dem Supinum ausdrücken.</div></a><a href="schwedisch-theorie-perfekt.html" class="service-card reveal"><div class="service-num">11</div><div class="service-title">⏭️ Perfekt</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Erfahrungen und Ergebnisse mit Bezug zur Gegenwart ausdrücken.</div></a><a href="schwedisch-theorie-praesens.html" class="service-card reveal"><div class="service-num">12</div><div class="service-title">⚡ Präsens</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Gewohnheiten und regelmässige Abläufe beschreiben.</div></a>
+<a href="schwedisch-unregelmaessige-verben-liste.html" class="service-card reveal">
   <div class="service-title">📚 Liste der unregelmässigen Verben</div>
   <div class="service-desc">Nachschlagen &amp; lernen · übersichtliche Verbliste mit Präsens sowie wichtigen Zeitformen und Modi.</div>
 </a>
-<a href="griechisch-theorie-ypotaktiki.html" class="service-card reveal"><div class="service-num">13</div><div class="service-title">✨ Να-Konstruktionen &amp; Aufforderungen</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · να-Konstruktionen, Wünsche, Aufforderungen und die Wahl der Verbform.</div></a><a href="griechisch-theorie-zahlen.html" class="service-card reveal"><div class="service-title">🔢 Zahlenübersicht</div><div class="service-desc">Zahlen von 0 bis 100, grosse Zahlen, Ordnungszahlen, Uhrzeiten und Preise · mit Regeln und Beispielen.</div></a></div></div></section>
-<section id="Spi"><div class="Spi-header reveal"><p class="section-label">Interaktive Übungen</p><h2 class="section-title">Was möchtest du <em>üben?</em></h2><div class="gold-bar"></div><p class="section-body">Wähle Grammatik oder Bezug zum Alltag. Niveau 1 ist kostenlos, Niveau 2 und 3 gehören zu Premium.</p></div><details class="entry-goals"><summary>Was lerne ich hier?</summary><div class="level-learning-goals" aria-label="Lernziele der drei Niveaus"><article class="learning-goals"><h3>Niveau 1 · Grundlagen</h3><p>Du kannst dich vorstellen, einfache Fragen stellen und Wünsche ausdrücken.</p></article><article class="learning-goals"><h3>Niveau 2 · Alltag sicher meistern</h3><p>Du kannst von Erlebnissen erzählen, Pläne erklären und höflich um Hilfe bitten.</p></article><article class="learning-goals"><h3>Niveau 3 · Zusammenhängend ausdrücken</h3><p>Du kannst Meinungen begründen, Probleme erklären und Lösungsvorschläge machen.</p></article></div><p class="goals-note">Die Niveaus beschreiben unsere internen Schwierigkeitsstufen. Sie sind keine zertifizierten A1-, A2- oder B1-Stufen.</p></details><div class="exercise-categories"><article class="topic-card"><div class="topic-top"><h3>Grammatik</h3></div><p>Übungen zu Verben, Artikeln, Adjektiven und weiteren Themen.</p><button class="level-btn category-button" id="chooseGrammar" aria-controls="Grammatik" aria-expanded="false">Grammatik öffnen →</button></article><article class="topic-card"><div class="topic-top"><h3>Bezug zum Alltag</h3></div><p>Griechisch in Familie, Freizeit, Schule, beim Essen, Einkaufen und Reisen anwenden.</p><button class="level-btn category-button" id="chooseEveryday" aria-controls="Alltag" aria-expanded="false">Alltagsthemen öffnen →</button></article></div><div id="Grammatik" class="exercise-panel" hidden><h3 class="exercise-panel-title">Grammatik</h3><div class="Spi-grid"><article class="topic-card reveal"><div class="topic-top"><h3>Είμαι &amp; Έχω</h3></div><details class="topic-details"><summary>Details</summary><p>Personen, Zustände und Besitz beschreiben.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-eimai-exo-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-eimai-exo-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-eimai-exo-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Artikel &amp; Plural</h3></div><details class="topic-details"><summary>Details</summary><p>Geschlecht, Artikel und Mehrzahl von Nomen verwenden.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-arthra-plithyntikos-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-arthra-plithyntikos-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-arthra-plithyntikos-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Adjektive &amp; Vergleiche</h3></div><details class="topic-details"><summary>Details</summary><p>Eigenschaften beschreiben und vergleichen.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-epitheta-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-epitheta-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-epitheta-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Pronomen</h3></div><details class="topic-details"><summary>Details</summary><p>Personen und Dinge durch passende Pronomen ersetzen.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-antonimies-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-antonimies-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-antonimies-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Können, Müssen &amp; Ratschläge</h3></div><details class="topic-details"><summary>Details</summary><p>Fähigkeiten, Pflichten und Empfehlungen ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-modales-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-modales-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-modales-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Fragen &amp; Verneinung</h3></div><details class="topic-details"><summary>Details</summary><p>Informationen erfragen und Aussagen verneinen.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-erotiseis-arnisi-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-erotiseis-arnisi-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-erotiseis-arnisi-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Präpositionen</h3></div><details class="topic-details"><summary>Details</summary><p>Ort, Richtung und Dauer ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-protheseis-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-protheseis-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-protheseis-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Wünsche &amp; Hypothesen</h3></div><details class="topic-details"><summary>Details</summary><p>Höfliche Wünsche und hypothetische Folgen formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-ypothetikes-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-ypothetikes-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-ypothetikes-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Αόριστος · Abgeschlossene Vergangenheit</h3></div><details class="topic-details"><summary>Details</summary><p>Abgeschlossene vergangene Ereignisse erzählen.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-aoristos-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-aoristos-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-aoristos-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Παρατατικός · Hintergrund &amp; Gewohnheiten</h3></div><details class="topic-details"><summary>Details</summary><p>Frühere Gewohnheiten und laufende Handlungen ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-paratatikos-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-paratatikos-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-paratatikos-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Μέλλοντας · Zukunft</h3></div><details class="topic-details"><summary>Details</summary><p>Pläne und zukünftige Möglichkeiten beschreiben.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-mellontas-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-mellontas-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-mellontas-3-oberstufe.html">Niveau 3</a></div></article>
-<article class="topic-card reveal"><div class="topic-top"><h3>Ενεστώτας · Gegenwart</h3></div><details class="topic-details"><summary>Details</summary><p>Gewohnheiten und aktuelle Tätigkeiten beschreiben.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-enestotas-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-enestotas-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-enestotas-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card reveal"><div class="topic-top"><h3>Να-Konstruktionen &amp; Aufforderungen</h3></div><details class="topic-details"><summary>Details</summary><p>Wünsche, Bewertungen und Aufforderungen formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-ypotaktiki-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-ypotaktiki-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-ypotaktiki-3-oberstufe.html">Niveau 3</a></div></article></div>
-</div><div id="Alltag" class="exercise-panel" hidden><h3 class="exercise-panel-title">Bezug zum Alltag</h3><div class="Spi-grid"><article class="topic-card"><div class="topic-top"><h3>Familie</h3></div><details class="topic-details"><summary>Details</summary><p>Gespräche verstehen und passende eigene Aussagen zum Thema Familie formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-alltag-familie-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-alltag-familie-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-alltag-familie-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Essen &amp; Trinken</h3></div><details class="topic-details"><summary>Details</summary><p>Gespräche verstehen und passende eigene Aussagen zum Thema Essen &amp; Trinken formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-alltag-essen-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-alltag-essen-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-alltag-essen-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Hobbys &amp; Freizeit</h3></div><details class="topic-details"><summary>Details</summary><p>Gespräche verstehen und passende eigene Aussagen zum Thema Hobbys &amp; Freizeit formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-alltag-hobbys-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-alltag-hobbys-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-alltag-hobbys-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Schule &amp; Lernen</h3></div><details class="topic-details"><summary>Details</summary><p>Gespräche verstehen und passende eigene Aussagen zum Thema Schule &amp; Lernen formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-alltag-schule-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-alltag-schule-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-alltag-schule-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Einkaufen</h3></div><details class="topic-details"><summary>Details</summary><p>Gespräche verstehen und passende eigene Aussagen zum Thema Einkaufen formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-alltag-einkaufen-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-alltag-einkaufen-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-alltag-einkaufen-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Reisen &amp; Unterwegs</h3></div><details class="topic-details"><summary>Details</summary><p>Gespräche verstehen und passende eigene Aussagen zum Thema Reisen &amp; Unterwegs formulieren.</p></details><div class="level-picker"><a class="level-btn" href="griechisch-alltag-reisen-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="griechisch-alltag-reisen-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="griechisch-alltag-reisen-3-oberstufe.html">Niveau 3</a></div></article></div></div></section>
+<a href="schwedisch-theorie-modalverben.html" class="service-card reveal"><div class="service-num">13</div><div class="service-title">✨ Modalverben</div><div class="service-desc">Theorie für Niveau 1, 2 und 3 · Fähigkeiten, Regeln und Ratschläge ausdrücken.</div></a></div></section>
+<section id="Spi"><div class="Spi-header reveal"><p class="section-label">Interaktive Übungen</p><h2 class="section-title">Was möchtest du <em>üben?</em></h2><div class="gold-bar"></div><p class="section-body">Wähle Grammatik oder Bezug zum Alltag. Niveau 1 ist kostenlos, Niveau 2 und 3 gehören zu Premium.</p></div><details class="entry-goals"><summary>Was lerne ich hier?</summary><div class="level-learning-goals" aria-label="Lernziele der drei Niveaus"><article class="learning-goals"><h3>Niveau 1 · Grundlagen</h3><p>Du kannst dich vorstellen, einfache Fragen stellen und Wünsche ausdrücken.</p></article><article class="learning-goals"><h3>Niveau 2 · Alltag sicher meistern</h3><p>Du kannst von Erlebnissen erzählen, Pläne erklären und höflich um Hilfe bitten.</p></article><article class="learning-goals"><h3>Niveau 3 · Zusammenhängend ausdrücken</h3><p>Du kannst Meinungen begründen, Probleme erklären und Lösungsvorschläge machen.</p></article></div><p class="goals-note">Die Niveaus beschreiben unsere internen Schwierigkeitsstufen. Sie sind keine zertifizierten A1-, A2- oder B1-Stufen.</p></details><div class="exercise-categories"><article class="topic-card"><div class="topic-top"><h3>Grammatik</h3></div><p>Übungen zu Verben, Artikeln, Adjektiven und weiteren Themen.</p><button class="level-btn category-button" id="chooseGrammar" aria-controls="Grammatik" aria-expanded="false">Grammatik öffnen →</button></article><article class="topic-card"><div class="topic-top"><h3>Bezug zum Alltag</h3></div><p>Schwedisch in Familie, Freizeit, Schule, beim Essen, Einkaufen und Reisen anwenden.</p><button class="level-btn category-button" id="chooseEveryday" aria-controls="Alltag" aria-expanded="false">Alltagsthemen öffnen →</button></article></div><div id="Grammatik" class="exercise-panel" hidden><h3 class="exercise-panel-title">Grammatik</h3><div class="Spi-grid"><article class="topic-card reveal"><div class="topic-top"><h3>Vara &amp; Ha</h3></div><details class="topic-details"><summary>Details</summary><p>Personen vorstellen und Besitz ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-vara-ha-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-vara-ha-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-vara-ha-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Artikel &amp; Mehrzahl</h3></div><details class="topic-details"><summary>Details</summary><p>Nomen mit passenden Artikeln und Mengen verwenden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-artikel-plural-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-artikel-plural-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-artikel-plural-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Adjektive &amp; Adverbien</h3></div><details class="topic-details"><summary>Details</summary><p>Eigenschaften und Handlungen genauer beschreiben.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-adjektive-adverbien-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-adjektive-adverbien-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-adjektive-adverbien-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Pronomen &amp; Präpositionen</h3></div><details class="topic-details"><summary>Details</summary><p>Personen, Besitz, Ort und Zeit ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-pronomen-praepositionen-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-pronomen-praepositionen-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-pronomen-praepositionen-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Fragen &amp; Verneinung</h3></div><details class="topic-details"><summary>Details</summary><p>Informationen erfragen und Aussagen verneinen.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-fragen-verneinung-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-fragen-verneinung-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-fragen-verneinung-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Satzbau &amp; Wortstellung</h3></div><details class="topic-details"><summary>Details</summary><p>Hauptsätze, Fragen und Nebensätze mit passender Wortstellung bilden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-satzbau-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-satzbau-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-satzbau-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Zukunft: ska &amp; kommer att</h3></div><details class="topic-details"><summary>Details</summary><p>Pläne und Vorhersagen formulieren.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-zukunft-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-zukunft-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-zukunft-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Konditional &amp; Bedingungen</h3></div><details class="topic-details"><summary>Details</summary><p>Bedingungen und mögliche Folgen ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-konditional-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-konditional-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-konditional-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Preteritum</h3></div><details class="topic-details"><summary>Details</summary><p>Abgeschlossene Ereignisse erzählen.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-preteritum-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-preteritum-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-preteritum-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Plusquamperfekt</h3></div><details class="topic-details"><summary>Details</summary><p>Vorzeitigkeit mit hade und dem Supinum ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-plusquamperfekt-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-plusquamperfekt-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-plusquamperfekt-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Perfekt</h3></div><details class="topic-details"><summary>Details</summary><p>Erfahrungen und Ergebnisse mit Bezug zur Gegenwart ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-perfekt-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-perfekt-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-perfekt-3-oberstufe.html">Niveau 3</a></div></article>
+<article class="topic-card reveal"><div class="topic-top"><h3>Präsens</h3></div><details class="topic-details"><summary>Details</summary><p>Gewohnheiten und regelmässige Abläufe beschreiben.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-praesens-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-praesens-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-praesens-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card reveal"><div class="topic-top"><h3>Modalverben</h3></div><details class="topic-details"><summary>Details</summary><p>Fähigkeiten, Regeln und Ratschläge ausdrücken.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-modalverben-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-modalverben-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-modalverben-3-oberstufe.html">Niveau 3</a></div></article></div>
+</div><div id="Alltag" class="exercise-panel" hidden><h3 class="exercise-panel-title">Bezug zum Alltag</h3><div class="Spi-grid"><article class="topic-card"><div class="topic-top"><h3>Familie</h3></div><details class="topic-details"><summary>Details</summary><p>Passende Aussagen verstehen und eigene Sätze zu Familie bilden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-alltag-familie-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-alltag-familie-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-alltag-familie-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Essen &amp; Trinken</h3></div><details class="topic-details"><summary>Details</summary><p>Passende Aussagen verstehen und eigene Sätze zu Essen &amp; Trinken bilden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-alltag-essen-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-alltag-essen-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-alltag-essen-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Hobbys &amp; Freizeit</h3></div><details class="topic-details"><summary>Details</summary><p>Passende Aussagen verstehen und eigene Sätze zu Hobbys &amp; Freizeit bilden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-alltag-hobbys-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-alltag-hobbys-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-alltag-hobbys-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Schule &amp; Lernen</h3></div><details class="topic-details"><summary>Details</summary><p>Passende Aussagen verstehen und eigene Sätze zu Schule &amp; Lernen bilden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-alltag-schule-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-alltag-schule-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-alltag-schule-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Einkaufen</h3></div><details class="topic-details"><summary>Details</summary><p>Passende Aussagen verstehen und eigene Sätze zu Einkaufen bilden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-alltag-einkaufen-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-alltag-einkaufen-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-alltag-einkaufen-3-oberstufe.html">Niveau 3</a></div></article><article class="topic-card"><div class="topic-top"><h3>Reisen &amp; Unterwegs</h3></div><details class="topic-details"><summary>Details</summary><p>Passende Aussagen verstehen und eigene Sätze zu Reisen &amp; Unterwegs bilden.</p></details><div class="level-picker"><a class="level-btn" href="schwedisch-alltag-reisen-1-oberstufe.html">Niveau 1</a><a class="level-btn" href="schwedisch-alltag-reisen-2-oberstufe.html">Niveau 2</a><a class="level-btn" href="schwedisch-alltag-reisen-3-oberstufe.html">Niveau 3</a></div></article></div></div></section>
 
 
 <section id="Heute" style="background:#0D1433;padding-top:5rem">
@@ -801,23 +1067,23 @@ window.addEventListener('appinstalled', () => {
     <p class="section-body">Starte eine Gesamtprüfung über alle Themen eines Niveaus. Während der Prüfung erhältst du keine Hinweise oder direkte Rückmeldung. Die vollständige Auswertung erscheint erst am Schluss.</p>
   </div>
   <div class="Spi-grid">
-    <a href="griechisch-grammatik-pruefung-1-oberstufe.html" class="service-card">
+    <a href="schwedisch-grammatik-pruefung-1-oberstufe.html" class="service-card">
       <div class="service-num">01</div>
       <div class="service-title">Gesamtprüfung Grammatik · Niveau 1</div>
       <div class="service-desc">26 gemischte Aufgaben · 13 Themen · 30 Minuten · Auswertung erst am Schluss.</div>
     </a>
-    <a href="griechisch-grammatik-pruefung-2-oberstufe.html" class="service-card">
+    <a href="schwedisch-grammatik-pruefung-2-oberstufe.html" class="service-card">
       <div class="service-num">02</div>
       <div class="service-title">Gesamtprüfung Grammatik · Niveau 2</div>
       <div class="service-desc">26 gemischte Aufgaben · 13 Themen · 30 Minuten · Auswertung erst am Schluss.</div>
     </a>
-    <a href="griechisch-grammatik-pruefung-3-oberstufe.html" class="service-card">
+    <a href="schwedisch-grammatik-pruefung-3-oberstufe.html" class="service-card">
       <div class="service-num">03</div>
       <div class="service-title">Gesamtprüfung Grammatik · Niveau 3</div>
       <div class="service-desc">26 gemischte Aufgaben · 13 Themen · 30 Minuten · Auswertung erst am Schluss.</div>
     </a>
   </div>
-<div class="Spi-grid"><a href="griechisch-alltag-pruefung-1-oberstufe.html" class="service-card"><div class="service-num">04</div><div class="service-title">Gesamtprüfung Bezug zum Alltag · Niveau 1</div><div class="service-desc">30 zufällige Aufgaben · 6 Alltagsthemen · 30 Minuten · Premium · Auswertung erst am Schluss.</div></a><a href="griechisch-alltag-pruefung-2-oberstufe.html" class="service-card"><div class="service-num">05</div><div class="service-title">Gesamtprüfung Bezug zum Alltag · Niveau 2</div><div class="service-desc">30 zufällige Aufgaben · 6 Alltagsthemen · 30 Minuten · Premium · Auswertung erst am Schluss.</div></a><a href="griechisch-alltag-pruefung-3-oberstufe.html" class="service-card"><div class="service-num">06</div><div class="service-title">Gesamtprüfung Bezug zum Alltag · Niveau 3</div><div class="service-desc">30 zufällige Aufgaben · 6 Alltagsthemen · 30 Minuten · Premium · Auswertung erst am Schluss.</div></a></div></section>
+<div class="Spi-grid"><a href="schwedisch-alltag-pruefung-1-oberstufe.html" class="service-card"><div class="service-num">04</div><div class="service-title">Gesamtprüfung Bezug zum Alltag · Niveau 1</div><div class="service-desc">30 zufällige Aufgaben · 6 Alltagsthemen · 30 Minuten · Premium · Auswertung erst am Schluss.</div></a><a href="schwedisch-alltag-pruefung-2-oberstufe.html" class="service-card"><div class="service-num">05</div><div class="service-title">Gesamtprüfung Bezug zum Alltag · Niveau 2</div><div class="service-desc">30 zufällige Aufgaben · 6 Alltagsthemen · 30 Minuten · Premium · Auswertung erst am Schluss.</div></a><a href="schwedisch-alltag-pruefung-3-oberstufe.html" class="service-card"><div class="service-num">06</div><div class="service-title">Gesamtprüfung Bezug zum Alltag · Niveau 3</div><div class="service-desc">30 zufällige Aufgaben · 6 Alltagsthemen · 30 Minuten · Premium · Auswertung erst am Schluss.</div></a></div></section>
 <!-- Pru -->
 <section id="Pru">
   <div class="Pru-container">
@@ -829,7 +1095,7 @@ window.addEventListener('appinstalled', () => {
     <div class="Pru-steps">
       <div class="Pru-step reveal"><div class="step-circle">01</div><div class="step-title">Thema wählen</div><div class="step-desc">Starte mit Verben, Artikeln &amp; Nomen, Adjektiven oder Pronomen.</div></div>
       <div class="Pru-step reveal"><div class="step-circle">02</div><div class="step-title">Stufe wählen</div><div class="step-desc">Wähle die 1., 2. oder Niveau 3 passend zu deinem Niveau.</div></div>
-      <div class="Pru-step reveal"><div class="step-circle">03</div><div class="step-title">Aktiv üben</div><div class="step-desc">Beantworte Auswahlfragen und schreibe griechische Formen selbst.</div></div>
+      <div class="Pru-step reveal"><div class="step-circle">03</div><div class="step-title">Aktiv üben</div><div class="step-desc">Beantworte Auswahlfragen und schreibe schwedische Formen selbst.</div></div>
       <div class="Pru-step reveal"><div class="step-circle">04</div><div class="step-title">Wiederholen</div><div class="step-desc">Fehlerhafte Aufgaben kommen erneut – bis die Form sitzt.</div></div>
     </div>
   </div>
@@ -842,21 +1108,21 @@ window.addEventListener('appinstalled', () => {
   <div class="lab-head">
    <div class="lab-kicker">Lernen lernen</div>
    <h2>Deine Lernwerkstatt</h2>
-   <p>Hier lernst du nicht nur Griechisch, sondern auch, <strong>wie</strong> du sinnvoll übst. Probiere eine Methode aus und finde heraus, welche dir beim Erinnern hilft.</p>
+   <p>Hier lernst du nicht nur Schwedisch, sondern auch, <strong>wie</strong> du sinnvoll übst. Probiere eine Methode aus und finde heraus, welche dir beim Erinnern hilft.</p>
   </div>
   <div class="lab-grid">
-<article class="lab-card"><div class="lab-icon">🗣️</div><h3>Jetzt anwenden</h3><p>Schreibe eigene Sätze, höre griechische Beispiele und beantworte Alltagssituationen laut. Niveau 1 kostenlos, Niveau 2 und 3 mit Premium.</p><a class="lab-btn" href="griechisch-jetzt-anwenden.html" style="display:inline-block;text-decoration:none">Schreiben &amp; Sprechen starten</a></article>
+<article class="lab-card"><div class="lab-icon">🗣️</div><h3>Jetzt anwenden</h3><p>Schreibe eigene Sätze, höre schwedische Beispiele und beantworte Alltagssituationen laut. Niveau 1 kostenlos, Niveau 2 und 3 mit Premium.</p><a class="lab-btn" href="schwedisch-jetzt-anwenden.html" style="display:inline-block;text-decoration:none">Schreiben &amp; Sprechen starten</a></article>
    <article class="lab-card"><div class="lab-icon">🧠</div><h3>Merkhilfen &amp; Eselsbrücken</h3><p>Verbinde eine schwierige Regel oder ein Wort mit einem Bild, Satz oder einer persönlichen Idee.</p><button class="lab-btn" data-panel="mnemo">Ausprobieren</button><div class="lab-panel" id="mnemo"><b>So geht's:</b> Wähle etwas, das du oft vergisst. Erfinde eine kurze, auffällige Verbindung.<input class="lab-input" id="mnemoText" placeholder="Meine Eselsbrücke …"><button class="lab-btn" onclick="saveLab(this,'mnemoText')">Speichern</button><div class="saved-note">Wird nur auf diesem Gerät gespeichert.</div></div></article>
-   <article class="lab-card"><div class="lab-icon">🗂️</div><h3>Lernkartei</h3><p>Arbeite nach dem Prinzip: <strong>Neu → Unsicher → Gelernt → Sicher</strong>. Unsichere Inhalte kommen früher wieder.</p><button class="lab-btn" onclick="location.href='griechisch-vokabeltrainer.html'">Kartei starten</button></article>
+   <article class="lab-card"><div class="lab-icon">🗂️</div><h3>Lernkartei</h3><p>Arbeite nach dem Prinzip: <strong>Neu → Unsicher → Gelernt → Sicher</strong>. Unsichere Inhalte kommen früher wieder.</p><button class="lab-btn" onclick="location.href='schwedisch-vokabeltrainer.html'">Kartei starten</button></article>
    <article class="lab-card"><div class="lab-icon">✍️</div><h3>Aktiv erinnern</h3><p>Nicht nur lesen: Decke die Lösung ab, rufe sie aus dem Gedächtnis ab und schreibe sie erst dann auf.</p><button class="lab-btn" data-panel="recall">Methode ansehen</button><div class="lab-panel" id="recall">1. Aufgabe lesen.<br>2. Lösung nicht anschauen.<br>3. Antwort laut sagen oder aufschreiben.<br>4. Kontrollieren.<br>5. Falsches später nochmals abrufen.</div></article>
-   <article class="lab-card"><div class="lab-icon">🗺️</div><h3>Mindmap</h3><p>Ordne ein Thema in Hauptbegriffe und Beispiele. Das hilft besonders bei Regeln und Zusammenhängen.</p><button class="lab-btn" data-panel="mindmap">Vorlage öffnen</button><div class="lab-panel" id="mindmap"><input class="lab-input" id="mindTopic" placeholder="Thema, z. B. Pronomen"><input class="lab-input" id="mindBranches" placeholder="Äste, z. B. Person · Besitz · Objekt"><button class="lab-btn" onclick="saveLab(this,'mindTopic','mindBranches')">Speichern</button></div></article>
+   <article class="lab-card"><div class="lab-icon">🗺️</div><h3>Mindmap</h3><p>Ordne ein Thema in Hauptbegriffe und Beispiele. Das hilft besonders bei Regeln und Zusammenhängen.</p><button class="lab-btn" data-panel="mindmap">Vorlage öffnen</button><div class="lab-panel" id="mindmap"><input class="lab-input" id="mindTopic" placeholder="Thema, z. B. Pronomen"><input class="lab-input" id="mindBranches" placeholder="Äste, z. B. jag · mig · min · mitt · mina"><button class="lab-btn" onclick="saveLab(this,'mindTopic','mindBranches')">Speichern</button></div></article>
    <article class="lab-card"><div class="lab-icon">🔎</div><h3>Aus Fehlern lernen</h3><p>Frage nach einem Fehler nicht nur „Was ist richtig?“, sondern auch „Warum war meine Antwort falsch?“</p><button class="lab-btn" data-panel="errors">3-Schritt-Technik</button><div class="lab-panel" id="errors"><b>1.</b> Fehler benennen. <br><b>2.</b> Regel in eigenen Worten erklären. <br><b>3.</b> Eine ähnliche Aufgabe lösen. Deine App priorisiert unsichere Aufgaben automatisch.</div></article>
    <article class="lab-card"><div class="lab-icon">💡</div><h3>Strategie wählen</h3><p><b>Verben:</b> Person → Stamm → Endung.<br><b>Vokabeln:</b> abdecken → erinnern → prüfen.<br><b>Pronomen:</b> Satzteil finden → ersetzen → Stellung prüfen.<br><b>Adjektive:</b> Nomen bestimmen → Geschlecht/Zahl → angleichen.</p></article>
   </div>
   <div class="study-plan">
    <h3>⏱️ Deine 15-Minuten-Lerneinheit</h3>
    <div class="plan-steps"><div class="plan-step"><b>5 Min.</b><br>Fällige Inhalte und alte Fehler wiederholen.</div><div class="plan-step"><b>7 Min.</b><br>Aktiv Aufgaben lösen – möglichst ohne Hilfe.</div><div class="plan-step"><b>3 Min.</b><br>Fehler erklären und schwierige Inhalte nochmals abrufen.</div></div>
-   <div style="margin-top:1.3rem"><a class="lab-btn" href="griechisch-15-minuten-lerneinheit.html" style="display:inline-block;text-decoration:none">15-Minuten-Einheit öffnen</a></div>
+   <div style="margin-top:1.3rem"><a class="lab-btn" href="schwedisch-15-minuten-lerneinheit.html" style="display:inline-block;text-decoration:none">15-Minuten-Einheit öffnen</a></div>
   </div>
  </div>
 </section>
@@ -934,10 +1200,10 @@ FRLearning.ready.then(refresh);window.addEventListener('frlearningchange',()=>{i
 
 <footer>
   <div class="footer-logo">
-    <div class="monogram">EL</div>
-    <span class="wordmark">Griechisch lernen</span>
+    <div class="monogram">SV</div>
+    <span class="wordmark">Schwedisch lernen</span>
   </div>
-  <p class="footer-copy">© 2026 · Griechisch Lerntrainer</p>
+  <p class="footer-copy">© 2026 · Schwedisch Lerntrainer</p>
   <div class="footer-links"><a href="#hero">Nach oben ↑</a></div>
 </footer>
 
@@ -957,21 +1223,17 @@ FRLearning.ready.then(refresh);window.addEventListener('frlearningchange',()=>{i
 </script>
 
 <script>
-const modules=EL_CATALOG.map(m=>({...m,key:m.module,title:m.title+" · Niveau "+m.level}));
+const modules=SV_CATALOG.map(m=>({...m,key:m.module,title:m.title+" · Niveau "+m.level}));
 const grid=document.getElementById('progressGrid');
 modules.forEach(m=>{let d={};try{d=JSON.parse(localStorage.getItem(m.key))||{}}catch(e){}const score=d.lastScore??'–',best=d.best??'–',done=d.completed||0;const card=document.createElement('div');card.className='service-card';card.style.cursor='default';card.innerHTML=`<div class="service-num">${score}${score==='–'?'':'%'}</div><div class="service-title">${m.title}</div><div class="service-desc">Letztes Ergebnis: ${score}${score==='–'?'':'%'} · Bestwert: ${best}${best==='–'?'':'%'} · Abgeschlossene Runden: ${done}</div>`;grid?.appendChild(card)});
 document.getElementById('resetProgress')?.addEventListener('click',()=>{
-  if(confirm('Möchtest du den gesamten Griechisch-Lernfortschritt auf diesem Gerät wirklich löschen?')){
+  if(confirm('Möchtest du den gesamten Schwedisch-Lernfortschritt auf diesem Gerät wirklich löschen?')){
     modules.forEach(m=>localStorage.removeItem(m.key));
     location.reload();
   }
 });
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err=>console.warn('Service Worker konnte nicht geladen werden:',err)));
-}
-</script>
+
 
 <script>
 const renderLearningDashboard = ()=>{
@@ -988,14 +1250,14 @@ const renderLearningDashboard = ()=>{
    const card=a.closest('.topic-card');
    const topic=card?.querySelector('h3')?.textContent.trim()||'Übung';
    const level=Number((a.textContent.match(/\d+/)||[])[0]||0);
-   const key=EL_CATALOG.find(m=>m.file===href)?.module||'';
+   const key=SV_CATALOG.find(m=>m.file===href)?.module||'';
    return {href,key,topic,level,title:`${topic} · Niveau ${level}`};
  });
 
  const examInfo=[1,2,3].map(level=>({
    level,
-   href:`griechisch-grammatik-pruefung-${level}-oberstufe.html`,
-   key:`el_exam_grammatik_${level}`,
+   href:`schwedisch-grammatik-pruefung-${level}-oberstufe.html`,
+   key:`sv_exam_grammatik_${level}`,
    title:`Gesamtprüfung Grammatik · Niveau ${level}`
  }));
 
@@ -1004,7 +1266,7 @@ const renderLearningDashboard = ()=>{
 
  const titleFor=k=>{
    const x=exercises.find(e=>e.key===k);
-   const c=EL_CATALOG.find(m=>m.module===k);return x?x.title:c?c.title+' · Niveau '+c.level:k==='el_unit_15'?'15-Minuten-Einheit':k.replace(/^el_/,'').replace(/_/g,' ');
+   const c=SV_CATALOG.find(m=>m.module===k);return x?x.title:c?c.title+' · Niveau '+c.level:k==='sv_unit_15'?'15-Minuten-Einheit':k.replace(/^sv_/,'').replace(/_/g,' ');
  };
  const completedUnique=arr=>[...new Set(arr.map(h=>h.module))];
  const renderCompleted=(id,mods,hist,emptyText)=>{
@@ -1080,11 +1342,11 @@ document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',
 }));
 function saveLab(button,...ids){
  const data={};ids.forEach(id=>{const e=document.getElementById(id);if(e)data[id]=e.value});
- try{const old=JSON.parse(localStorage.getItem('el_learning_methods')||'{}');Object.assign(old,data);localStorage.setItem('el_learning_methods',JSON.stringify(old));}catch(e){}
+ try{const old=JSON.parse(localStorage.getItem('sv_learning_methods')||'{}');Object.assign(old,data);localStorage.setItem('sv_learning_methods',JSON.stringify(old));}catch(e){}
  const b=button;if(b){const old=b.textContent;b.textContent='✓ Gespeichert';setTimeout(()=>b.textContent=old,1200)}
 }
 window.addEventListener('load',()=>{
- try{const d=JSON.parse(localStorage.getItem('el_learning_methods')||'{}');Object.entries(d).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.value=v})}catch(e){}
+ try{const d=JSON.parse(localStorage.getItem('sv_learning_methods')||'{}');Object.entries(d).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.value=v})}catch(e){}
 });
 </script>
 
@@ -1258,9 +1520,119 @@ window.addEventListener('load',()=>{
  });
 })();
 </script>
-<script src="greek-error-analysis.js?v=exact-main1"></script>
+<script>
+(() => {
+ 'use strict';
+ const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const names=Object.fromEntries(SV_CATALOG.map(m=>[m.module,m.title+' · Niveau '+m.level]));
+ const availableFiles=new Set(SV_CATALOG.map(m=>m.file).concat('schwedisch-15-minuten-lerneinheit.html'));
+ const catalogue=new Map();
+ function addExercise(link,label){
+  const url=new URL(link.getAttribute('href'),location.href);
+  if(url.origin!==location.origin)return;
+  const file=url.pathname.split('/').pop();
+  if(!availableFiles.has(file))return;
+  catalogue.set(file,{file,label});
+ }
+ document.querySelectorAll('#Spi .topic-card').forEach(card=>{
+  const topic=card.querySelector('h3')?.textContent.trim();
+  card.querySelectorAll('.level-btn').forEach(link=>addExercise(link,topic+' · '+link.textContent.trim()));
+ });
+ document.querySelectorAll('a[href*="15-minuten-lerneinheit"]').forEach(link=>addExercise(link,'Deine 15-Minuten-Lerneinheit'));
+ function findExercise(file){
+  const exact=catalogue.get(file);if(exact)return exact;
+  // Older records may omit the extra filename suffix used by Verben & Konjugation.
+  const canonical=String(file||'').replace(/-mit-gemischten-schreibuebungen(?=\.html$)/,'');
+  return [...catalogue.values()].find(e=>e.file.replace(/-mit-gemischten-schreibuebungen(?=\.html$)/,'')===canonical)||null;
+ }
+ function practiceLink(p){
+  const exercise=findExercise(p.file);if(!exercise)return '';
+  const unit=exercise.file.includes('15-minuten-lerneinheit');
+  const ids=[...new Set((p.ids||[]).map(String).filter(id=>/^[a-zA-Z0-9_-]+$/.test(id)))].slice(0,10);
+  const url=new URL(exercise.file,location.href);
+  if(!unit&&ids.length)url.searchParams.set('review',ids.join(','));
+  const href=exercise.file+url.search;
+  return `<a class="btn-smart fa-practice" href="${esc(href)}">${esc(exercise.label)}${unit?'':` · ${ids.length} Aufgaben wiederholen`}</a>`;
+ }
+ const title=key=>names[key]||(key==='sv_unit_15'?'Deine 15-Minuten-Lerneinheit':String(key).replace(/^sv_/,'').replace(/_/g,' '));
+ let generation=0,actor=null;
+ function basic(){
+  if(!window.FRLearning)return;
+  const current=FRLearning.account;
+  if(actor!==current){actor=current;generation++;$('analysisDetail').replaceChildren();$('analysisStatus').textContent='';$('analysisRefresh').disabled=false;}
+  const s=FRLearning.summary(),entries=Object.entries(s.modules||{}).filter(([key,m])=>key.startsWith('sv_')&&m.answered>0).map(([key,m])=>({label:title(key),n:m.answered,wrong:m.answered-m.correct})).sort((a,b)=>b.wrong/Math.max(1,b.n)-a.wrong/Math.max(1,a.n));
+  $('analysisBasic').innerHTML=entries.length?entries.slice(0,6).map(e=>`<div class="fa-topic"><div><strong>${esc(e.label)}</strong><p>${e.wrong} von ${e.n} Antworten falsch${e.n<5?' · noch wenige Daten':''}</p></div><span>${Math.round((e.n-e.wrong)/e.n*100)} % richtig</span></div>`).join(''):'<p class="fa-muted">Noch keine Antworten gespeichert. Bearbeite zuerst eine Übung.</p>';
+  $('analysisAccount').textContent=current==='guest'?'Gastmodus: Die Themenübersicht verwendet den Fortschritt auf diesem Gerät. Für die Detailanalyse bitte anmelden.':'Die Analyse gehört zu deinem angemeldeten Konto.';
+ }
+ function exerciseForTopic(t){const m=SV_CATALOG.find(m=>m.module===t.topic);return m?{file:m.file,label:title(m.module),ids:t.ids||[]}:null;}
+ function directButton(e,text,ids=[]){
+  if(!e)return '';
+  const valid=[...new Set(ids.map(String).filter(x=>/^[a-zA-Z0-9_-]+$/.test(x)))].slice(0,10);
+  const url=new URL(e.file,location.href);
+  if(valid.length)url.searchParams.set('review',valid.join(','));
+  return `<a class="btn-smart fa-practice" href="${esc(e.file+url.search)}">${esc(text)}: ${esc(e.label)}</a>`;
+ }
+ function makePlan(d){
+  const candidates=d.topics.filter(t=>t.wrong>0).map(t=>({t,e:exerciseForTopic(t)})).filter(x=>x.e&&!x.e.file.includes('15-minuten'));
+  const first=candidates[0];
+  if(!first){
+   const studied=Object.entries(FRLearning.summary().modules||{}).sort((a,b)=>(b[1].answered||0)-(a[1].answered||0)).map(([key])=>exerciseForTopic({topic:key})).find(Boolean);
+   const e=studied||[...catalogue.values()].find(x=>x.label.endsWith('Niveau 1'));
+   return e?[{e,title:'Deinen Lernstand prüfen',body:'Löse fünf Aufgaben ohne Hilfe. Daraus entsteht dein persönlicher Schwerpunkt.',ids:[]},{e,title:'Unsichere Antworten wiederholen',body:'Erkläre nach jeder falschen Antwort die richtige Lösung in eigenen Worten und übe weiter.',ids:[]},{e,title:'Nochmals selbst lösen',body:'Starte eine neue Runde. Ziel: mindestens vier von fünf Antworten richtig. Aktualisiere danach die Analyse.',ids:[]}]:[];
+  }
+  const second=candidates.find(x=>x.e.file!==first.e.file)||first;
+  return [{e:first.e,title:'Deinen grössten Schwerpunkt üben',body:`${first.e.label}: ${first.t.wrong} von ${first.t.recent} zuletzt beantworteten Aufgaben falsch. Löse die vorgeschlagenen Aufgaben und lies die Erklärung nach jedem Fehler.`,ids:first.e.ids||[]},
+   {e:second.e,title:second===first?'Dasselbe Thema festigen':'Den nächsten Schwerpunkt festigen',body:second===first?'Löse eine neue Runde ohne Hilfe. Sprich oder schreibe die richtige Regel nach jedem Fehler in eigenen Worten auf.':`${second.e.label}: Übe dieses Thema als Nächstes. Nimm dir fünf bis zehn Aufgaben vor.`,ids:[]},
+   {e:first.e,title:'Deinen Fortschritt überprüfen',body:'Löse erneut fünf Aufgaben ohne Hilfe. Ziel: mindestens vier richtig. Aktualisiere danach die Fehleranalyse; dein Plan wird aus deinen neuen Antworten erstellt.',ids:[]}];
+ }
+ function render(d){
+  const plan=makePlan(d),weak=d.topics.filter(t=>t.wrong>0);
+  let html='<div class="fa-summary"><h4>'+(weak.length?'Das solltest du als Nächstes üben':'Dein nächster Lernschritt')+'</h4>';
+  if(weak.length){const t=weak[0],e=exerciseForTopic(t);html+=`<p><strong>${esc(e?.label||title(t.topic))}</strong></p><p>${t.wrong} von ${t.recent} zuletzt beantworteten Aufgaben waren falsch. Beginne mit diesem Thema.</p>`+directButton(e,'Übung öffnen',e?.ids||[]);}
+  else html+='<p>'+(!d.total?'Bearbeite zuerst eine Übung. Danach passen wir deinen Plan an deine Antworten an.':'In den zuletzt ausgewerteten Antworten ist kein Fehlerschwerpunkt erkennbar. Festige dein zuletzt geübtes Thema.')+'</p>';
+  if(d.legacy&&!d.detailed)html+='<p class="fa-muted">Für deine bisherigen Antworten kennen wir nur richtig oder falsch. Konkrete Fehlerbeispiele erscheinen, sobald neue Antworten mit Lösungen gespeichert werden.</p>';
+  html+='</div><h4>Dein Lernplan: die nächsten drei Schritte</h4><p class="fa-muted">Gehe der Reihe nach vor. Plane je Schritt ungefähr fünf Minuten ein.</p><div class="fa-plan-grid">';
+  html+=plan.map((p,i)=>`<article class="fa-step"><span class="fa-step-number">${i+1}</span><h5>${esc(p.title)}</h5><p>${esc(p.body)}</p>${directButton(p.e,'Schritt '+(i+1)+' starten',p.ids)}</article>`).join('');
+  html+='</div><h4>Deine Fehler verstehen</h4>';
+  const examples=d.topics.filter(t=>t.examples?.length);
+  if(!examples.length)html+='<p class="fa-muted">Noch keine Fehlerbeispiele verfügbar. Das bedeutet nicht automatisch, dass alle Antworten richtig waren.</p>';
+  html+=examples.slice(0,3).map(t=>`<article class="fa-card"><h5>${esc(title(t.topic))}</h5>`+t.examples.slice(0,2).map(e=>`<div class="fa-example"><p><strong>${esc(e.question)}</strong></p><p>Deine Antwort: <span class="fa-wrong">${esc(e.own)}</span></p><p>Richtig wäre: <span class="fa-right">${esc(e.right)}</span></p><p>${esc(e.explanation||'Übe diese Aufgabe nochmals und vergleiche die Lösungen.')}</p>${e.latestCorrect?'<p class="fa-muted">Beim letzten Versuch hast du diese Aufgabe richtig gelöst.</p>':''}</div>`).join('')+'</article>').join('');
+  html+='<details class="fa-more"><summary>Weitere Ergebnisse anzeigen</summary>';
+  html+=d.topics.map(t=>`<div class="fa-topic"><div><strong>${esc(title(t.topic))}</strong><p>${t.recent?t.wrong+' von '+t.recent+' zuletzt beantworteten Aufgaben falsch.':'Bisher nur Wiederholungen erfasst.'}${!t.enough?' Noch wenige Antworten – vorläufige Einschätzung.':''}</p>${t.trend===null?'':`<p class="fa-muted">In deinen letzten zehn Antworten waren ${t.trend>0?'mehr':t.trend<0?'weniger':'gleich viele'} Lösungen richtig als in den zehn davor. Die Aufgaben können unterschiedlich schwierig sein.</p>`}</div>${directButton(exerciseForTopic(t),'Übung öffnen')}</div>`).join('');
+  html+='</details>';
+  $('analysisDetail').innerHTML=html;
+ }
+
+ function buildSwedishAnalysis(events){
+  const list=events.filter(e=>e.kind==='answer'&&String(e.module).startsWith('sv_')).sort((a,b)=>a.at.localeCompare(b.at)||a.id.localeCompare(b.id));
+  const groups=new Map();for(const e of list){if(!groups.has(e.module))groups.set(e.module,[]);groups.get(e.module).push(e);}
+  const topics=[...groups].map(([topic,all])=>{
+   const first=all.filter(e=>!e.review),recent=first.slice(-20),correct=recent.filter(e=>e.ok).length;
+   const last=first.slice(-10),prev=first.slice(-20,-10);const byQuestion=new Map();for(const e of all){if(!byQuestion.has(String(e.question)))byQuestion.set(String(e.question),[]);byQuestion.get(String(e.question)).push(e);}
+   const examples=[],ids=[];for(const [id,attempts] of byQuestion){const latest=attempts.at(-1),wrong=attempts.filter(e=>!e.ok);if(!latest.ok)ids.push(id);const detail=wrong.filter(e=>e.details?.right).at(-1);if(detail)examples.push({question:detail.details.prompt||detail.text||'',own:detail.details.own||'Keine Antwort',right:detail.details.right,explanation:detail.details.explanation||'',wrong:wrong.length,at:detail.at,latestCorrect:!!latest.ok});}
+   return {topic,attempts:first.length,recent:recent.length,wrong:recent.length-correct,accuracy:recent.length?Math.round(correct/recent.length*100):null,trend:last.length===10&&prev.length===10?Math.round((last.filter(e=>e.ok).length-prev.filter(e=>e.ok).length)*10):null,enough:recent.length>=5,ids:ids.slice(0,10),examples:examples.sort((a,b)=>b.wrong-a.wrong||b.at.localeCompare(a.at)).slice(0,4),practice:[]};
+  }).sort((a,b)=>(b.wrong/Math.max(1,b.recent))-(a.wrong/Math.max(1,a.recent))||b.wrong-a.wrong);
+  const detailed=list.filter(e=>e.details?.right).length;return {total:list.length,detailed,legacy:list.length-detailed,topics};
+ }
+ async function detail(){
+  const token=++generation,owner=FRLearning.account;const button=$('analysisRefresh');button.disabled=true;$('analysisStatus').textContent='Dein persönlicher Lernplan wird erstellt …';$('analysisDetail').replaceChildren();
+  try{
+   if(owner==='guest')throw new Error('Bitte melde dich zuerst an. Die Detailanalyse gehört zu Premium.');
+   await FRLearning.sync();
+   const access=await FRPremium.status();if(!access.premium)throw new Error('Die vertiefte Fehleranalyse gehört zu Premium.');const d=buildSwedishAnalysis(FRLearning.events);
+   if(token!==generation||owner!==FRLearning.account)return;
+   render(d);$('analysisStatus').textContent='Dein Lernplan ist aktualisiert.';
+  }catch(e){if(token===generation){$('analysisStatus').textContent=e.message;}}
+  finally{if(token===generation)button.disabled=false;}
+ }
+ $('analysisRefresh').addEventListener('click',detail);
+ window.addEventListener('frlearningchange',basic);
+ (async()=>{await FRLearning.ready;basic();})();
+})();
+
+</script>
 <script>(()=>{const panels=['Grammatik','Alltag'],buttons=['chooseGrammar','chooseEveryday'];function select(id,scroll=false){panels.forEach((p,i)=>{const open=p===id;document.getElementById(p).hidden=!open;const button=document.getElementById(buttons[i]);button.setAttribute('aria-expanded',String(open));button.textContent=(i===0?'Grammatik':'Alltagsthemen')+(open?' schliessen ↑':' öffnen →');});if(scroll)document.getElementById(id).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'});}buttons.forEach((b,i)=>document.getElementById(b).onclick=()=>{const open=document.getElementById(panels[i]).hidden;select(open?panels[i]:null,open);});function jump(id){select(id);const panel=document.getElementById(id);panel.style.scrollMarginTop=((document.getElementById('navbar')?.offsetHeight||80)+16)+'px';requestAnimationFrame(()=>panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'}));}document.querySelectorAll('a[href="#Alltag"],a[href="#Grammatik"]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();const id=link.getAttribute('href').slice(1);if(location.hash!=='#'+id)history.pushState(null,'','#'+id);jump(id);}));function hash(){const id=location.hash.slice(1);if(panels.includes(id))jump(id);}window.addEventListener('hashchange',hash);hash();})();</script><script>(()=>{'use strict';const menus=[...document.querySelectorAll('.foxora-language-switcher, .foxora-more-switcher')];menus.forEach(menu=>{menu.addEventListener('toggle',()=>{if(menu.open)menus.forEach(other=>{if(other!==menu)other.open=false;});});menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{menu.open=false;}));});document.addEventListener('click',event=>{menus.forEach(menu=>{if(menu.open&&!menu.contains(event.target))menu.open=false;});});document.addEventListener('keydown',event=>{if(event.key==='Escape'){menus.forEach(menu=>{if(menu.open){menu.open=false;menu.querySelector('summary').focus();}});}});})();
-</script><script>(()=>{const button=document.getElementById('chooseTheory'),panel=document.getElementById('Theoriekarten');function toggle(open){panel.hidden=!open;button.setAttribute('aria-expanded',String(open));button.textContent=open?'Theoriekarten schliessen ↑':'Theoriekarten öffnen →';}button.addEventListener('click',()=>toggle(panel.hidden));function fromHash(){if(location.hash==='#theorie'||location.hash==='#Theoriekarten')toggle(true);}window.addEventListener('hashchange',fromHash);fromHash();})();</script><script id="geia-sou-interaction">(()=>{const audio=document.getElementById('geia-souAudio'),button=document.getElementById('geia-souPlay'),status=document.getElementById('geia-souStatus');function failed(){status.hidden=false;status.textContent='Die Aufnahme ist noch nicht verfügbar.';button.setAttribute('aria-label','Γεια σου anhören');}button.addEventListener('click',async()=>{status.hidden=true;if(!audio.paused){audio.pause();audio.currentTime=0;button.setAttribute('aria-label','Γεια σου anhören');return;}try{audio.currentTime=0;await audio.play();button.setAttribute('aria-label','Wiedergabe stoppen');}catch(e){failed();}});audio.addEventListener('error',failed);audio.addEventListener('ended',()=>button.setAttribute('aria-label','Γεια σου anhören'));document.querySelectorAll('.welcome-path-menu a').forEach(a=>a.addEventListener('click',()=>a.closest('details').open=false));})();</script><script id="foxora-stable-background-size">
+</script><script>(()=>{const button=document.getElementById('chooseTheory'),panel=document.getElementById('Theoriekarten');function toggle(open){panel.hidden=!open;button.setAttribute('aria-expanded',String(open));button.textContent=open?'Theoriekarten schliessen ↑':'Theoriekarten öffnen →';}button.addEventListener('click',()=>toggle(panel.hidden));function fromHash(){if(location.hash==='#theorie'||location.hash==='#Theoriekarten')toggle(true);}window.addEventListener('hashchange',fromHash);fromHash();})();</script><script id="hej-interaction">(()=>{const audio=document.getElementById('hejAudio'),button=document.getElementById('hejPlay'),status=document.getElementById('hejStatus');function failed(){status.hidden=false;status.textContent='Die Aufnahme ist noch nicht verfügbar.';button.setAttribute('aria-label','Hej anhören');}button.addEventListener('click',async()=>{status.hidden=true;if(!audio.paused){audio.pause();audio.currentTime=0;button.setAttribute('aria-label','Hej anhören');return;}try{audio.currentTime=0;await audio.play();button.setAttribute('aria-label','Wiedergabe stoppen');}catch(e){failed();}});audio.addEventListener('error',failed);audio.addEventListener('ended',()=>button.setAttribute('aria-label','Hej anhören'));document.querySelectorAll('.welcome-path-menu a').forEach(a=>a.addEventListener('click',()=>a.closest('details').open=false));})();</script><script id="foxora-stable-background-size">
 (()=>{
   const hero=document.getElementById('hero');
   if(!hero)return;
