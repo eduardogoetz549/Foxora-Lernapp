@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lernkartei · Spanisch lernen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0D1433">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1433;--navy2:#121E47;--gold:#B79440;--goldlt:#D4AF60;--ice:#C0D4F2;--cream:#F7F1E6;--white:#fff;--muted:#66708c;--line:#e4dccd;--display:'Cormorant Garamond',Georgia,serif;--body:'Jost',Arial,sans-serif}
+body{background:var(--navy);color:#fff;font-family:var(--body);min-height:100vh}
+nav.site-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 4rem;background:rgba(13,20,51,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(183,148,64,.2)}
+.nav-logo{display:flex;align-items:center;gap:.75rem;text-decoration:none}.monogram{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:600;color:var(--navy)}
+.wordmark{font-weight:600;letter-spacing:.18em;font-size:.9rem;color:#fff}.nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none}.nav-links a{position:relative;color:var(--ice);text-decoration:none;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;padding-bottom:3px}.nav-links a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold);transition:.3s}.nav-links a:hover{color:#fff}.nav-links a:hover::after{width:100%}.nav-cta{border:1px solid var(--gold);color:var(--gold)!important;padding:.5rem 1.4rem}.nav-cta:hover{background:var(--gold);color:var(--navy)!important}.nav-cta::after{display:none}
+.hero{text-align:center;padding:5rem 1.5rem 3.4rem;background:radial-gradient(ellipse 80% 60% at 70% 30%,#1a2654 0%,var(--navy) 62%)}.ey{display:inline-block;background:#fff0d7;color:#9a5c00;padding:.55rem 1rem;border-radius:99px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.hero h1{font:400 clamp(3.2rem,7vw,5.6rem) var(--display);margin:1rem 0 .5rem}.hero h1 span{color:var(--goldlt)}.hero p{max-width:760px;margin:auto;color:var(--ice);font-size:1.05rem;line-height:1.7}
+.wrap{max-width:1180px;margin:auto;padding:2.5rem 1.5rem 6rem}.toolbar{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1.5rem}.btn{border:1px solid var(--gold);background:var(--gold);color:var(--navy);padding:.78rem 1.1rem;font:600 .74rem var(--body);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.25s}.btn:hover{background:var(--goldlt);transform:translateY(-2px);box-shadow:0 8px 24px rgba(183,148,64,.28)}.btn.secondary{background:transparent;color:var(--goldlt)}.btn.secondary:hover{background:var(--gold);color:var(--navy)}.btn.danger{border-color:#b75b5b;background:transparent;color:#ffd6d6}
+.layout{display:grid;grid-template-columns:360px 1fr;gap:1.2rem}.panel{background:var(--cream);color:var(--navy);border-top:3px solid var(--gold);padding:1.5rem}.panel h2{font:600 2rem var(--display);margin-bottom:.3rem}.panel-sub{color:#697087;line-height:1.55;margin-bottom:1.2rem}
+label{display:block;font-size:.76rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:.8rem 0 .35rem;color:#615942}input,select,textarea{width:100%;padding:.82rem;border:1px solid #d8cfbe;background:#fff;font:400 .95rem var(--body);color:var(--navy);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(183,148,64,.12)}textarea{min-height:90px;resize:vertical}.pair{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.form-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+.deck-list{display:grid;gap:.65rem;max-height:560px;overflow:auto}.deck-item{background:#fff;border:1px solid var(--line);padding:1rem;cursor:pointer;transition:.2s}.deck-item:hover,.deck-item.active{border-color:var(--gold);transform:translateY(-1px)}.deck-item b{display:block}.deck-item small{color:#777}
+.empty{padding:2rem;text-align:center;color:#777;border:1px dashed #cfc4ae}.cards-table{display:grid;gap:.6rem;margin-top:1rem}.card-row{display:grid;grid-template-columns:1fr 1fr auto;gap:.6rem;align-items:center;background:#fff;border:1px solid var(--line);padding:.7rem}.card-row span{overflow-wrap:anywhere}.iconbtn{border:0;background:#f2eadb;padding:.55rem;cursor:pointer}
+.study{display:none}.study.open{display:block}.study-head{display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap}.study-card{margin-top:1rem;background:#fff;min-height:260px;padding:2rem;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:1px solid var(--line)}.study-label{color:#8b6b26;text-transform:uppercase;letter-spacing:.12em;font-size:.72rem}.study-word{font:600 clamp(2rem,5vw,3.6rem) var(--display);margin:1rem 0}.answer{display:none;color:#4e5871;font-size:1.2rem}.answer.show{display:block}.rating{display:none;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:1rem}.rating.show{display:flex}.progress{height:7px;background:#ded6c6;margin-top:1rem}.progress div{height:100%;background:var(--gold);width:0}
+.sharebox{display:none;margin-top:1rem;padding:1rem;background:#fff;border:1px solid var(--line)}.sharebox.open{display:block}.notice{font-size:.82rem;color:#756c5a;margin-top:.6rem;line-height:1.5}
+@media(max-width:900px){nav.site-header{padding:1rem 1.2rem}.nav-links li:not(:last-child){display:none}.layout{grid-template-columns:1fr}.pair,.card-row{grid-template-columns:1fr}.wordmark{font-size:.76rem}.hero{padding-top:3.5rem}}
+</style>
+</head>
+<body>
+<nav id="navbar" class="site-header">
+ <a href="main.html" class="nav-logo"><div class="monogram">ES</div><span class="wordmark">Spanisch lernen</span></a>
+ <ul class="nav-links">
+  <li><a href="main.html#Lernen">Lernen</a></li>
+  <li><a href="main.html#lernwerkstatt">Lernwerkstatt</a></li>
+  <li><a href="main.html#Fortschritt">Mein Fortschritt</a></li>
+  <li><a href="main.html" class="nav-cta">Startseite</a></li>
+ </ul>
+</nav>
+<section class="hero"><div class="ey">Lernkartei · selbst erstellen</div><h1>Meine <span>Lernkarten</span></h1><p>Erstelle eigene Deutsch-Spanisch-Kartensets, speichere sie auf deinem Gerät und teile sie mit anderen.</p></section>
+<main class="wrap">
+ <div class="toolbar">
+  <button class="btn" id="newDeck">+ Neues Kartenset</button>
+  <button class="btn secondary" id="importBtn">Kartenset importieren</button>
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+ </div>
+ <div class="layout">
+  <aside class="panel"><h2>Meine Sets</h2><p class="panel-sub">Deine Lernkarteien werden lokal in diesem Browser gespeichert.</p><div id="deckList" class="deck-list"></div></aside>
+  <section class="panel">
+   <div id="editor">
+    <h2>Kartenset erstellen</h2><p class="panel-sub">Erstelle dein eigenes Lernkartenset und füge beliebig viele Deutsch-Spanisch-Karten hinzu.</p>
+    <label>Name des Sets</label><input id="deckName" placeholder="z. B. Unité 3 – Schule">
+    
+    <div class="pair"><div><label>Deutsch</label><input id="front" placeholder="z. B. das Haus"></div><div><label>Spanisch</label><input id="back" placeholder="z. B. la casa"></div></div>
+    <div class="form-actions"><button class="btn" id="addCard">Karte hinzufügen</button><button class="btn secondary" id="saveDeck">Set speichern</button></div>
+    <div id="cards" class="cards-table"></div>
+   </div>
+   <div id="study" class="study">
+    <div class="study-head"><div><h2 id="studyTitle">Lernen</h2><div class="panel-sub" id="studyMeta"></div></div><button class="btn secondary" id="backEdit">Bearbeiten</button></div>
+    <div class="study-card"><div class="study-label" id="studySide"></div><div class="study-word" id="studyWord"></div><div class="answer" id="studyAnswer"></div><button class="btn" id="reveal">Antwort zeigen</button></div>
+    <div class="rating" id="rating"><button class="btn secondary" data-rate="miss">Noch nicht</button><button class="btn" data-rate="know">Gewusst</button></div><div class="progress"><div id="studyProgress"></div></div>
+   </div>
+   <div class="sharebox" id="sharebox"><b>Kartenset teilen</b><p class="notice">Du kannst eine kleine Teilen-Nachricht mit Link erzeugen oder das Set als JSON-Datei exportieren. Die Datei kann in dieser Lernkartei wieder importiert werden.</p><div class="form-actions"><button class="btn" id="nativeShare">Teilen</button><button class="btn secondary" id="exportDeck">Als Datei exportieren</button></div></div>
+  </section>
+ </div>
+</main>
+<script>
+const STORE='es_custom_flashcard_decks_v1';
+let decks=[],current=null,draft=[],studyOrder=[],studyIndex=0;
+const $=id=>document.getElementById(id);
+function load(){try{decks=JSON.parse(localStorage.getItem(STORE)||'[]')}catch(e){decks=[]} renderDecks()}
+function persist(){localStorage.setItem(STORE,JSON.stringify(decks))}
+function uid(){return 'd'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderDecks(){
+ const box=$('deckList'); if(!decks.length){box.innerHTML='<div class="empty">Noch kein eigenes Kartenset.<br>Erstelle dein erstes Set.</div>';return}
+ box.innerHTML=decks.map(d=>`<div class="deck-item ${current&&d.id===current.id?'active':''}" data-id="${d.id}"><b>${esc(d.name)}</b><small>Deutsch → Spanisch · ${d.cards.length} Karten</small><div class="form-actions"><button class="btn" data-action="study" data-id="${d.id}">Lernen</button><button class="btn secondary" data-action="edit" data-id="${d.id}">Bearbeiten</button><button class="btn secondary" data-action="share" data-id="${d.id}">Teilen</button></div></div>`).join('')
+}
+function renderCards(){ $('cards').innerHTML=draft.length?draft.map((c,i)=>`<div class="card-row"><span>${esc(c.front)}</span><span>${esc(c.back)}</span><button class="iconbtn" data-del="${i}" title="Löschen">✕</button></div>`).join(''):'<div class="empty">Noch keine Karten im Set.</div>'}
+function newDeck(){current=null;draft=[];$('deckName').value='';$('front').value='';$('back').value='';$('study').classList.remove('open');$('editor').style.display='block';$('sharebox').classList.remove('open');renderCards();renderDecks()}
+function editDeck(id){current=decks.find(d=>d.id===id);if(!current)return;draft=current.cards.map(c=>({...c}));$('deckName').value=current.name;$('editor').style.display='block';$('study').classList.remove('open');$('sharebox').classList.remove('open');renderCards();renderDecks()}
+
+$('addCard').onclick=()=>{const f=$('front').value.trim(),b=$('back').value.trim();if(!f||!b)return alert('Bitte beide Seiten der Lernkarte ausfüllen.');draft.push({front:f,back:b,known:0,missed:0});$('front').value='';$('back').value='';renderCards();$('front').focus()};
+$('cards').onclick=e=>{const b=e.target.closest('[data-del]');if(b){draft.splice(Number(b.dataset.del),1);renderCards()}};
+$('saveDeck').onclick=()=>{const name=$('deckName').value.trim();if(!name)return alert('Bitte gib dem Kartenset einen Namen.');if(!draft.length)return alert('Füge mindestens eine Lernkarte hinzu.');const d={id:current?.id||uid(),name,source:'Deutsch',cards:draft.map(c=>({...c})),updated:Date.now()};const ix=decks.findIndex(x=>x.id===d.id);if(ix>=0)decks[ix]=d;else decks.unshift(d);current=d;persist();renderDecks();alert('Kartenset gespeichert.')};
+$('newDeck').onclick=newDeck;
+$('deckList').onclick=e=>{const b=e.target.closest('[data-action]');if(!b)return;const id=b.dataset.id,a=b.dataset.action;if(a==='edit')editDeck(id);if(a==='study')startStudy(id);if(a==='share')openShare(id)};
+function startStudy(id){current=decks.find(d=>d.id===id);if(!current||!current.cards.length)return;studyOrder=current.cards.map((_,i)=>i).sort((a,b)=>(current.cards[b].missed||0)-(current.cards[a].missed||0));studyIndex=0;$('editor').style.display='none';$('sharebox').classList.remove('open');$('study').classList.add('open');showStudy();renderDecks()}
+function showStudy(){if(studyIndex>=studyOrder.length){$('studyWord').textContent='Runde geschafft!';$('studyAnswer').textContent='';$('studyAnswer').classList.remove('show');$('reveal').style.display='none';$('rating').classList.remove('show');$('studyProgress').style.width='100%';return}const c=current.cards[studyOrder[studyIndex]];$('studyTitle').textContent=current.name;$('studyMeta').textContent='Deutsch → Spanisch';$('studySide').textContent='Deutsch';$('studyWord').textContent=c.front;$('studyAnswer').textContent=c.back;$('studyAnswer').classList.remove('show');$('reveal').style.display='inline-block';$('rating').classList.remove('show');$('studyProgress').style.width=(studyIndex/studyOrder.length*100)+'%'}
+$('reveal').onclick=()=>{$('studyAnswer').classList.add('show');$('reveal').style.display='none';$('rating').classList.add('show')};
+$('rating').onclick=e=>{const b=e.target.closest('[data-rate]');if(!b)return;const c=current.cards[studyOrder[studyIndex]];if(b.dataset.rate==='know')c.known=(c.known||0)+1;else{c.missed=(c.missed||0)+1;studyOrder.splice(Math.min(studyIndex+4,studyOrder.length),0,studyOrder[studyIndex])}persist();studyIndex++;showStudy()};
+$('backEdit').onclick=()=>editDeck(current.id);
+function openShare(id){current=decks.find(d=>d.id===id);if(!current)return;editDeck(id);$('sharebox').classList.add('open');$('sharebox').scrollIntoView({behavior:'smooth',block:'nearest'})}
+function exportCurrent(){if(!current)return;const blob=new Blob([JSON.stringify({app:'Foxora · Spanisch lernen',version:1,deck:current},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(current.name||'lernkarten').replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+$('exportDeck').onclick=exportCurrent;
+$('nativeShare').onclick=async()=>{if(!current)return;const text=`Kartenset „${current.name}“ (${current.source} → Spanisch, ${current.cards.length} Karten). Exportiere die Datei in der Lernapp, um das vollständige Set zu teilen.`;if(navigator.share){try{await navigator.share({title:current.name,text,url:location.href});}catch(e){}}else{try{await navigator.clipboard.writeText(text+' '+location.href);alert('Teilen-Text und Link wurden kopiert. Für das vollständige Kartenset nutze „Als Datei exportieren“.')}catch(e){alert('Nutze „Als Datei exportieren“, um das Kartenset zu teilen.')}}};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text()),d=obj.deck||obj;if(!d.name||!Array.isArray(d.cards))throw 0;d.id=uid();d.cards=d.cards.filter(c=>c.front&&c.back).map(c=>({front:String(c.front),back:String(c.back),known:c.known||0,missed:c.missed||0}));decks.unshift(d);persist();renderDecks();editDeck(d.id);alert('Kartenset importiert.')}catch(err){alert('Diese Datei ist kein gültiges Kartenset.')}e.target.value=''};
+newDeck();load();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
+</script>
+</body></html>
