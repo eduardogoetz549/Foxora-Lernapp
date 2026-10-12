@@ -4,6 +4,9 @@ function plan(pool,questions={},now=Date.now()){
  const priority=q=>{const state=questions[String(q.id)];return (state.unresolvedError?100:0)+Math.min(60,(state.wrong||0)*5)+Math.min(60,Math.max(0,(now-Date.parse(state.due))/86400000));};
  const unique=[...new Map(pool.map(q=>[String(q.id),q])).values()];pool=unique;
  const due=pool.filter(q=>questions[String(q.id)]&&Date.parse(questions[String(q.id)].due)<=now).sort((a,b)=>priority(b)-priority(a)||Date.parse(questions[String(a.id)].due)-Date.parse(questions[String(b.id)].due)||String(a.id).localeCompare(String(b.id)));
+ const mode=new URLSearchParams(window.location?.search||'').get('review');
+ const targeted=mode==='errors'?due.filter(q=>questions[String(q.id)].unresolvedError):mode==='due'?due:[];
+ if(targeted.length)return targeted.slice(0,10);
  const unseen=shuffle(pool.filter(q=>!questions[String(q.id)]));const selected=due.slice(0,due.some(q=>questions[String(q.id)].unresolvedError)?6:3),counts={};
  const add=q=>{if(!selected.includes(q)){selected.push(q);counts[q.family||'fill']=(counts[q.family||'fill']||0)+1;}};
  selected.forEach(q=>counts[q.family||'fill']=(counts[q.family||'fill']||0)+1);
@@ -32,7 +35,13 @@ async function boot(){
  await window.FRLearning?.ready;
  const meta=window.ESPage;
  function renderProgress(){const rows=document.getElementById('esTopicProgressRows');if(!rows)return;rows.replaceChildren();const summary=window.FRLearning?.summary()||{};
-  for(const item of map){const m=summary.modules?.[item.module]||{},qs=Object.values(m.questions||{});if(!m.answered)continue;const row=el('div');row.className='es-topic-row';row.append(link(item.title+' · Niveau '+item.level,item.file),el('span',Object.keys(m.questions||{}).length+(Number.isInteger(Number(item.count))&&Number(item.count)>=Object.keys(m.questions||{}).length?'/'+Number(item.count):'')+' Aufgaben bearbeitet'),el('span',Math.round((m.correct||0)/Math.max(1,m.answered||0)*100)+' % richtig'),el('span',qs.filter(q=>Date.parse(q.due)<=Date.now()).length+' zur Wiederholung'));rows.append(row)}
+  for(const item of map){
+   const m=summary.modules?.[item.module]||{},qs=Object.values(m.questions||{});if(!m.answered)continue;
+   const row=el('div');row.className='es-topic-row';row.append(link(item.title+' · Niveau '+item.level,item.file));
+   const count=qs.length,total=Number(item.count);
+   const metric=(value,label)=>{const span=el('span',String(value));span.append(el('small',label));return span};
+   row.append(metric(count+(Number.isInteger(total)&&total>=count?'/'+total:''),'bearbeitet'),metric(Math.round((m.correct||0)/Math.max(1,m.answered||0)*100)+' %','Trefferquote'),metric(qs.filter(q=>q.unresolvedError).length,'offene Fehler'),metric(qs.filter(q=>Date.parse(q.due)<=Date.now()).length,'fällig'),metric(qs.filter(q=>q.consolidated).length,'gefestigt'));rows.append(row);
+  }
   if(!rows.children.length)rows.textContent='Nach deinen ersten Antworten erscheint hier dein Fortschritt pro Thema.';
  }
  let signature='';
