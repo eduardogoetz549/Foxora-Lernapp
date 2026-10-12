@@ -14,9 +14,9 @@
  const hidden=new Set();
  function hide(el,on){if(!el)return;el.classList.toggle('fr-guide-hidden',on);if(on)hidden.add(el);else hidden.delete(el);}
  function render(){
-  const core=window.FRLearning;const mode=core?.guidanceMode?.()||'guided';state=derive(core?.summary?.()||{},mode==='all');
+  const core=window.FRLearning;let mode=core?.guidanceMode?.();if(!mode){try{mode=localStorage.getItem('fr_guidance_mode:'+core?.account)||'guided'}catch{mode='guided'}}state=derive(core?.summary?.()||{},(mode==='all'||mode==='free'));
   const steps=[true,state.grammar,state.daily,state.lab,state.exam];
-  document.querySelectorAll('[data-fr-step]').forEach(el=>{const n=Number(el.dataset.frStep);el.classList.toggle('done',steps[n]);el.textContent=['1 · Erste Übung','2 · Grammatik','3 · Alltag','4 · Wiederholen','5 · Prüfung'][n]+(steps[n]?' ✓':' 🔒');});
+  document.querySelectorAll('[data-fr-step]').forEach(el=>{const n=Number(el.dataset.esStep);el.classList.toggle('done',steps[n]);el.textContent=['1 · Erste Übung','2 · Grammatik','3 · Alltag','4 · Wiederholen','5 · Prüfung'][n]+(steps[n]?' ✓':' 🔒');});
   $('frGuideToggle').textContent=state.skip?'Geführten Lernweg anzeigen':'Alle Bereiche anzeigen';
   let title,text,href;
   if(!state.grammar){title='Dein erster Schritt';text='Starte mit Verben und Konjugation. Eine abgeschlossene Runde öffnet die Grammatikübersicht – unabhängig vom Ergebnis.';href='franzoesisch-verben-konjugation-1-oberstufe-mit-gemischten-schreibuebungen.html';}
@@ -34,15 +34,15 @@
   document.querySelectorAll('#navbar a[href^="#"]').forEach(a=>{const h=a.hash;hide(a,(h==='#Spi'&&!state.grammar)||(h==='#Fortschritt'&&!state.grammar)||(h==='#Pruefung'&&!state.exam)||(h==='#lernwerkstatt'&&!state.lab));});
   $('frGuidePractice').hidden=!state.daily||state.lab;
   $('frGuideTheory').hidden=state.grammar;
-  $('frGuideStatus').textContent=ready?(core?.account==='guest'?'Dein Lernweg wird auf diesem Gerät gespeichert.':'Dein Lernweg wird mit deinem Konto synchronisiert.'):'Lernfortschritt wird geladen …';
+  $('frGuideStatus').textContent=ready?(core?.account==='guest'?'Dein Lernweg wird auf diesem Gerät gespeichert.':'Dein Lernfortschritt wird mit deinem Konto synchronisiert.'):'Lernfortschritt wird geladen …';
   document.documentElement.classList.remove('fr-guide-loading');
   if(lastActor!==core?.account){lastActor=core?.account;checkHash();}
  }
  const restricted=h=>(['#Spi','#Grammatik','#Heute','#Fortschritt'].includes(h)&&!state.grammar)||(['#Alltag'].includes(h)&&!state.daily)||(['#lernwerkstatt','#Fehleranalyse'].includes(h)&&!state.lab)||(h==='#Pruefung'&&!state.exam);
  function checkHash(){if(restricted(location.hash)){history.replaceState(null,'','#hero');$('frGuide').scrollIntoView({block:'center'});$('frGuideStatus').textContent='Dieser Bereich öffnet sich nach deinem nächsten Lernschritt. Du kannst auch alle Bereiche anzeigen.';}}
  document.addEventListener('click',e=>{const a=e.target.closest('a');if(a&&a.getAttribute('href')?.startsWith('#')&&restricted(a.getAttribute('href'))){e.preventDefault();e.stopImmediatePropagation();$('frGuide').scrollIntoView({block:'center'});$('frGuideStatus').textContent='Dieser Bereich öffnet sich nach deinem nächsten Lernschritt.';}},true);
- $('frGuideToggle').onclick=()=>{window.FRLearning?.setGuidanceMode?.(state.skip?'guided':'all');render();};
- function openEveryday(e){e.preventDefault();const panel=$('Alltag'),button=$('chooseEveryday');if(panel?.hidden)button?.click();if(!panel)return;history.replaceState(null,'','#Alltag');requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}));}
+ $('frGuideToggle').onclick=()=>{const mode=state.skip?'guided':'all';if(window.FRLearning?.setGuidanceMode)window.FRLearning.setGuidanceMode(mode);else try{localStorage.setItem('fr_guidance_mode:'+window.FRLearning?.account,mode)}catch{}render();};
+ function openEveryday(e){e.preventDefault();const panel=$('Alltag'),button=$('chooseEveryday');if(panel.hidden)button.click();history.replaceState(null,'','#Alltag');requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}));}
  $('frGuideNext').addEventListener('click',e=>{if($('frGuideNext').hash==='#Alltag')openEveryday(e);else if($('frGuideNext').hash==='#Grammatik'&&$('Grammatik').hidden)$('chooseGrammar')?.click();});
 
  window.addEventListener('hashchange',checkHash);window.addEventListener('frlearningchange',render);
