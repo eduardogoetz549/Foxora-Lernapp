@@ -1,12 +1,14 @@
 (()=>{'use strict';
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
 function plan(pool,questions={},now=Date.now()){
- const due=shuffle(pool.filter(q=>questions[String(q.id)]&&Date.parse(questions[String(q.id)].due)<=now));
- const unseen=shuffle(pool.filter(q=>!questions[String(q.id)]));const selected=due.slice(0,3),counts={};
+ const priority=q=>{const state=questions[String(q.id)];return (state.unresolvedError?100:0)+Math.min(60,(state.wrong||0)*5)+Math.min(60,Math.max(0,(now-Date.parse(state.due))/86400000));};
+ const unique=[...new Map(pool.map(q=>[String(q.id),q])).values()];pool=unique;
+ const due=pool.filter(q=>questions[String(q.id)]&&Date.parse(questions[String(q.id)].due)<=now).sort((a,b)=>priority(b)-priority(a)||Date.parse(questions[String(a.id)].due)-Date.parse(questions[String(b.id)].due)||String(a.id).localeCompare(String(b.id)));
+ const unseen=shuffle(pool.filter(q=>!questions[String(q.id)]));const selected=due.slice(0,due.some(q=>questions[String(q.id)].unresolvedError)?6:3),counts={};
  const add=q=>{if(!selected.includes(q)){selected.push(q);counts[q.family||'fill']=(counts[q.family||'fill']||0)+1;}};
  selected.forEach(q=>counts[q.family||'fill']=(counts[q.family||'fill']||0)+1);
  for(const q of unseen){if(selected.length===10)break;if((counts[q.family||'fill']||0)<3)add(q)}
- for(const list of [unseen,due,shuffle(pool)])for(const q of list){if(selected.length===10)break;add(q)}
+ for(const list of [due,unseen,shuffle(pool)])for(const q of list){if(selected.length===10)break;add(q)}
  return selected.slice(0,10);
 }
 window.ESLearningSupport={plan};
@@ -30,7 +32,7 @@ async function boot(){
  await window.FRLearning?.ready;
  const meta=window.ESPage;
  function renderProgress(){const rows=document.getElementById('esTopicProgressRows');if(!rows)return;rows.replaceChildren();const summary=window.FRLearning?.summary()||{};
-  for(const item of map){const m=summary.modules?.[item.module]||{},qs=Object.values(m.questions||{});if(!m.answered)continue;const row=el('div');row.className='es-topic-row';row.append(link(item.title+' · Niveau '+item.level,item.file),el('span',Object.keys(m.questions||{}).length+'/'+item.count+' bearbeitet'),el('span',Math.round((m.correct||0)/Math.max(1,m.answered||0)*100)+' % richtig'),el('span',qs.filter(q=>Date.parse(q.due)<=Date.now()).length+' zur Wiederholung'));rows.append(row)}
+  for(const item of map){const m=summary.modules?.[item.module]||{},qs=Object.values(m.questions||{});if(!m.answered)continue;const row=el('div');row.className='es-topic-row';row.append(link(item.title+' · Niveau '+item.level,item.file),el('span',Object.keys(m.questions||{}).length+(Number.isInteger(Number(item.count))&&Number(item.count)>=Object.keys(m.questions||{}).length?'/'+Number(item.count):'')+' Aufgaben bearbeitet'),el('span',Math.round((m.correct||0)/Math.max(1,m.answered||0)*100)+' % richtig'),el('span',qs.filter(q=>Date.parse(q.due)<=Date.now()).length+' zur Wiederholung'));rows.append(row)}
   if(!rows.children.length)rows.textContent='Nach deinen ersten Antworten erscheint hier dein Fortschritt pro Thema.';
  }
  let signature='';
@@ -38,20 +40,34 @@ async function boot(){
   if(!meta)return;const result=document.getElementById('result');if(!result||result.hidden||result.classList.contains('hidden')){signature='';return}
   const score=document.getElementById('resultScore')?.textContent||'';const writing=document.getElementById('freeWritingBox');const sig=score+'|'+!!writing;if(signature===sig)return;signature=sig;
   result.querySelector('#esRoundNext')?.remove();const card=el('section');card.id='esRoundNext';card.className='es-support-card';card.append(el('h3','Dein nächster Schritt'));
-  const numbers=score.match(/(\d+)\s*(?:von|\/)\s*(\d+)/);const pct=numbers?Number(numbers[1])/Math.max(1,Number(numbers[2]))*100:0;
+  const numbers=score.match(/(\d+)\s*(?:von|\/)\s*(\d+)/);const percent=score.match(/(\d+(?:[.,]\d+)?)\s*%/);const pct=numbers?Number(numbers[1])/Math.max(1,Number(numbers[2]))*100:percent?Number(percent[1].replace(',','.')):null;
   const actions=el('div');actions.className='es-support-actions';
   const retry=document.getElementById(meta.daily?'errorsOnly':'mistakesBtn');
-  if(pct<70){card.append(el('p','Wiederhole zuerst deine Fehler oder sieh dir die passende Theorie an. Danach kannst du eine neue Runde starten.'));if(retry&&!retry.hidden&&retry.style.display!=='none'){const b=el('button','Nur Fehler üben');b.type='button';b.className='es-support-action';b.onclick=()=>retry.click();actions.append(b)}actions.append(link('Theorie ansehen',meta.theory));}
+  if(pct!==null&&pct<60){card.append(el('p','Wiederhole zuerst deine Fehler oder sieh dir die passende Theorie an. Danach kannst du eine neue Runde starten.'));if(retry&&!retry.hidden&&retry.style.display!=='none'){const b=el('button','Nur Fehler üben');b.type='button';b.className='es-support-action';b.onclick=()=>retry.click();actions.append(b)}actions.append(link('Theorie ansehen',meta.theory));}
+  else if(pct===null||pct<85){
+   card.append(el('p',pct===null?'Dein Ergebnis konnte nicht sicher gelesen werden. Prüfe deine Rückmeldungen und übe unsichere Aufgaben.':'Du hast vieles verstanden. Übe die unsicheren Aufgaben nochmals, bevor du weitergehst.'));
+   if(retry&&!retry.hidden&&retry.style.display!=='none'){const b=el('button','Unsichere Aufgaben üben');b.type='button';b.className='es-support-action';b.onclick=()=>retry.click();actions.append(b)}
+   actions.append(link('Theorie ansehen',meta.theory));
+  }
   else{
    card.append(el('p','Gut gearbeitet. Du kannst ein weiteres Thema üben. Bekannte Aufgaben kommen bei späteren Runden zur Wiederholung zurück.'));
    const section=map.filter(x=>x.daily===meta.daily&&x.level===meta.level);const index=section.findIndex(x=>x.file===meta.file);const next=section[(index+1)%section.length];if(next)actions.append(link('Weiter: '+next.title,next.file));
   }
-  actions.append(link('Zur Lernübersicht','main.html#hero'));card.append(actions,el('p','Wiederholung: nach einer richtigen Antwort ungefähr nach 1, 3 und 7 Tagen. „Zweimal in Folge richtig“ ist eine Lernanzeige und kein Nachweis dauerhafter Beherrschung.'));result.append(card);
+  actions.append(link('Zur Lernübersicht','main.html#hero'));card.append(actions,el('p','Wiederholung: nach einer richtigen Antwort je nach Antwortqualität und zeitlichem Abstand nach 1, 3, 7, 14 und 30 Tagen. „Zweimal in Folge richtig“ ist eine Lernanzeige und kein Nachweis dauerhafter Beherrschung.'));result.append(card);
   if(writing&&!writing.querySelector('#esWritingExamples')){
    const examples=el('details');examples.id='esWritingExamples';examples.append(el('summary','Weitere Musterantworten & Prüfkriterien'));
    const samples=meta.level===1?[simple[meta.topic],beginnerAlt[meta.topic]]:meta.level===2?[models[meta.topic]?.[0],levelTwoAlt[meta.topic]]:[models[meta.topic]?.[1],levelThreeAlt[meta.topic]];
    (samples||[]).filter(Boolean).forEach((sample,i)=>{examples.append(el('h4','Beispiel '+(i+2)));const p=el('p',sample);p.lang='es';examples.append(p)});
    const list=el('ul');for(const text of ['Beantwortet dein Text alle Teile der Aufgabe?','Passen Zeitform, Person und Wortschatz zur Situation?','Ist die Aussage verständlich und zusammenhängend?'])list.append(el('li',text));examples.append(list,el('p','Die Beispiele zeigen mögliche Antworten. LanguageTool prüft Sprache, aber nicht zuverlässig, ob die Aufgabe inhaltlich erfüllt ist.'));writing.append(examples);
+   const feedback=el('section');feedback.id='esWritingFeedback';feedback.append(el('h4','Deine Schreibreflexion'));
+   const output=el('p');output.setAttribute('aria-live','polite');const checks=[];
+   for(const [label,help] of [['Grammatik','Prüfe Person, Verbform und die zur Aufgabe passende Zeitform.'],['Wortschatz','Prüfe, ob deine Wörter zur Situation passen und verständlich sind.'],['Aufgabenstellung','Prüfe jeden verlangten Inhalt direkt anhand der Aufgabenstellung.']]){
+    const field=el('label',label+' ');const select=el('select');select.setAttribute('aria-label',label);
+    for(const [value,text] of [['','Bitte einschätzen'],['secure','Sicher'],['unsure','Unsicher'],['help','Ich brauche Hilfe']]){const option=el('option',text);option.value=value;select.append(option)}
+    field.append(select);feedback.append(field,el('p',help));checks.push({label,help,select});
+    select.addEventListener('change',()=>{const needs=checks.filter(x=>['unsure','help'].includes(x.select.value));output.textContent=needs.length?'Dein nächster Schwerpunkt: '+needs.map(x=>x.label+': '+x.help).join(' '):checks.every(x=>x.select.value==='secure')?'Vergleiche deinen Text abschliessend mit den Musterantworten. Deine Selbsteinschätzung ist keine automatische Korrektur.':'Schätze alle drei Bereiche ein, um deinen nächsten Schwerpunkt zu sehen.'});
+   }
+   feedback.append(output);writing.append(feedback);
   }
  }
  renderProgress();renderRound();window.addEventListener('frlearningchange',()=>{renderProgress();renderRound()});
