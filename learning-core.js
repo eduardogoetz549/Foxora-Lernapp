@@ -8,13 +8,13 @@
   const URL = 'https://npbiccwpyetefnlmjihd.supabase.co';
   const KEY = 'sb_publishable_b3PsFQ0rO-lYqbbr05e2Qg_-sGGgjSp';
   const TABLE = 'fr_learning_events';
-  const PREFIX = 'es_learning_events_v1:';
+  const PREFIX = 'fr_learning_events_v1:';
   let actor = 'guest', client = null, syncing = false, initialized = false;
   let resyncRequested = false;
   let status = 'Lernspeicher wird geladen …';
   const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch (_) { return null; } };
-  const events = () => { const value=read(PREFIX+actor); return Array.isArray(value)?value.filter(e=>String(e?.module||'').startsWith('es_')):[]; };
+  const events = () => { const value=read(PREFIX+actor); return Array.isArray(value)?value.filter(e=>String(e?.module||'').startsWith('fr_')):[]; };
   function write(value) {
     try { localStorage.setItem(PREFIX+actor,JSON.stringify(value)); }
     catch (_) { status='Der Browser konnte den Fortschritt nicht speichern.'; }
@@ -23,7 +23,7 @@
   const ordered = () => events().sort((a,b)=>a.at.localeCompare(b.at)||a.id.localeCompare(b.id));
   function summary() {
     // Preserve existing guest totals until the first new event. Account data stays separate.
-    const list=ordered(), old=actor==='guest'?read('es_learning_profile_v4'):null;
+    const list=ordered(), old=actor==='guest'?read('fr_learning_profile_v4'):null;
     const result={xp:0,total:0,correct:0,streak:0,day:{answered:0,correct:0},daily:{},modules:{},history:[]};
     if(old && !list.length) return {...result,...old,day:old.daily?.[dayKey()]||result.day};
     const rounds={};
@@ -33,9 +33,29 @@
         result.total++; result.correct+=e.ok?1:0; result.xp+=e.ok?10:2;
         const daily=result.daily[e.date] ||= {answered:0,correct:0};daily.answered++;daily.correct+=e.ok?1:0;
         m.answered++;m.correct+=e.ok?1:0;
-        const q=m.questions[e.question] ||= {strength:0,wrong:0};
-        q.strength=e.ok?Math.min(3,q.strength+1):0;q.wrong+=e.ok?0:1;q.last=e.at;q.text=e.text;
-        q.due=new Date(Date.parse(e.at)+(e.ok?[0,1,3,7][q.strength]:0)*86400000).toISOString();
+        const q=m.questions[e.question] ||= {strength:0,wrong:0,correct:0,spacedCorrect:0,unresolvedError:false};
+        const previous=Date.parse(q.last), at=Date.parse(e.at);
+        const spaced=Number.isFinite(previous)&&at-previous>=86400000;
+        q.attempts=(q.attempts||0)+1;
+        if(e.ok){
+          q.correct++;q.strength=Math.min(3,q.strength+1);
+          if(spaced&&e.details?.quality!=='assisted'&&e.details?.quality!=='hard')q.spacedCorrect++;
+          q.reviewStage=Math.min(5,(q.reviewStage||0)+((q.attempts===1||spaced)&&e.details?.quality!=='assisted'&&e.details?.quality!=='hard'?1:0));
+          if(spaced)q.unresolvedError=false;
+        }else{
+          q.wrong++;q.strength=Math.max(0,q.strength-1);
+          q.reviewStage=Math.max(0,(q.reviewStage||0)-2);
+          q.spacedCorrect=0;q.unresolvedError=true;
+        }
+        q.last= e.at;q.text=e.text;
+        q.lastCorrect=!!e.ok;
+        // Optional quality is explicit; old events remain valid without it.
+        const quality=e.details?.quality;
+        const days=e.ok?[0,1,3,7,14,30][q.reviewStage]:0;
+        const interval=quality==='assisted'?Math.min(1,days):quality==='hard'?Math.min(3,days):days;
+        q.due=new Date(at+interval*86400000).toISOString();
+        q.consolidated=!q.unresolvedError&&q.spacedCorrect>=4&&q.reviewStage>=5;
+
         const round=rounds[e.module] ||= {answered:0,correct:0};round.answered++;round.correct+=e.ok?1:0;
       } else if(e.kind==='finish') {
         const round=rounds[e.module]||{answered:0,correct:0};
@@ -69,7 +89,7 @@
       const remote=[];
       for(let offset=0;;offset+=1000) {
         const {data,error}=await client.from(TABLE).select('payload').eq('user_id',owner).order('event_id').range(offset,offset+999);
-        if(error)throw error;remote.push(...data.map(row=>row.payload).filter(e=>String(e?.module||'').startsWith('es_')));if(data.length<1000)break;
+        if(error)throw error;remote.push(...data.map(row=>row.payload).filter(e=>String(e?.module||'').startsWith('fr_')));if(data.length<1000)break;
       }
       if(actor!==owner)return;
       const merged=new Map([...remote,...events()].map(e=>[e.id,e]));write([...merged.values()]);status='Fortschritt mit deinem Konto synchronisiert.';
@@ -86,21 +106,27 @@
   }
   let readyResolve;
   const ready=new Promise(resolve=>readyResolve=resolve);
-  const api={ready,summary,level:xp=>Math.floor(Math.max(0,xp)/100)+1,
+  const api={ready,summary,
+    guidanceMode(){const e=ordered().filter(e=>e.kind==='guidance'&&e.module==='fr_guidance').at(-1);return e?.mode==='all'?'all':'guided';},
+    setGuidanceMode(mode){add({kind:'guidance',module:'fr_guidance',mode:mode==='all'?'all':'guided'});},
+    level:xp=>Math.floor(Math.max(0,xp)/100)+1,
     get client(){return client;},get status(){return status;},get account(){return actor;},sync,
     record(module,id,ok,review=false,text='',details=null) {
-      add({kind:'answer',module,question:String(id),ok:!!ok,review:!!review,text:String(text).slice(0,500),...(details ? {details:Object.fromEntries(['own','right','prompt','explanation','topic','file','type'].map(k=>[k,String(details[k]??'').replace(/<[^>]*>/g,'').slice(0,800)]).concat([['unanswered',!!details.unanswered]]))} : {})});
+      add({kind:'answer',module,question:String(id),ok:!!ok,review:!!review,text:String(text).slice(0,500),...(details ? {details:Object.fromEntries(['own','right','prompt','explanation','topic','file','type'].map(k=>[k,String(details[k]??'').replace(/<[^>]*>/g,'').slice(0,800)]).concat([['unanswered',!!details.unanswered],['quality',['assisted','hard','normal'].includes(details.quality)?details.quality:'normal']]))} : {})});
     },
     finish(module,pct){add({kind:'finish',module,pct:Math.min(100,Math.max(0,Number(pct)||0))});},
-    dueScore(module,id){const q=summary().modules[module]?.questions?.[String(id)];return !q?100:q.strength===0?200:Date.parse(q.due)<=Date.now()?120-q.strength:10-q.strength;},
+    dueScore(module,id){const q=summary().modules[module]?.questions?.[String(id)];return !q?100:Date.parse(q.due)<=Date.now()?200+(q.unresolvedError?100:0)+Math.min(60,q.wrong*5)+Math.min(60,Math.max(0,(Date.now()-Date.parse(q.due))/86400000)):10-q.strength;},
     moduleData(module) {
       const m=summary().modules[module];
       if(!m)return actor==='guest'?(read(module)||{}):{};
       return {totalAttempts:m.answered,totalCorrect:m.correct,completed:m.completed,lastScore:m.lastScore,best:m.best,
         mastery:Object.fromEntries(Object.entries(m.questions).map(([id,q])=>[id,q.strength])),
-        wrongIds:Object.entries(m.questions).filter(([,q])=>q.wrong>0&&q.strength<2).map(([id])=>Number(id))};
+        wrongIds:Object.entries(m.questions).filter(([,q])=>q.unresolvedError).map(([id])=>Number(id)),
+        historicalWrongIds:Object.entries(m.questions).filter(([,q])=>q.wrong>0).map(([id])=>Number(id)),
+        dueIds:Object.entries(m.questions).filter(([,q])=>Date.parse(q.due)<=Date.now()).map(([id])=>Number(id)),
+        consolidatedIds:Object.entries(m.questions).filter(([,q])=>q.consolidated).map(([id])=>Number(id))};
     },
-    saveModuleData(module,data){try{localStorage.setItem('es_module_cache_v1:'+actor+':'+module,JSON.stringify(data));}catch(_){}},
+    saveModuleData(module,data){try{localStorage.setItem('fr_module_cache_v1:'+actor+':'+module,JSON.stringify(data));}catch(_){}},
   };
   window.FRLearning=api;
   (async()=>{
@@ -178,7 +204,7 @@
     status: () => call('premium-access', { action: 'status' }),
     checkout: () => redirect('create-checkout'),
     portal: () => redirect('customer-portal'),
-    protectedFile: file => /^(?:spanisch-.*-[23]-oberstufe(?:-mit-gemischten-schreibuebungen)?|spanisch-(?:grammatik-|alltag-)?pruefung-[123]-oberstufe|spanisch-jetzt-anwenden-[23]|spanisch-15-minuten-lerneinheit)\.html$/.test(file),
+    protectedFile: file => /^(?:franzoesisch-.*-[23]-oberstufe(?:-mit-gemischten-schreibuebungen)?|franzoesisch-(?:grammatik-|alltag-)?pruefung-[123]-oberstufe|franzoesisch-jetzt-anwenden-[23]|franzoesisch-15-minuten-lerneinheit)\.html$/.test(file),
   };
 })();
 

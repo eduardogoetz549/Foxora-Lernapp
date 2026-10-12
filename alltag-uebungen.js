@@ -10,7 +10,7 @@
  function sample(pool,counts){return shuffled(Object.entries(counts).flatMap(([type,n])=>shuffled(pool.filter(q=>q.type===type)).slice(0,n)));}
  function start(){
   clearInterval(timer);document.getElementById('examReview')?.remove();
-  round=targeted?selected:config.exam?shuffled([...new Set(config.questions.map(q=>q.topic))].flatMap(topic=>sample(config.questions.filter(q=>q.topic===topic),{choice:2,write:2,order:1}))):sample(config.questions,{choice:6,write:6,order:3});
+  round=targeted?selected:config.exam?shuffled([...new Set(config.questions.map(q=>q.topic))].flatMap(topic=>sample(config.questions.filter(q=>q.topic===topic),{choice:2,write:2,order:1}))):FRLearningSupport.plan(config.questions,FRLearning.summary().modules[config.module]?.questions||{});
   queue=round.map(q=>({...q,repetition:0}));position=0;correct=0;answered=0;locked=false;finished=false;last=new Map();examAnswers=[];
   $('result').hidden=true;$('quizCard').hidden=false;$('coachImage').src='fuchs-tipp.png';$('foxBubble').textContent=config.exam?'Prüfungsmodus: Die Auswertung erscheint erst nach der Abgabe.':'Lies die Situation. Nutze bei Fehlern die Erklärung und den Beispielsatz.';
   if(config.exam){deadline=Date.now()+30*60*1000;$('examTime').textContent='30:00';timer=setInterval(()=>{const left=Math.max(0,Math.ceil((deadline-Date.now())/1000));$('examTime').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');if(!left)finishExam();},1000);}

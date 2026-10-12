@@ -1,0 +1,76 @@
+(()=>{'use strict';
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+function plan(pool,questions={},now=Date.now()){
+ const priority=q=>{const state=questions[String(q.id)];return (state.unresolvedError?100:0)+Math.min(60,(state.wrong||0)*5)+Math.min(60,Math.max(0,(now-Date.parse(state.due))/86400000));};
+ const unique=[...new Map(pool.map(q=>[String(q.id),q])).values()];pool=unique;
+ const due=pool.filter(q=>questions[String(q.id)]&&Date.parse(questions[String(q.id)].due)<=now).sort((a,b)=>priority(b)-priority(a)||Date.parse(questions[String(a.id)].due)-Date.parse(questions[String(b.id)].due)||String(a.id).localeCompare(String(b.id)));
+ const mode=new URLSearchParams(window.location?.search||'').get('review');
+ const targeted=mode==='errors'?due.filter(q=>questions[String(q.id)].unresolvedError):mode==='due'?due:[];
+ if(targeted.length)return targeted.slice(0,10);
+ const unseen=shuffle(pool.filter(q=>!questions[String(q.id)]));const selected=due.slice(0,due.some(q=>questions[String(q.id)].unresolvedError)?6:3),counts={};
+ const add=q=>{if(!selected.includes(q)){selected.push(q);counts[q.family||'fill']=(counts[q.family||'fill']||0)+1;}};
+ selected.forEach(q=>counts[q.family||'fill']=(counts[q.family||'fill']||0)+1);
+ for(const q of unseen){if(selected.length===10)break;if((counts[q.family||'fill']||0)<3)add(q)}
+ for(const list of [due,unseen,shuffle(pool)])for(const q of list){if(selected.length===10)break;add(q)}
+ return selected.slice(0,10);
+}
+window.FRLearningSupport={plan};
+const writingModels={"familie": ["Ma famille est petite. Je vis avec mes parents. Le dimanche, nous rendons visite à ma grand-mère.", "Hier, j’ai rendu visite à mes grands-parents. Demain, je téléphonerai à ma sœur.", "Si j’avais plus de temps, je rendrais visite à mes grands-parents plus souvent. J’aimerais passer quelques jours avec eux."], "essen": ["Je voudrais une soupe et de l’eau, s’il vous plaît. L’addition, s’il vous plaît.", "Hier, j’ai préparé une soupe. Demain, je cuisinerai pour mes amis.", "Si j’avais tous les ingrédients, je préparerais une soupe. J’aimerais cuisiner avec mes amis."], "einkaufen": ["Je cherche une chemise. Je voudrais une grande taille. Est-ce que je peux payer par carte ?", "Hier, j’ai acheté une chemise. Demain, je changerai mes chaussures parce qu’elles sont trop petites.", "J’achèterais ces chaussures si elles coûtaient moins cher. Je demanderais aussi une taille plus grande."], "hobbys": ["Je joue de la guitare. Pendant mon temps libre, je lis et je joue aux échecs.", "Hier, j’ai chanté dans la chorale. Demain, je jouerai au handball avec mes amis.", "Si j’avais plus de temps libre, j’apprendrais à jouer du piano. J’aimerais aussi lire davantage."], "schule": ["J’étudie le français. Je vais à l’école en bus. Ma matière préférée est la musique.", "Hier, j’ai étudié pour le contrôle. Demain, je réviserai avec un ami.", "Si j’organisais mieux mon temps, j’étudierais plus calmement. Il est important que je révise les règles."], "reisen": ["Je voudrais aller à Paris. Je voyage en train. Où est-ce que je peux acheter un billet ?", "Hier, j’ai réservé une chambre. Demain, je partirai pour Paris en train.", "Si j’avais quelques jours libres, j’irais à Paris. Je réserverais une chambre près de la gare."]};const writingAlt={"familie": ["Ma famille est petite. Je vis avec mes parents. Le dimanche, nous rendons visite à ma grand-mère. Merci !", "Hier, j’ai rendu visite à mes grands-parents. Demain, je téléphonerai à ma sœur. Je suis content.", "Si j’avais plus de temps, je rendrais visite à mes grands-parents plus souvent. J’aimerais passer quelques jours avec eux. Ce serait une belle expérience."], "essen": ["Je voudrais une soupe et de l’eau, s’il vous plaît. L’addition, s’il vous plaît. Merci !", "Hier, j’ai préparé une soupe. Demain, je cuisinerai pour mes amis. Je suis content.", "Si j’avais tous les ingrédients, je préparerais une soupe. J’aimerais cuisiner avec mes amis. Ce serait une belle expérience."], "einkaufen": ["Je cherche une chemise. Je voudrais une grande taille. Est-ce que je peux payer par carte ? Merci !", "Hier, j’ai acheté une chemise. Demain, je changerai mes chaussures parce qu’elles sont trop petites. Je suis content.", "J’achèterais ces chaussures si elles coûtaient moins cher. Je demanderais aussi une taille plus grande. Ce serait une belle expérience."], "hobbys": ["Je joue de la guitare. Pendant mon temps libre, je lis et je joue aux échecs. Merci !", "Hier, j’ai chanté dans la chorale. Demain, je jouerai au handball avec mes amis. Je suis content.", "Si j’avais plus de temps libre, j’apprendrais à jouer du piano. J’aimerais aussi lire davantage. Ce serait une belle expérience."], "schule": ["J’étudie le français. Je vais à l’école en bus. Ma matière préférée est la musique. Merci !", "Hier, j’ai étudié pour le contrôle. Demain, je réviserai avec un ami. Je suis content.", "Si j’organisais mieux mon temps, j’étudierais plus calmement. Il est important que je révise les règles. Ce serait une belle expérience."], "reisen": ["Je voudrais aller à Paris. Je voyage en train. Où est-ce que je peux acheter un billet ? Merci !", "Hier, j’ai réservé une chambre. Demain, je partirai pour Paris en train. Je suis content.", "Si j’avais quelques jours libres, j’irais à Paris. Je réserverais une chambre près de la gare. Ce serait une belle expérience."]};
+function el(tag,text){const x=document.createElement(tag);if(text)x.textContent=text;return x}
+function link(text,href){const a=el('a',text);a.href=href;a.className='fr-support-action';return a}
+let map=[];
+async function boot(){
+ const style=el('style');style.textContent='.fr-support-card{padding:16px;margin:18px 0;border:1px solid #B79440;border-radius:10px;background:#fbfaf6;color:#0D1433;text-align:left}.fr-support-card p,.fr-support-card li{font-size:14px!important;line-height:1.6!important}.fr-support-actions{display:flex;gap:10px;flex-wrap:wrap}.fr-support-action{display:inline-flex;align-items:center;justify-content:center;padding:12px 15px;border:1px solid #B79440;border-radius:6px;background:#fff;color:#0D1433;text-decoration:none;font:600 14px Jost,Arial,sans-serif;min-height:44px;cursor:pointer}.fr-topic-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;padding:14px 0;border-bottom:1px solid #B7944040;font-size:14px}.fr-topic-row a{color:inherit}.fr-support-card summary{cursor:pointer;font-size:14px;font-weight:600}@media(max-width:600px){.fr-topic-row{grid-template-columns:1fr 1fr}.fr-topic-row a{grid-column:1/-1}.fr-support-actions>*{width:100%}}';document.head.append(style);
+ try{const response=await fetch('french-course-map.json?v=1');if(response.ok)map=await response.json();}catch{}
+ await window.FRLearning?.ready;
+ const meta=window.FRPage;
+ function renderProgress(){const rows=document.getElementById('frTopicProgressRows');if(!rows)return;rows.replaceChildren();const summary=window.FRLearning?.summary()||{};
+  for(const item of map){
+   const m=summary.modules?.[item.module]||{},qs=Object.values(m.questions||{});if(!m.answered)continue;
+   const row=el('div');row.className='fr-topic-row';row.append(link(item.title+' · Niveau '+item.level,item.file));
+   const count=qs.length,total=Number(item.count);
+   const metric=(value,label)=>{const span=el('span',String(value));span.append(el('small',label));return span};
+   row.append(metric(count+(Number.isInteger(total)&&total>=count?'/'+total:''),'bearbeitet'),metric(Math.round((m.correct||0)/Math.max(1,m.answered||0)*100)+' %','Trefferquote'),metric(qs.filter(q=>q.unresolvedError).length,'offene Fehler'),metric(qs.filter(q=>Date.parse(q.due)<=Date.now()).length,'fällig'),metric(qs.filter(q=>q.consolidated).length,'gefestigt'));rows.append(row);
+  }
+  if(!rows.children.length)rows.textContent='Nach deinen ersten Antworten erscheint hier dein Fortschritt pro Thema.';
+ }
+ let signature='';
+ function renderRound(){
+  if(!meta)return;const result=document.getElementById('result');if(!result||result.hidden||result.classList.contains('hidden')){signature='';return}
+  const score=document.getElementById('resultScore')?.textContent||'';const writing=(document.getElementById('freeWritingBox')||document.getElementById('freeWriting'));const sig=score+'|'+!!writing;if(signature===sig)return;signature=sig;
+  result.querySelector('#esRoundNext')?.remove();const card=el('section');card.id='esRoundNext';card.className='fr-support-card';card.append(el('h3','Dein nächster Schritt'));
+  const numbers=score.match(/(\d+)\s*(?:von|\/)\s*(\d+)/);const percent=score.match(/(\d+(?:[.,]\d+)?)\s*%/);const pct=numbers?Number(numbers[1])/Math.max(1,Number(numbers[2]))*100:percent?Number(percent[1].replace(',','.')):null;
+  const actions=el('div');actions.className='fr-support-actions';
+  const retry=document.getElementById(meta.daily?'errorsOnly':'mistakesBtn');
+  if(pct!==null&&pct<60){card.append(el('p','Wiederhole zuerst deine Fehler oder sieh dir die passende Theorie an. Danach kannst du eine neue Runde starten.'));if(retry&&!retry.hidden&&retry.style.display!=='none'){const b=el('button','Nur Fehler üben');b.type='button';b.className='fr-support-action';b.onclick=()=>retry.click();actions.append(b)}actions.append(link('Theorie ansehen',meta.theory));}
+  else if(pct===null||pct<85){
+   card.append(el('p',pct===null?'Dein Ergebnis konnte nicht sicher gelesen werden. Prüfe deine Rückmeldungen und übe unsichere Aufgaben.':'Du hast vieles verstanden. Übe die unsicheren Aufgaben nochmals, bevor du weitergehst.'));
+   if(retry&&!retry.hidden&&retry.style.display!=='none'){const b=el('button','Unsichere Aufgaben üben');b.type='button';b.className='fr-support-action';b.onclick=()=>retry.click();actions.append(b)}
+   actions.append(link('Theorie ansehen',meta.theory));
+  }
+  else{
+   card.append(el('p','Gut gearbeitet. Du kannst ein weiteres Thema üben. Bekannte Aufgaben kommen bei späteren Runden zur Wiederholung zurück.'));
+   const section=map.filter(x=>x.daily===meta.daily&&x.level===meta.level);const index=section.findIndex(x=>x.file===meta.file);const next=section[(index+1)%section.length];if(next)actions.append(link('Weiter: '+next.title,next.file));
+  }
+  actions.append(link('Zur Lernübersicht','main.html#hero'));card.append(actions,el('p','Wiederholung: nach einer richtigen Antwort je nach Antwortqualität und zeitlichem Abstand nach 1, 3, 7, 14 und 30 Tagen. „Zweimal in Folge richtig“ ist eine Lernanzeige und kein Nachweis dauerhafter Beherrschung.'));result.append(card);
+  if(writing&&!writing.querySelector('#esWritingExamples')){
+   const examples=el('details');examples.id='esWritingExamples';examples.append(el('summary','Weitere Musterantworten & Prüfkriterien'));
+   const samples=[writingModels[meta.topic]?.[meta.level-1],writingAlt[meta.topic]?.[meta.level-1]];
+   (samples||[]).filter(Boolean).forEach((sample,i)=>{examples.append(el('h4','Beispiel '+(i+2)));const p=el('p',sample);p.lang='fr';examples.append(p)});
+   const list=el('ul');for(const text of ['Beantwortet dein Text alle Teile der Aufgabe?','Passen Zeitform, Person und Wortschatz zur Situation?','Ist die Aussage verständlich und zusammenhängend?'])list.append(el('li',text));examples.append(list,el('p','Die Beispiele zeigen mögliche Antworten. LanguageTool prüft Sprache, aber nicht zuverlässig, ob die Aufgabe inhaltlich erfüllt ist.'));writing.append(examples);
+   const feedback=el('section');feedback.id='esWritingFeedback';feedback.append(el('h4','Deine Schreibreflexion'));
+   const output=el('p');output.setAttribute('aria-live','polite');const checks=[];
+   for(const [label,help] of [['Grammatik','Prüfe Person, Verbform und die zur Aufgabe passende Zeitform.'],['Wortschatz','Prüfe, ob deine Wörter zur Situation passen und verständlich sind.'],['Aufgabenstellung','Prüfe jeden verlangten Inhalt direkt anhand der Aufgabenstellung.']]){
+    const field=el('label',label+' ');const select=el('select');select.setAttribute('aria-label',label);
+    for(const [value,text] of [['','Bitte einschätzen'],['secure','Sicher'],['unsure','Unsicher'],['help','Ich brauche Hilfe']]){const option=el('option',text);option.value=value;select.append(option)}
+    field.append(select);feedback.append(field,el('p',help));checks.push({label,help,select});
+    select.addEventListener('change',()=>{const needs=checks.filter(x=>['unsure','help'].includes(x.select.value));output.textContent=needs.length?'Dein nächster Schwerpunkt: '+needs.map(x=>x.label+': '+x.help).join(' '):checks.every(x=>x.select.value==='secure')?'Vergleiche deinen Text abschliessend mit den Musterantworten. Deine Selbsteinschätzung ist keine automatische Korrektur.':'Schätze alle drei Bereiche ein, um deinen nächsten Schwerpunkt zu sehen.'});
+   }
+   feedback.append(output);writing.append(feedback);
+  }
+ }
+ renderProgress();renderRound();window.addEventListener('frlearningchange',()=>{renderProgress();renderRound()});
+ if(document.getElementById('result'))new MutationObserver(renderRound).observe(document.getElementById('result'),{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden']});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>boot().catch(()=>{}),{once:true});else boot().catch(()=>{});
+})();
