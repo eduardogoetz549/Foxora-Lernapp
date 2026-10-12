@@ -1,0 +1,61 @@
+(()=>{'use strict';
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+function plan(pool,questions={},now=Date.now()){
+ const due=shuffle(pool.filter(q=>questions[String(q.id)]&&Date.parse(questions[String(q.id)].due)<=now));
+ const unseen=shuffle(pool.filter(q=>!questions[String(q.id)]));const selected=due.slice(0,3),counts={};
+ const add=q=>{if(!selected.includes(q)){selected.push(q);counts[q.family||'fill']=(counts[q.family||'fill']||0)+1;}};
+ selected.forEach(q=>counts[q.family||'fill']=(counts[q.family||'fill']||0)+1);
+ for(const q of unseen){if(selected.length===10)break;if((counts[q.family||'fill']||0)<3)add(q)}
+ for(const list of [unseen,due,shuffle(pool)])for(const q of list){if(selected.length===10)break;add(q)}
+ return selected.slice(0,10);
+}
+window.ESLearningSupport={plan};
+const models={
+ familie:['El fin de semana visité a mis abuelos. Comimos juntos y hablamos de nuestros planes.','Si tuviera más tiempo, visitaría a mi familia más a menudo. Me gustaría pasar unos días con mis abuelos.'],
+ essen:['Ayer preparé una ensalada y bebí agua. Mañana cocinaré arroz con verduras.','Me gustaría comer con mis amigos. Si pudiera elegir, prepararía una sopa y una ensalada.'],
+ einkaufen:['Ayer compré una camisa. Pagué con tarjeta porque no llevaba efectivo.','Compraría estos zapatos si fueran más baratos. Preferiría pagar con tarjeta y pediría el recibo.'],
+ hobbys:['El sábado escuché música y nadé en la piscina. Mañana practicaré deporte con mis amigos.','Si tuviera más tiempo libre, aprendería a tocar la guitarra. También me gustaría leer más novelas.'],
+ schule:['Ayer estudié para el examen y escribí un resumen. Mañana revisaré mis respuestas.','Si organizara mejor mi tiempo, estudiaría con más calma. Es importante que revise las respuestas.'],
+ reisen:['Ayer reservé una habitación y compré un billete. Mañana viajaré a Madrid en tren.','Si tuviera unos días libres, viajaría a Madrid. Reservaría una habitación cerca de la estación.']};
+const beginnerAlt={familie:'Mi hermana vive en Madrid. Hablo con ella por teléfono. Los domingos visitamos a nuestra abuela.',essen:'Me gusta la fruta. Bebo agua y como arroz con verduras. Por la mañana tomo un café.',einkaufen:'Busco unos zapatos. Quiero pagar en efectivo. También necesito una bolsa.',hobbys:'Toco la guitarra. En mi tiempo libre dibujo y bailo. Me gusta escuchar música.',schule:'Tengo un examen. Necesito estudiar. Mi profesora me ayuda.',reisen:'Quiero viajar a Barcelona. Voy en autobús. Necesito un billete.'};
+const levelTwoAlt={familie:'Ayer hablé con mi hermana. El domingo visitaré a mis padres.',essen:'Ayer comí arroz en casa. Mañana prepararé una sopa.',einkaufen:'Ayer compré unos zapatos. Mañana cambiaré la camisa.',hobbys:'Ayer canté en el coro. Mañana escucharé música.',schule:'Ayer terminé los deberes. Mañana prepararé el examen.',reisen:'Ayer compré un billete. Mañana visitaré el museo.'};
+const levelThreeAlt={familie:'Me gustaría visitar a mis padres. Si tuviera unos días libres, viajaría para verlos.',essen:'Prepararía una ensalada si tuviera todos los ingredientes. Me gustaría cocinar con mis amigos.',einkaufen:'Si la camisa fuera más barata, la compraría. Pediría una talla más grande.',hobbys:'Si pudiera elegir, aprendería a tocar la guitarra. Practicaría todos los días.',schule:'Me gustaría estudiar con más calma. Si organizara mejor mi tiempo, terminaría antes.',reisen:'Si tuviera más vacaciones, viajaría en tren. Reservaría una habitación cerca del centro.'};
+const simple={familie:'Mi familia es pequeña. Vivo con mi madre y mi hermano. Mi abuela vive cerca.',essen:'Desayuno en casa. Me gusta el pan con queso. Para cenar preparo una ensalada.',einkaufen:'Quiero comprar una camisa. Necesito una talla grande. Pago con tarjeta.',hobbys:'Me gusta leer y escuchar música. Los sábados nado. También juego al ajedrez.',schule:'Estudio español. Voy a la escuela en autobús. Mi asignatura favorita es música.',reisen:'Viajo en tren. Busco la estación. Quiero visitar Madrid.'};
+function el(tag,text){const x=document.createElement(tag);if(text)x.textContent=text;return x}
+function link(text,href){const a=el('a',text);a.href=href;a.className='es-support-action';return a}
+let map=[];
+async function boot(){
+ const style=el('style');style.textContent='.es-support-card{padding:16px;margin:18px 0;border:1px solid #B79440;border-radius:10px;background:#fbfaf6;color:#0D1433;text-align:left}.es-support-card p,.es-support-card li{font-size:14px!important;line-height:1.6!important}.es-support-actions{display:flex;gap:10px;flex-wrap:wrap}.es-support-action{display:inline-flex;align-items:center;justify-content:center;padding:12px 15px;border:1px solid #B79440;border-radius:6px;background:#fff;color:#0D1433;text-decoration:none;font:600 14px Jost,Arial,sans-serif;min-height:44px;cursor:pointer}.es-topic-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;padding:14px 0;border-bottom:1px solid #B7944040;font-size:14px}.es-topic-row a{color:inherit}.es-support-card summary{cursor:pointer;font-size:14px;font-weight:600}@media(max-width:600px){.es-topic-row{grid-template-columns:1fr 1fr}.es-topic-row a{grid-column:1/-1}.es-support-actions>*{width:100%}}';document.head.append(style);
+ try{const response=await fetch('spanish-course-map.json?v=1');if(response.ok)map=await response.json();}catch{}
+ await window.FRLearning?.ready;
+ const meta=window.ESPage;
+ function renderProgress(){const rows=document.getElementById('esTopicProgressRows');if(!rows)return;rows.replaceChildren();const summary=window.FRLearning?.summary()||{};
+  for(const item of map){const m=summary.modules?.[item.module]||{},qs=Object.values(m.questions||{});if(!m.answered)continue;const row=el('div');row.className='es-topic-row';row.append(link(item.title+' · Niveau '+item.level,item.file),el('span',Object.keys(m.questions||{}).length+'/'+item.count+' bearbeitet'),el('span',Math.round((m.correct||0)/Math.max(1,m.answered||0)*100)+' % richtig'),el('span',qs.filter(q=>Date.parse(q.due)<=Date.now()).length+' zur Wiederholung'));rows.append(row)}
+  if(!rows.children.length)rows.textContent='Nach deinen ersten Antworten erscheint hier dein Fortschritt pro Thema.';
+ }
+ let signature='';
+ function renderRound(){
+  if(!meta)return;const result=document.getElementById('result');if(!result||result.hidden||result.classList.contains('hidden')){signature='';return}
+  const score=document.getElementById('resultScore')?.textContent||'';const writing=document.getElementById('freeWritingBox');const sig=score+'|'+!!writing;if(signature===sig)return;signature=sig;
+  result.querySelector('#esRoundNext')?.remove();const card=el('section');card.id='esRoundNext';card.className='es-support-card';card.append(el('h3','Dein nächster Schritt'));
+  const numbers=score.match(/(\d+)\s*(?:von|\/)\s*(\d+)/);const pct=numbers?Number(numbers[1])/Math.max(1,Number(numbers[2]))*100:0;
+  const actions=el('div');actions.className='es-support-actions';
+  const retry=document.getElementById(meta.daily?'errorsOnly':'mistakesBtn');
+  if(pct<70){card.append(el('p','Wiederhole zuerst deine Fehler oder sieh dir die passende Theorie an. Danach kannst du eine neue Runde starten.'));if(retry&&!retry.hidden&&retry.style.display!=='none'){const b=el('button','Nur Fehler üben');b.type='button';b.className='es-support-action';b.onclick=()=>retry.click();actions.append(b)}actions.append(link('Theorie ansehen',meta.theory));}
+  else{
+   card.append(el('p','Gut gearbeitet. Du kannst ein weiteres Thema üben. Bekannte Aufgaben kommen bei späteren Runden zur Wiederholung zurück.'));
+   const section=map.filter(x=>x.daily===meta.daily&&x.level===meta.level);const index=section.findIndex(x=>x.file===meta.file);const next=section[(index+1)%section.length];if(next)actions.append(link('Weiter: '+next.title,next.file));
+  }
+  actions.append(link('Zur Lernübersicht','main.html#hero'));card.append(actions,el('p','Wiederholung: nach einer richtigen Antwort ungefähr nach 1, 3 und 7 Tagen. „Zweimal in Folge richtig“ ist eine Lernanzeige und kein Nachweis dauerhafter Beherrschung.'));result.append(card);
+  if(writing&&!writing.querySelector('#esWritingExamples')){
+   const examples=el('details');examples.id='esWritingExamples';examples.append(el('summary','Weitere Musterantworten & Prüfkriterien'));
+   const samples=meta.level===1?[simple[meta.topic],beginnerAlt[meta.topic]]:meta.level===2?[models[meta.topic]?.[0],levelTwoAlt[meta.topic]]:[models[meta.topic]?.[1],levelThreeAlt[meta.topic]];
+   (samples||[]).filter(Boolean).forEach((sample,i)=>{examples.append(el('h4','Beispiel '+(i+2)));const p=el('p',sample);p.lang='es';examples.append(p)});
+   const list=el('ul');for(const text of ['Beantwortet dein Text alle Teile der Aufgabe?','Passen Zeitform, Person und Wortschatz zur Situation?','Ist die Aussage verständlich und zusammenhängend?'])list.append(el('li',text));examples.append(list,el('p','Die Beispiele zeigen mögliche Antworten. LanguageTool prüft Sprache, aber nicht zuverlässig, ob die Aufgabe inhaltlich erfüllt ist.'));writing.append(examples);
+  }
+ }
+ renderProgress();renderRound();window.addEventListener('frlearningchange',()=>{renderProgress();renderRound()});
+ if(document.getElementById('result'))new MutationObserver(renderRound).observe(document.getElementById('result'),{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden']});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>boot().catch(()=>{}),{once:true});else boot().catch(()=>{});
+})();
