@@ -699,6 +699,13 @@ window.addEventListener('appinstalled', () => {
 /* Bei schmalen Ansichten bleibt die Fläche hinter den Inhalten deckend. */
 @media(max-width:900px){#deGuide::before{-webkit-mask-image:linear-gradient(to right,#000 0%,#000 94%,rgba(0,0,0,.65) 100%);mask-image:linear-gradient(to right,#000 0%,#000 94%,rgba(0,0,0,.65) 100%)}}
 @supports not (mask-image:linear-gradient(to right,#000,transparent)){#deGuide::before{background:linear-gradient(to right,rgba(13,20,51,.94) 64%,rgba(13,20,51,.85) 76%,transparent);border:0;border-left:1px solid #B79440}}
+</style><style id="foxora-password-visibility-style">
+.foxora-password-field{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:8px;margin-bottom:12px}
+.foxora-password-field input{width:100%;min-width:0;margin:0!important}
+.foxora-password-field .foxora-password-toggle{align-self:stretch;min-height:44px;margin:0;padding:9px 12px;border:1px solid #B79440;border-radius:5px;background:#0D1433;color:#D4AF60;font:500 13px/1.4 Jost,Arial,sans-serif;cursor:pointer;white-space:nowrap}
+.foxora-password-field .foxora-password-toggle:hover{background:#B79440;color:#0D1433}
+.foxora-password-field .foxora-password-toggle:focus-visible{outline:2px solid #D4AF60;outline-offset:3px}
+@media(max-width:380px){.foxora-password-field{gap:6px}.foxora-password-field .foxora-password-toggle{padding:8px;font-size:12px}}
 </style></head>
 <body>
 
@@ -1292,5 +1299,16 @@ window.addEventListener('load',()=>{
   window.addEventListener('load',updateBackground,{once:true});
   if(document.fonts)document.fonts.ready.then(updateBackground);
 })();
-</script><script src="german-guidance.js?v=uniform1"></script><script>(()=>{const note=document.getElementById('deGuideSignup');function refresh(){if(note)note.hidden=!window.FRLearning||window.FRLearning.account!=='guest';}if(window.FRLearning?.ready)window.FRLearning.ready.then(refresh).catch(()=>{});window.addEventListener('frlearningchange',refresh);})();</script></body>
+</script><script src="german-guidance.js?v=uniform1"></script><script>(()=>{const note=document.getElementById('deGuideSignup');function refresh(){if(note)note.hidden=!window.FRLearning||window.FRLearning.account!=='guest';}if(window.FRLearning?.ready)window.FRLearning.ready.then(refresh).catch(()=>{});window.addEventListener('frlearningchange',refresh);})();</script><script id="foxora-password-visibility-script">
+(()=>{'use strict';const english=document.documentElement.lang==='en';
+function init(){document.querySelectorAll('input[type="password"]').forEach(input=>{
+ if(input.closest('.foxora-password-field'))return;
+ const wrap=document.createElement('div');wrap.className='foxora-password-field';input.parentNode.insertBefore(wrap,input);wrap.append(input);
+ const toggle=document.createElement('button');toggle.type='button';toggle.className='foxora-password-toggle';toggle.setAttribute('aria-pressed','false');if(input.id)toggle.setAttribute('aria-controls',input.id);
+ const label=input.id?document.querySelector('label[for="'+input.id+'"]'):null;const field=label?.textContent.trim()||(english?'Password':'Passwort');
+ function update(){const visible=input.type==='text';toggle.textContent=visible?(english?'Hide':'Verbergen'):(english?'Show':'Anzeigen');toggle.setAttribute('aria-pressed',String(visible));toggle.setAttribute('aria-label',field+': '+(visible?(english?'hide password':'Passwort verbergen'):(english?'show password':'Passwort anzeigen')))}
+ toggle.addEventListener('click',()=>{input.type=input.type==='password'?'text':'password';update()});
+ input.form?.addEventListener('submit',()=>{input.type='password';update()});wrap.append(toggle);update();
+})}init();new MutationObserver(init).observe(document.body,{childList:true,subtree:true});})();
+</script></body>
 </html>
