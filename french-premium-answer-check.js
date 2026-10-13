@@ -1,0 +1,1 @@
+(()=>{'use strict';const norm=s=>String(s).normalize('NFC').toLocaleLowerCase('es').trim().replace(/[’‘]/g,"'").replace(/[¿¡?!.,;:]/g,'').replace(/\s+/g,' ');window.FRAnswers={check:(v,a,accepted=[])=>[a,...accepted].some(x=>norm(v)===norm(x))};})();
