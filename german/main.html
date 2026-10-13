@@ -1,9 +1,47 @@
 <!DOCTYPE html>
 <html lang="en" class="de-guide-loading">
-<head><script src="foxora-start/password-recovery.js?v=1"></script>
+<head><script id="foxora-password-recovery">(()=>{'use strict';
+ const query=new URLSearchParams(location.search);
+ // Older redirects included #Konto before Supabase's own fragment.
+ const fragment=new URLSearchParams(location.hash.replace(/^#(?:Konto[#&])?/,''));
+ const arrival=query.get('reset')==='1'||query.get('type')==='recovery'||fragment.get('type')==='recovery';
+ const state={arrival,pending:arrival,valid:false,error:null,userId:null};
+ const key='foxora:password-recovery:v1';
+ const cleanURL=()=>{const url=new URL(location.href);for(const k of ['access_token','refresh_token','token_hash','code','type','error','error_code','error_description'])url.searchParams.delete(k);url.searchParams.set('reset','1');url.hash='Konto';history.replaceState(null,'',url.href);};
+ const notify=()=>window.dispatchEvent(new CustomEvent('frrecoverychange'));
+ const remember=session=>{if(!session?.user?.id)return;state.userId=session.user.id;state.valid=true;state.pending=false;state.error=null;try{sessionStorage.setItem(key,JSON.stringify({userId:state.userId,until:Date.now()+3600000}));}catch(_){};};
+ function mark(event,session){if(event==='PASSWORD_RECOVERY'){state.arrival=true;window.FRRecoveryArrival=true;remember(session);notify();}if(event==='SIGNED_OUT'){state.valid=false;state.userId=null;try{sessionStorage.removeItem(key);}catch(_){};notify();}}
+ let initialization;
+ function initialize(client){return initialization||(initialization=runInitialize(client));}
+ async function runInitialize(client){
+  if(!state.arrival)return;
+  try{
+   const err=fragment.get('error_description')||query.get('error_description')||fragment.get('error')||query.get('error');if(err)throw new Error('Der Passwort-Link ist abgelaufen oder ungültig. Fordere einen neuen Link an.');
+   let result;const access=fragment.get('access_token')||query.get('access_token'),refresh=fragment.get('refresh_token')||query.get('refresh_token');
+   if(access||refresh){if(!access||!refresh)throw new Error('Der Passwort-Link ist unvollständig. Fordere einen neuen Link an.');result=await client.auth.setSession({access_token:access,refresh_token:refresh});}
+   else if(query.get('token_hash'))result=await client.auth.verifyOtp({token_hash:query.get('token_hash'),type:'recovery'});
+   else if(query.get('code'))result=await client.auth.exchangeCodeForSession(query.get('code'));
+   else{
+    const {data,error}=await client.auth.getSession();if(error)throw error;
+    let previous;try{previous=JSON.parse(sessionStorage.getItem(key));}catch(_){}
+    if(!previous||previous.until<Date.now()||previous.userId!==data.session?.user?.id)throw new Error('Dieser Link enthält keine gültige Passwort-Freigabe. Fordere eine neue Passwort-Mail an und öffne deren Bestätigungslink.');
+    result={data,error:null};
+   }
+   if(result.error)throw result.error;
+   const session=result.data?.session;if(!session?.user?.id)throw new Error('Der Passwort-Link konnte nicht bestätigt werden. Fordere einen neuen Link an.');
+   const checked=await client.auth.getUser();if(checked.error||checked.data?.user?.id!==session.user.id)throw new Error('Der Passwort-Link konnte nicht bestätigt werden. Fordere einen neuen Link an.');
+   remember(session);
+  }catch(_){state.valid=false;state.userId=null;state.error='Der Passwort-Link ist ungültig, abgelaufen oder konnte nicht geprüft werden. Fordere eine neue Passwort-Mail an und öffne den neuesten Link. Du musst dich dafür nicht zuerst anmelden.';try{sessionStorage.removeItem(key);}catch(_){};}
+  finally{state.pending=false;cleanURL();notify();}
+ }
+ function complete(){state.arrival=false;state.pending=false;state.valid=false;state.userId=null;window.FRRecoveryArrival=false;try{sessionStorage.removeItem(key);}catch(_){};}
+ window.FRRecovery=Object.assign(state,{initialize,mark,complete});window.FRRecoveryArrival=arrival;
+ if(arrival){document.documentElement.classList.add('foxora-recovery');const style=document.createElement('style');style.textContent='html.foxora-recovery #accountForm,html.foxora-recovery #accountSignedIn{display:none!important}html.foxora-recovery #accountResetForm{display:block!important}';document.head.appendChild(style);}
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Foxora · Learn German</title>
+<title>Foxora Lernapp · Learn German</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&amp;family=Jost:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 <style>
@@ -706,6 +744,38 @@ window.addEventListener('appinstalled', () => {
 .foxora-password-field .foxora-password-toggle:hover{background:#B79440;color:#0D1433}
 .foxora-password-field .foxora-password-toggle:focus-visible{outline:2px solid #D4AF60;outline-offset:3px}
 @media(max-width:380px){.foxora-password-field{gap:6px}.foxora-password-field .foxora-password-toggle{padding:8px;font-size:12px}}
+</style><style id="foxora-uniform-main-layout">.de-guide-hidden{display:none!important}.de-guide-loading #Spi,.de-guide-loading #Heute,.de-guide-loading #Fortschritt,.de-guide-loading #Pruefung,.de-guide-loading #lernwerkstatt,.de-guide-loading .welcome-paths{display:none!important}#deGuide{max-width:900px;margin:28px auto;padding:24px;background:rgba(13,20,51,.92);border:1px solid #B79440;border-radius:12px;color:#fff;text-align:left}#deGuide h2{font:400 32px 'Cormorant Garamond',Georgia,serif;margin:8px 0}#deGuide p{color:#C0D4F2;line-height:1.6}#deGuide .de-steps{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.de-steps span{font-size:12px;padding:6px 9px;border:1px solid #C0D4F240;border-radius:6px;color:#C0D4F2}.de-steps .done{color:#D4AF60;border-color:#B79440}#deGuide .de-actions{display:flex;gap:10px;flex-wrap:wrap}#deGuide a,#deGuide button{font:500 15px Jost,Arial,sans-serif;padding:12px 16px;border-radius:4px;cursor:pointer;text-decoration:none}#deGuideNext{background:#B79440;color:#0D1433;border:1px solid #B79440}#deGuideToggle,#deGuidePractice{background:transparent;color:#D4AF60;border:1px solid #B79440}#deGuide a:hover,#deGuide button:hover{background:#D4AF60;color:#0D1433}#deGuideStatus{font-size:12px;margin-bottom:0}#deGuide button:disabled{opacity:.5;cursor:wait}@media(max-width:600px){#deGuide{padding:18px;margin:20px 0}#deGuide .de-actions>*{width:100%;text-align:center}}
+
+#deGuide #deGuideSignup{margin:12px 0 0;font:400 13px/1.5 var(--font-body);color:#C0D4F2}
+#deGuide #deGuideSignup[hidden]{display:none!important}
+#deGuide #deGuideSignup a{display:inline;min-height:0;padding:0;border:0;border-radius:0;background:transparent;color:#D4AF60;font:500 13px/1.5 var(--font-body);text-decoration:underline;text-underline-offset:3px}
+#deGuide #deGuideSignup a:hover{background:transparent;color:#fff}
+#deGuide #deGuideSignup a:focus-visible{outline:2px solid #D4AF60;outline-offset:3px}
+
+
+/* Nur die Kartenfläche verblasst; Inhalte bleiben auf einer eigenen Ebene. */
+#deGuide{position:relative;isolation:isolate;background:transparent;border:0;box-shadow:none}
+#deGuide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border:1px solid #B79440;border-radius:12px;background:rgba(13,20,51,.94);-webkit-mask-image:linear-gradient(to right,#000 0%,#000 64%,rgba(0,0,0,.9) 76%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 64%,rgba(0,0,0,.9) 76%,transparent 100%)}
+#deGuide .de-guide-main{position:relative;color:#fff}
+#deGuide h2,#deGuide p,#deGuide small{ text-shadow:0 1px 5px rgba(0,0,0,.8) }
+#deGuide .de-actions>a,#deGuide .de-actions>button{ text-shadow:none }
+#deGuide #deGuideTheory,#deGuide #deGuideToggle{background:#0D1433;border-color:#B79440;color:#D4AF60}
+#deGuide #deGuideNext{background:#B79440;color:#0D1433}
+#deGuide #deGuideTheory:hover,#deGuide #deGuideToggle:hover,#deGuide #deGuideNext:hover{background:#D4AF60;color:#0D1433}
+/* Bei schmalen Ansichten bleibt die Fläche hinter den Inhalten deckend. */
+@media(max-width:900px){#deGuide::before{-webkit-mask-image:linear-gradient(to right,#000 0%,#000 94%,rgba(0,0,0,.65) 100%);mask-image:linear-gradient(to right,#000 0%,#000 94%,rgba(0,0,0,.65) 100%)}}
+@supports not (mask-image:linear-gradient(to right,#000,transparent)){#deGuide::before{background:linear-gradient(to right,rgba(13,20,51,.94) 64%,rgba(13,20,51,.85) 76%,transparent);border:0;border-left:1px solid #B79440}}
+
+
+#hero .hero-bg{bottom:auto;height:var(--hero-background-height,100%);pointer-events:none}
+
+
+.welcome-paths{position:relative;isolation:isolate}
+.welcome-paths::before{content:'';position:absolute;inset:-35px -100vw -80px;z-index:-1;pointer-events:none;background:linear-gradient(to bottom,rgba(13,20,51,0),rgba(13,20,51,.82) 95px,rgba(13,20,51,.96) 100%)}
+.welcome-path,.welcome-path:hover{background:rgba(13,20,51,.92);border-color:rgba(192,212,242,.32)}
+.welcome-path:hover{background:rgba(18,30,71,.98);border-color:rgba(212,175,96,.72)}
+.welcome-path-menu a{background:rgba(13,20,51,.96);border-color:rgba(212,175,96,.65)}
+.welcome-path-menu a:hover,.welcome-path-menu a:focus-visible{background:#26345d;color:#fff;border-color:var(--gold-lt)}
 </style></head>
 <body>
 
@@ -713,12 +783,12 @@ window.addEventListener('appinstalled', () => {
 
 <!-- NAV -->
 <nav id="navbar">
-  <div class="foxora-header-brand"><a class="foxora-brand-link" href="main.html" aria-label="Foxora – Home"><img src="fuchs-idle.png" alt="" width="40" height="40"><span>Foxora</span></a></div>
+  <div class="foxora-header-brand"><a class="foxora-brand-link" href="main.html" aria-label="Foxora – Startseite"><img src="fuchs-idle.png" alt="" width="40" height="40"><span>Foxora</span></a></div>
   <div class="foxora-header-navigation"><ul class="nav-links">
     
     <li><a href="#Spi">Learn</a></li>
-    <li><a href="#Fortschritt">Mein Fortschritt</a></li>
-  <li class="foxora-more-item"><details class="foxora-more-switcher"><summary>More <span class="foxora-chevron" aria-hidden="true">⌄</span></summary><div class="foxora-more-menu" aria-label="More areas"><a href="#theorie">Theory</a><a href="#Pruefung">Exams</a><a href="#lernwerkstatt">Learning workshop</a></div></details></li></ul></div>
+    <li><a href="#Fortschritt">My progress</a></li>
+  <li class="foxora-more-item"><details class="foxora-more-switcher"><summary>More <span class="foxora-chevron" aria-hidden="true">⌄</span></summary><div class="foxora-more-menu" aria-label="Weitere Bereiche"><a href="#theorie">Theory</a><a href="#Pruefung">Exams</a><a href="#lernwerkstatt">Learning workshop</a></div></details></li></ul></div>
   <div class="nav-account-actions">
 <details class="foxora-language-switcher"><summary aria-label="German – Change language"><span class="foxora-language-label"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="20" fill="#000"/><rect x="0" y="20" width="90" height="20" fill="#dd0000"/><rect x="0" y="40" width="90" height="20" fill="#ffce00"/></svg></span> Deutsch</span><span class="foxora-chevron" aria-hidden="true">⌄</span></summary><div class="foxora-language-menu" aria-label="All languages"><a href="../main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="30" height="60" fill="#002395"/><rect x="30" y="0" width="30" height="60" fill="#fff"/><rect x="60" y="0" width="30" height="60" fill="#ed2939"/></svg></span> French</a><a href="../italian/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="30" height="60" fill="#009246"/><rect x="30" y="0" width="30" height="60" fill="#fff"/><rect x="60" y="0" width="30" height="60" fill="#ce2b37"/></svg></span> Italian</a><a href="../spanish/main.html"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="60" fill="#aa151b"/><rect x="0" y="15" width="90" height="30" fill="#f1bf00"/><path d="M23 23h10v13q-5 8-10 0z" fill="#aa151b" stroke="#fff" stroke-width="1.5"/><path d="M23 21h10" stroke="#aa151b" stroke-width="3"/></svg></span> Spanish</a><a href="main.html" aria-current="page"><span class="foxora-flag" aria-hidden="true"><svg class="foxora-flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 60" width="24" height="16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="90" height="20" fill="#000"/><rect x="0" y="20" width="90" height="20" fill="#dd0000"/><rect x="0" y="40" width="90" height="20" fill="#ffce00"/></svg></span> Deutsch</a></div></details>
     <a href="#Premium" class="account-link nav-cta" id="premiumNav">Premium</a>
@@ -1133,6 +1203,7 @@ window.addEventListener('load',()=>{
    if (!client) throw new Error("Offline");
  } catch (_) { showMessage('Sign-in could not be initialised.'); busy(true); return; }
  window.FRAccount = client;
+ await window.FRRecovery.initialize(client);
  let recovering = !!window.FRRecoveryArrival;
  const resetForm = byId('accountResetForm');
  function render(session) {
@@ -1161,7 +1232,7 @@ window.addEventListener('load',()=>{
    return 'The action failed. Check your connection and try again.';
  }
  client.auth.onAuthStateChange((event, session) => {
-   if (event === 'PASSWORD_RECOVERY') { recovering = true; location.hash = 'Konto'; }
+   if (event === 'PASSWORD_RECOVERY') { recovering = true; }
    render(session);
    if (recovering) { showMessage(window.FRRecovery?.valid ? 'Set your new password now.' : 'This password link could not be verified. Request a new email and open its latest link.'); return; }
    if (event === 'INITIAL_SESSION') showMessage(session ? 'You are signed in.' : 'Sign in or create an account.');
@@ -1220,6 +1291,10 @@ window.addEventListener('load',()=>{
    const input=byId('accountRecoveryEmail');if(!input.value.trim()||!input.reportValidity())return;
    const button=byId('accountRecoveryResend');button.disabled=true;
    try{const target=new URL('./main.html',location.href);target.search='?reset=1';target.hash='';const {error}=await client.auth.resetPasswordForEmail(input.value.trim(),{redirectTo:target.href});if(error)throw error;showMessage('If an account exists, a new password email has been requested. Open its latest link.');}catch(error){showMessage(errorText(error));}finally{button.disabled=false;}
+ });
+ window.addEventListener('frrecoverychange', () => {
+   recovering = !!window.FRRecoveryArrival;
+   client.auth.getSession().then(({data}) => { render(data.session); if(recovering) { location.hash = 'Konto'; showMessage(window.FRRecovery.valid ? 'Set your new password now.' : window.FRRecovery.error); } });
  });
  const {data: initial} = await client.auth.getSession();
  render(initial.session);
@@ -1299,7 +1374,60 @@ window.addEventListener('load',()=>{
   window.addEventListener('load',updateBackground,{once:true});
   if(document.fonts)document.fonts.ready.then(updateBackground);
 })();
-</script><script src="german-guidance.js?v=uniform1"></script><script>(()=>{const note=document.getElementById('deGuideSignup');function refresh(){if(note)note.hidden=!window.FRLearning||window.FRLearning.account!=='guest';}if(window.FRLearning?.ready)window.FRLearning.ready.then(refresh).catch(()=>{});window.addEventListener('frlearningchange',refresh);})();</script><script id="foxora-password-visibility-script">
+</script><script id="foxora-guidance-inline">(() => {
+ 'use strict';
+ function derive(summary,skip=false){
+  const completed=Object.entries(summary.modules||{}).filter(([id,m])=>/^(?:de_|deutsch_|german_)/.test(id) && Number(m.completed)>0 && !/guidance|pruefung|prüfung|exam|15_minuten/.test(id));
+  const daily=completed.filter(([id])=>/alltag|daily|jetzt.?anwenden/.test(id));
+  const grammar=completed.filter(([id])=>!daily.some(([other])=>other===id));
+  const topics=new Set(grammar.map(([id])=>id.replace(/_[123]_(?:oberstufe|level).*$/,'').replace(/_[123]$/,'')));
+  return {grammar:skip||grammar.length>=1,daily:skip||topics.size>=2,lab:skip||(topics.size>=2&&daily.length>=1),exam:skip||(topics.size>=4&&daily.length>=1),count:topics.size,dailyCount:daily.length,skip};
+ }
+ window.DEGuidance={derive};
+ if(!document.getElementById('deGuide'))return;
+ const $=id=>document.getElementById(id);
+ let ready=false,state=derive({}),lastActor=null;
+ const hidden=new Set();
+ function hide(el,on){if(!el)return;el.classList.toggle('de-guide-hidden',on);if(on)hidden.add(el);else hidden.delete(el);}
+ function render(){
+  const core=window.FRLearning;let mode=core?.guidanceMode?.();if(!mode){try{mode=localStorage.getItem('de_guidance_mode:'+core?.account)||'guided'}catch{mode='guided'}}state=derive(core?.summary?.()||{},(mode==='all'||mode==='free'));
+  const steps=[true,state.grammar,state.daily,state.lab,state.exam];
+  document.querySelectorAll('[data-de-step]').forEach(el=>{const n=Number(el.dataset.deStep);el.classList.toggle('done',steps[n]);el.setAttribute('aria-label', ['First lesson','Grammar','Everyday','Review','Exam'][n]+(steps[n]?' · unlocked':' · still locked'));el.textContent=['1 · First lesson','2 · Grammar','3 · Everyday','4 · Review','5 · Exam'][n]+(steps[n]?' ✓':' 🔒');});
+  $('deGuideToggle').textContent=state.skip?'Show guided learning path':'Show all areas';
+  const grammarFiles=["deutsch-en-sein-haben-1-oberstufe.html", "deutsch-en-artikel-plural-1-oberstufe.html", "deutsch-en-adjektive-1-oberstufe.html", "deutsch-en-pronomen-1-oberstufe.html"];
+  function nextGrammar(){const modules=core?.summary?.().modules||{};return grammarFiles.find(file=>{const key=file.replace(/\.html$/,'').replace(/-/g,'_');return !Object.entries(modules).some(([id,m])=>id.includes(key)&&Number(m.completed)>0);})||grammarFiles[0];}
+  let title,text,href;
+  if(!state.grammar){title='Your first step';text='Start with sein and haben. Completing a round opens the grammar overview, whatever your score.';href='deutsch-en-sein-haben-1-oberstufe.html';}
+  else if(!state.daily){title='Another grammar lesson';text='Complete a round in a second grammar topic to unlock everyday German.';href=nextGrammar();}
+  else if(!state.lab){title='Use your German';text='Complete an everyday round to unlock your learning workshop.';href='deutsch-en-alltag-familie-1-oberstufe.html';}
+  else if(!state.exam){title='Build your foundations';text=`${state.count} of 4 grammar topics completed. Then exam practice opens.`;href=nextGrammar();}
+  else{title='Your learning path is open';text='You can explore all areas. Levels 2 and 3 and exams still require Premium.';href=nextGrammar();}
+  if(state.skip){title='All areas are visible';text='Choose your topic and level freely. Premium rules still apply.';href=nextGrammar();}
+  $('deGuideTitle').textContent=title;$('deGuideText').textContent=text;$('deGuideNext').href=href;
+  hide($('Spi'),!state.grammar);hide($('Heute'),!state.grammar);hide($('Fortschritt'),!state.grammar);hide($('Pruefung'),!state.exam);hide($('lernwerkstatt'),!state.lab);hide($('analysisFold'),!state.lab);hide($('Pru'),!state.grammar);hide($('kompetenzlernen'),!state.lab);
+  hide($('chooseEveryday')?.closest('article'),!state.daily);hide($('Alltag'),!state.daily);
+  document.querySelectorAll('#Theoriekarten a').forEach(a=>hide(a,!state.grammar&&!a.href.includes('deutsch-en-theorie-sein-haben.html')));
+  document.querySelectorAll('.welcome-path').forEach(el=>{const href=el.getAttribute('href');hide(el,!state.grammar||(href==='#Alltag'&&!state.daily)||(href==='#lernwerkstatt'&&!state.lab));});
+  hide(document.querySelector('.welcome-paths'),!state.grammar);
+  document.querySelectorAll('#navbar a[href^="#"]').forEach(a=>{const h=a.hash;hide(a,(h==='#Spi'&&!state.grammar)||(h==='#Fortschritt'&&!state.grammar)||(h==='#Pruefung'&&!state.exam)||(h==='#lernwerkstatt'&&!state.lab));});
+  if($('deGuidePractice'))$('deGuidePractice').hidden=true;
+  $('deGuideTheory').hidden=state.grammar;
+  $('deGuideStatus').textContent=ready?(core?.account==='guest'?'Your learning path is saved on this device.':'Your progress syncs with your account.'):'Loading your progress …';
+  document.documentElement.classList.remove('de-guide-loading');
+  if(lastActor!==core?.account){lastActor=core?.account;checkHash();}
+ }
+ const restricted=h=>(['#Spi','#Grammatik','#Heute','#Fortschritt'].includes(h)&&!state.grammar)||(['#Alltag'].includes(h)&&!state.daily)||(['#lernwerkstatt','#Fehleranalyse'].includes(h)&&!state.lab)||(h==='#Pruefung'&&!state.exam);
+ function checkHash(){if(restricted(location.hash)){history.replaceState(null,'','#hero');$('deGuide').scrollIntoView({block:'center'});$('deGuideStatus').textContent='This area opens after your next learning step. You can also show all areas.';}}
+ document.addEventListener('click',e=>{const a=e.target.closest('a');if(a&&a.getAttribute('href')?.startsWith('#')&&restricted(a.getAttribute('href'))){e.preventDefault();e.stopImmediatePropagation();$('deGuide').scrollIntoView({block:'center'});$('deGuideStatus').textContent='This area opens after your next learning step.';}},true);
+ $('deGuideToggle').onclick=()=>{const mode=state.skip?'guided':'all';if(window.FRLearning?.setGuidanceMode)window.FRLearning.setGuidanceMode(mode);else try{localStorage.setItem('de_guidance_mode:'+window.FRLearning?.account,mode)}catch{}render();};
+ function openEveryday(e){e.preventDefault();const panel=$('Alltag'),button=$('chooseEveryday');if(panel.hidden)button.click();history.replaceState(null,'','#Alltag');requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}));}
+ $('deGuideNext').addEventListener('click',e=>{if($('deGuideNext').hash==='#Alltag')openEveryday(e);else if($('deGuideNext').hash==='#Grammatik'&&$('Grammatik').hidden)$('chooseGrammar')?.click();});
+
+ window.addEventListener('hashchange',checkHash);window.addEventListener('frlearningchange',render);
+ render();
+ window.FRLearning?.ready.then(()=>{ready=true;$('deGuideToggle').disabled=false;render();checkHash();});
+})();
+</script><script>(()=>{const note=document.getElementById('deGuideSignup');function refresh(){if(note)note.hidden=!window.FRLearning||window.FRLearning.account!=='guest';}if(window.FRLearning?.ready)window.FRLearning.ready.then(refresh).catch(()=>{});window.addEventListener('frlearningchange',refresh);})();</script><script id="foxora-password-visibility-script">
 (()=>{'use strict';const english=document.documentElement.lang==='en';
 function init(){document.querySelectorAll('input[type="password"]').forEach(input=>{
  if(input.closest('.foxora-password-field'))return;
