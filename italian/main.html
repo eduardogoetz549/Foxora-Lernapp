@@ -1,9 +1,47 @@
 <!DOCTYPE html>
 <html lang="de" class="it-guide-loading">
-<head><script src="foxora-start/password-recovery.js?v=1"></script>
+<head><script id="foxora-password-recovery">(()=>{'use strict';
+ const query=new URLSearchParams(location.search);
+ // Older redirects included #Konto before Supabase's own fragment.
+ const fragment=new URLSearchParams(location.hash.replace(/^#(?:Konto[#&])?/,''));
+ const arrival=query.get('reset')==='1'||query.get('type')==='recovery'||fragment.get('type')==='recovery';
+ const state={arrival,pending:arrival,valid:false,error:null,userId:null};
+ const key='foxora:password-recovery:v1';
+ const cleanURL=()=>{const url=new URL(location.href);for(const k of ['access_token','refresh_token','token_hash','code','type','error','error_code','error_description'])url.searchParams.delete(k);url.searchParams.set('reset','1');url.hash='Konto';history.replaceState(null,'',url.href);};
+ const notify=()=>window.dispatchEvent(new CustomEvent('frrecoverychange'));
+ const remember=session=>{if(!session?.user?.id)return;state.userId=session.user.id;state.valid=true;state.pending=false;state.error=null;try{sessionStorage.setItem(key,JSON.stringify({userId:state.userId,until:Date.now()+3600000}));}catch(_){};};
+ function mark(event,session){if(event==='PASSWORD_RECOVERY'){state.arrival=true;window.FRRecoveryArrival=true;remember(session);notify();}if(event==='SIGNED_OUT'){state.valid=false;state.userId=null;try{sessionStorage.removeItem(key);}catch(_){};notify();}}
+ let initialization;
+ function initialize(client){return initialization||(initialization=runInitialize(client));}
+ async function runInitialize(client){
+  if(!state.arrival)return;
+  try{
+   const err=fragment.get('error_description')||query.get('error_description')||fragment.get('error')||query.get('error');if(err)throw new Error('Der Passwort-Link ist abgelaufen oder ungültig. Fordere einen neuen Link an.');
+   let result;const access=fragment.get('access_token')||query.get('access_token'),refresh=fragment.get('refresh_token')||query.get('refresh_token');
+   if(access||refresh){if(!access||!refresh)throw new Error('Der Passwort-Link ist unvollständig. Fordere einen neuen Link an.');result=await client.auth.setSession({access_token:access,refresh_token:refresh});}
+   else if(query.get('token_hash'))result=await client.auth.verifyOtp({token_hash:query.get('token_hash'),type:'recovery'});
+   else if(query.get('code'))result=await client.auth.exchangeCodeForSession(query.get('code'));
+   else{
+    const {data,error}=await client.auth.getSession();if(error)throw error;
+    let previous;try{previous=JSON.parse(sessionStorage.getItem(key));}catch(_){}
+    if(!previous||previous.until<Date.now()||previous.userId!==data.session?.user?.id)throw new Error('Dieser Link enthält keine gültige Passwort-Freigabe. Fordere eine neue Passwort-Mail an und öffne deren Bestätigungslink.');
+    result={data,error:null};
+   }
+   if(result.error)throw result.error;
+   const session=result.data?.session;if(!session?.user?.id)throw new Error('Der Passwort-Link konnte nicht bestätigt werden. Fordere einen neuen Link an.');
+   const checked=await client.auth.getUser();if(checked.error||checked.data?.user?.id!==session.user.id)throw new Error('Der Passwort-Link konnte nicht bestätigt werden. Fordere einen neuen Link an.');
+   remember(session);
+  }catch(_){state.valid=false;state.userId=null;state.error='Der Passwort-Link ist ungültig, abgelaufen oder konnte nicht geprüft werden. Fordere eine neue Passwort-Mail an und öffne den neuesten Link. Du musst dich dafür nicht zuerst anmelden.';try{sessionStorage.removeItem(key);}catch(_){};}
+  finally{state.pending=false;cleanURL();notify();}
+ }
+ function complete(){state.arrival=false;state.pending=false;state.valid=false;state.userId=null;window.FRRecoveryArrival=false;try{sessionStorage.removeItem(key);}catch(_){};}
+ window.FRRecovery=Object.assign(state,{initialize,mark,complete});window.FRRecoveryArrival=arrival;
+ if(arrival){document.documentElement.classList.add('foxora-recovery');const style=document.createElement('style');style.textContent='html.foxora-recovery #accountForm,html.foxora-recovery #accountSignedIn{display:none!important}html.foxora-recovery #accountResetForm{display:block!important}';document.head.appendChild(style);}
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Foxora · Italienisch lernen</title>
+<title>Foxora Lernapp · Italienisch lernen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&amp;family=Jost:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 <style>
@@ -687,13 +725,22 @@ window.addEventListener('appinstalled', () => {
 .welcome-path:hover{background:rgba(18,30,71,.98);border-color:rgba(212,175,96,.72)}
 .welcome-path-menu a{background:rgba(13,20,51,.96);border-color:rgba(212,175,96,.65)}
 .welcome-path-menu a:hover,.welcome-path-menu a:focus-visible{background:#26345d;color:#fff;border-color:var(--gold-lt)}
-</style><style id="fr-guidance-style">.it-guide-hidden{display:none!important}.it-guide-loading #Spi,.it-guide-loading #Heute,.it-guide-loading #Fortschritt,.it-guide-loading #Pruefung,.it-guide-loading #lernwerkstatt,.it-guide-loading .welcome-paths{display:none!important}#itGuide{max-width:900px;margin:28px auto;padding:24px;background:rgba(13,20,51,.92);border:1px solid #B79440;border-radius:12px;color:#fff;text-align:left}#itGuide h2{font:400 32px 'Cormorant Garamond',Georgia,serif;margin:8px 0}#itGuide p{color:#C0D4F2;line-height:1.6}#itGuide .it-steps{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.it-steps span{font-size:12px;padding:6px 9px;border:1px solid #C0D4F240;border-radius:6px;color:#C0D4F2}.it-steps .done{color:#D4AF60;border-color:#B79440}#itGuide .it-actions{display:flex;gap:10px;flex-wrap:wrap}#itGuide a,#itGuide button{font:500 15px Jost,Arial,sans-serif;padding:12px 16px;border-radius:4px;cursor:pointer;text-decoration:none}#itGuideNext{background:#B79440;color:#0D1433;border:1px solid #B79440}#itGuideToggle,#itGuidePractice{background:transparent;color:#D4AF60;border:1px solid #B79440}#itGuide a:hover,#itGuide button:hover{background:#D4AF60;color:#0D1433}#itGuideStatus{font-size:12px;margin-bottom:0}#itGuide button:disabled{opacity:.5;cursor:wait}@media(max-width:600px){#itGuide{padding:18px;margin:20px 0}#itGuide .it-actions>*{width:100%;text-align:center}}</style><style>#itGuide{width:100%;max-width:none;margin:24px 0;padding:22px}#itGuide p{font:400 15px/1.6 var(--font-body)}#itGuideTheory{border:1px solid #B7944066;color:#D4AF60;border-radius:4px}#itGuide .it-actions{align-items:stretch}#itGuide a,#itGuide button{min-height:44px}#itGuideStatus{font-size:12px!important}@media(max-width:600px){#itGuide{padding:16px}#itGuide .it-actions>*{width:100%}}</style><noscript><style>.it-guide-loading #Spi,.it-guide-loading #Heute,.it-guide-loading #Fortschritt,.it-guide-loading #Pruefung,.it-guide-loading #lernwerkstatt,.it-guide-loading .welcome-paths{display:block!important}</style></noscript><style id="fr-guidance-style">.it-guide-hidden{display:none!important}.it-guide-loading #Spi,.it-guide-loading #Heute,.it-guide-loading #Fortschritt,.it-guide-loading #Pruefung,.it-guide-loading #lernwerkstatt,.it-guide-loading .welcome-paths{display:none!important}#itGuide{max-width:900px;margin:28px auto;padding:24px;background:rgba(13,20,51,.92);border:1px solid #B79440;border-radius:12px;color:#fff;text-align:left}#itGuide h2{font:400 32px 'Cormorant Garamond',Georgia,serif;margin:8px 0}#itGuide p{color:#C0D4F2;line-height:1.6}#itGuide .it-steps{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.it-steps span{font-size:12px;padding:6px 9px;border:1px solid #C0D4F240;border-radius:6px;color:#C0D4F2}.it-steps .done{color:#D4AF60;border-color:#B79440}#itGuide .it-actions{display:flex;gap:10px;flex-wrap:wrap}#itGuide a,#itGuide button{font:500 15px Jost,Arial,sans-serif;padding:12px 16px;border-radius:4px;cursor:pointer;text-decoration:none}#itGuideNext{background:#B79440;color:#0D1433;border:1px solid #B79440}#itGuideToggle,#itGuidePractice{background:transparent;color:#D4AF60;border:1px solid #B79440}#itGuide a:hover,#itGuide button:hover{background:#D4AF60;color:#0D1433}#itGuideStatus{font-size:12px;margin-bottom:0}#itGuide button:disabled{opacity:.5;cursor:wait}@media(max-width:600px){#itGuide{padding:18px;margin:20px 0}#itGuide .it-actions>*{width:100%;text-align:center}}</style><style>#itGuide{width:100%;max-width:none;margin:24px 0;padding:22px}#itGuide h2{font-family:var(--font-display);font-size:30px}#itGuide p{font:400 15px/1.6 var(--font-body)}#itGuide .it-actions{align-items:stretch}#itGuide a,#itGuide button{min-height:44px;display:inline-flex;align-items:center;justify-content:center}#itGuideTheory{border:1px solid #B7944066;color:#D4AF60;border-radius:4px}#itGuideStatus{font-size:12px!important}@media(max-width:600px){#itGuide{padding:16px}#itGuide h2{font-size:26px}#itGuide .it-actions>*{width:100%}}</style><style id="it-guide-compact-signup-style">
+</style><style>#itGuide{width:100%;max-width:none;margin:24px 0;padding:22px}#itGuide p{font:400 15px/1.6 var(--font-body)}#itGuideTheory{border:1px solid #B7944066;color:#D4AF60;border-radius:4px}#itGuide .it-actions{align-items:stretch}#itGuide a,#itGuide button{min-height:44px}#itGuideStatus{font-size:12px!important}@media(max-width:600px){#itGuide{padding:16px}#itGuide .it-actions>*{width:100%}}</style><noscript><style>.it-guide-loading #Spi,.it-guide-loading #Heute,.it-guide-loading #Fortschritt,.it-guide-loading #Pruefung,.it-guide-loading #lernwerkstatt,.it-guide-loading .welcome-paths{display:block!important}</style></noscript><style>#itGuide{width:100%;max-width:none;margin:24px 0;padding:22px}#itGuide h2{font-family:var(--font-display);font-size:30px}#itGuide p{font:400 15px/1.6 var(--font-body)}#itGuide .it-actions{align-items:stretch}#itGuide a,#itGuide button{min-height:44px;display:inline-flex;align-items:center;justify-content:center}#itGuideTheory{border:1px solid #B7944066;color:#D4AF60;border-radius:4px}#itGuideStatus{font-size:12px!important}@media(max-width:600px){#itGuide{padding:16px}#itGuide h2{font-size:26px}#itGuide .it-actions>*{width:100%}}</style><style id="foxora-password-visibility-style">
+.foxora-password-field{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:8px;margin-bottom:12px}
+.foxora-password-field input{width:100%;min-width:0;margin:0!important}
+.foxora-password-field .foxora-password-toggle{align-self:stretch;min-height:44px;margin:0;padding:9px 12px;border:1px solid #B79440;border-radius:5px;background:#0D1433;color:#D4AF60;font:500 13px/1.4 Jost,Arial,sans-serif;cursor:pointer;white-space:nowrap}
+.foxora-password-field .foxora-password-toggle:hover{background:#B79440;color:#0D1433}
+.foxora-password-field .foxora-password-toggle:focus-visible{outline:2px solid #D4AF60;outline-offset:3px}
+@media(max-width:380px){.foxora-password-field{gap:6px}.foxora-password-field .foxora-password-toggle{padding:8px;font-size:12px}}
+</style><style id="foxora-uniform-main-layout">.it-guide-hidden{display:none!important}.it-guide-loading #Spi,.it-guide-loading #Heute,.it-guide-loading #Fortschritt,.it-guide-loading #Pruefung,.it-guide-loading #lernwerkstatt,.it-guide-loading .welcome-paths{display:none!important}#itGuide{max-width:900px;margin:28px auto;padding:24px;background:rgba(13,20,51,.92);border:1px solid #B79440;border-radius:12px;color:#fff;text-align:left}#itGuide h2{font:400 32px 'Cormorant Garamond',Georgia,serif;margin:8px 0}#itGuide p{color:#C0D4F2;line-height:1.6}#itGuide .it-steps{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.it-steps span{font-size:12px;padding:6px 9px;border:1px solid #C0D4F240;border-radius:6px;color:#C0D4F2}.it-steps .done{color:#D4AF60;border-color:#B79440}#itGuide .it-actions{display:flex;gap:10px;flex-wrap:wrap}#itGuide a,#itGuide button{font:500 15px Jost,Arial,sans-serif;padding:12px 16px;border-radius:4px;cursor:pointer;text-decoration:none}#itGuideNext{background:#B79440;color:#0D1433;border:1px solid #B79440}#itGuideToggle,#itGuidePractice{background:transparent;color:#D4AF60;border:1px solid #B79440}#itGuide a:hover,#itGuide button:hover{background:#D4AF60;color:#0D1433}#itGuideStatus{font-size:12px;margin-bottom:0}#itGuide button:disabled{opacity:.5;cursor:wait}@media(max-width:600px){#itGuide{padding:18px;margin:20px 0}#itGuide .it-actions>*{width:100%;text-align:center}}
+
 #itGuide #itGuideSignup{margin:12px 0 0;font:400 13px/1.5 var(--font-body);color:#C0D4F2}
 #itGuide #itGuideSignup[hidden]{display:none!important}
 #itGuide #itGuideSignup a{display:inline;min-height:0;padding:0;border:0;border-radius:0;background:transparent;color:#D4AF60;font:500 13px/1.5 var(--font-body);text-decoration:underline;text-underline-offset:3px}
 #itGuide #itGuideSignup a:hover{background:transparent;color:#fff}
 #itGuide #itGuideSignup a:focus-visible{outline:2px solid #D4AF60;outline-offset:3px}
-</style><style id="it-guide-fade-style">
+
+
 /* Nur die Kartenfläche verblasst; Inhalte bleiben auf einer eigenen Ebene. */
 #itGuide{position:relative;isolation:isolate;background:transparent;border:0;box-shadow:none}
 #itGuide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border:1px solid #B79440;border-radius:12px;background:rgba(13,20,51,.94);-webkit-mask-image:linear-gradient(to right,#000 0%,#000 64%,rgba(0,0,0,.9) 76%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 64%,rgba(0,0,0,.9) 76%,transparent 100%)}
@@ -706,13 +753,17 @@ window.addEventListener('appinstalled', () => {
 /* Bei schmalen Ansichten bleibt die Fläche hinter den Inhalten deckend. */
 @media(max-width:900px){#itGuide::before{-webkit-mask-image:linear-gradient(to right,#000 0%,#000 94%,rgba(0,0,0,.65) 100%);mask-image:linear-gradient(to right,#000 0%,#000 94%,rgba(0,0,0,.65) 100%)}}
 @supports not (mask-image:linear-gradient(to right,#000,transparent)){#itGuide::before{background:linear-gradient(to right,rgba(13,20,51,.94) 64%,rgba(13,20,51,.85) 76%,transparent);border:0;border-left:1px solid #B79440}}
-</style><style id="foxora-password-visibility-style">
-.foxora-password-field{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:8px;margin-bottom:12px}
-.foxora-password-field input{width:100%;min-width:0;margin:0!important}
-.foxora-password-field .foxora-password-toggle{align-self:stretch;min-height:44px;margin:0;padding:9px 12px;border:1px solid #B79440;border-radius:5px;background:#0D1433;color:#D4AF60;font:500 13px/1.4 Jost,Arial,sans-serif;cursor:pointer;white-space:nowrap}
-.foxora-password-field .foxora-password-toggle:hover{background:#B79440;color:#0D1433}
-.foxora-password-field .foxora-password-toggle:focus-visible{outline:2px solid #D4AF60;outline-offset:3px}
-@media(max-width:380px){.foxora-password-field{gap:6px}.foxora-password-field .foxora-password-toggle{padding:8px;font-size:12px}}
+
+
+#hero .hero-bg{bottom:auto;height:var(--hero-background-height,100%);pointer-events:none}
+
+
+.welcome-paths{position:relative;isolation:isolate}
+.welcome-paths::before{content:'';position:absolute;inset:-35px -100vw -80px;z-index:-1;pointer-events:none;background:linear-gradient(to bottom,rgba(13,20,51,0),rgba(13,20,51,.82) 95px,rgba(13,20,51,.96) 100%)}
+.welcome-path,.welcome-path:hover{background:rgba(13,20,51,.92);border-color:rgba(192,212,242,.32)}
+.welcome-path:hover{background:rgba(18,30,71,.98);border-color:rgba(212,175,96,.72)}
+.welcome-path-menu a{background:rgba(13,20,51,.96);border-color:rgba(212,175,96,.65)}
+.welcome-path-menu a:hover,.welcome-path-menu a:focus-visible{background:#26345d;color:#fff;border-color:var(--gold-lt)}
 </style></head>
 <body>
 
@@ -1141,6 +1192,7 @@ window.addEventListener('load',()=>{
    if (!client) throw new Error("Offline");
  } catch (_) { showMessage('Die Anmeldung konnte nicht initialisiert werden.'); busy(true); return; }
  window.FRAccount = client;
+ await window.FRRecovery.initialize(client);
  let recovering = !!window.FRRecoveryArrival;
  const resetForm = byId('accountResetForm');
  function render(session) {
@@ -1169,7 +1221,7 @@ window.addEventListener('load',()=>{
    return 'Der Vorgang ist fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.';
  }
  client.auth.onAuthStateChange((event, session) => {
-   if (event === 'PASSWORD_RECOVERY') { recovering = true; location.hash = 'Konto'; }
+   if (event === 'PASSWORD_RECOVERY') { recovering = true; }
    render(session);
    if (recovering) { showMessage(window.FRRecovery?.valid ? 'Lege jetzt dein neues Passwort fest.' : window.FRRecovery?.error || 'Dein Passwort-Link wird geprüft …'); return; }
    if (event === 'INITIAL_SESSION') showMessage(session ? 'Du bist angemeldet.' : 'Melde dich an oder erstelle ein Konto.');
@@ -1228,6 +1280,10 @@ window.addEventListener('load',()=>{
    const input=byId('accountRecoveryEmail');if(!input.value.trim()||!input.reportValidity())return;
    const button=byId('accountRecoveryResend');button.disabled=true;
    try{const target=new URL('./main.html',location.href);target.search='?reset=1';target.hash='';const {error}=await client.auth.resetPasswordForEmail(input.value.trim(),{redirectTo:target.href});if(error)throw error;showMessage('Falls ein Konto besteht, wurde eine neue Passwort-Mail angefordert. Öffne den neuesten Link.');}catch(error){showMessage(errorText(error));}finally{button.disabled=false;}
+ });
+ window.addEventListener('frrecoverychange', () => {
+   recovering = !!window.FRRecoveryArrival;
+   client.auth.getSession().then(({data}) => { render(data.session); if(recovering) { location.hash = 'Konto'; showMessage(window.FRRecovery.valid ? 'Lege jetzt dein neues Passwort fest.' : window.FRRecovery.error); } });
  });
  const {data: initial} = await client.auth.getSession();
  render(initial.session);
@@ -1307,7 +1363,60 @@ window.addEventListener('load',()=>{
   window.addEventListener('load',updateBackground,{once:true});
   if(document.fonts)document.fonts.ready.then(updateBackground);
 })();
-</script><script src="italian-guidance.js?v=uniform5"></script><script>(()=>{const note=document.getElementById('itGuideSignup');function refresh(){if(note)note.hidden=!window.FRLearning||window.FRLearning.account!=='guest';}if(window.FRLearning?.ready)window.FRLearning.ready.then(refresh).catch(()=>{});window.addEventListener('frlearningchange',refresh);})();</script><script id="foxora-password-visibility-script">
+</script><script id="foxora-guidance-inline">(() => {
+ 'use strict';
+ function derive(summary,skip=false){
+  const completed=Object.entries(summary.modules||{}).filter(([id,m])=>id.startsWith('it_') && Number(m.completed)>0 && !/guidance|pruefung|prüfung|exam|15_minuten/.test(id));
+  const daily=completed.filter(([id])=>/alltag|daily|jetzt.?anwenden/.test(id));
+  const grammar=completed.filter(([id])=>!daily.some(([other])=>other===id));
+  const topics=new Set(grammar.map(([id])=>id.replace(/_[123]_(?:oberstufe|level).*$/,'').replace(/_[123]$/,'')));
+  return {grammar:skip||grammar.length>=1,daily:skip||topics.size>=2,lab:skip||(topics.size>=2&&daily.length>=1),exam:skip||(topics.size>=4&&daily.length>=1),count:topics.size,dailyCount:daily.length,skip};
+ }
+ window.ITGuidance={derive};
+ if(!document.getElementById('itGuide'))return;
+ const $=id=>document.getElementById(id);
+ let ready=false,state=derive({}),lastActor=null;
+ const hidden=new Set();
+ function hide(el,on){if(!el)return;el.classList.toggle('it-guide-hidden',on);if(on)hidden.add(el);else hidden.delete(el);}
+ function render(){
+  const core=window.FRLearning;let mode=core?.guidanceMode?.();if(!mode){try{mode=localStorage.getItem('it_guidance_mode:'+core?.account)||'guided'}catch{mode='guided'}}state=derive(core?.summary?.()||{},(mode==='all'||mode==='free'));
+  const steps=[true,state.grammar,state.daily,state.lab,state.exam];
+  document.querySelectorAll('[data-it-step]').forEach(el=>{const n=Number(el.dataset.itStep);el.classList.toggle('done',steps[n]);el.setAttribute('aria-label', ['Erste Übung','Grammatik','Alltag','Wiederholen','Prüfung'][n]+(steps[n]?' · freigeschaltet':' · noch gesperrt'));el.textContent=['1 · Erste Übung','2 · Grammatik','3 · Alltag','4 · Wiederholen','5 · Prüfung'][n]+(steps[n]?' ✓':' 🔒');});
+  $('itGuideToggle').textContent=state.skip?'Geführten Lernweg anzeigen':'Alle Bereiche anzeigen';
+  const grammarFiles=["italienisch-verben-konjugation-1-oberstufe.html", "italienisch-artikel-nomen-1-oberstufe.html", "italienisch-adjektive-1-oberstufe.html", "italienisch-pronomen-1-oberstufe.html"];
+  function nextGrammar(){const modules=core?.summary?.().modules||{};return grammarFiles.find(file=>{const key=file.replace(/\.html$/,'').replace(/-/g,'_');return !Object.entries(modules).some(([id,m])=>id.includes(key)&&Number(m.completed)>0);})||grammarFiles[0];}
+  let title,text,href;
+  if(!state.grammar){title='Dein erster Schritt';text='Starte mit Verben und Konjugation. Eine abgeschlossene Runde öffnet die Grammatikübersicht – unabhängig vom Ergebnis.';href='italienisch-verben-konjugation-1-oberstufe.html';}
+  else if(!state.daily){title='Eine weitere Grammatikübung';text='Schliesse eine Runde in einem zweiten Grammatikthema ab. Danach öffnet sich Italienisch im Alltag.';href=nextGrammar();}
+  else if(!state.lab){title='Wende dein Italienisch an';text='Schliesse eine Alltagsrunde ab. Danach öffnet sich deine Lernwerkstatt.';href='italienisch-alltag-familie-1-oberstufe.html';}
+  else if(!state.exam){title='Vertiefe deine Grundlagen';text=`${state.count} von 4 Grammatikthemen abgeschlossen. Danach öffnet sich das Prüfungstraining.`;href=nextGrammar();}
+  else{title='Dein Lernweg ist geöffnet';text='Du kannst alle Bereiche nutzen. Niveau 2 und 3 sowie Prüfungen benötigen weiterhin Premium.';href=nextGrammar();}
+  if(state.skip){title='Alle Bereiche sind sichtbar';text='Wähle dein Thema und Niveau frei. Die Premium-Regeln gelten weiterhin.';href=nextGrammar();}
+  $('itGuideTitle').textContent=title;$('itGuideText').textContent=text;$('itGuideNext').href=href;
+  hide($('Spi'),!state.grammar);hide($('Heute'),!state.grammar);hide($('Fortschritt'),!state.grammar);hide($('Pruefung'),!state.exam);hide($('lernwerkstatt'),!state.lab);hide($('analysisFold'),!state.lab);hide($('Pru'),!state.grammar);hide($('kompetenzlernen'),!state.lab);
+  hide($('chooseEveryday')?.closest('article'),!state.daily);hide($('Alltag'),!state.daily);
+  document.querySelectorAll('#Theoriekarten a').forEach(a=>hide(a,!state.grammar&&!a.href.includes('italienisch-theorie-verben-konjugation.html')));
+  document.querySelectorAll('.welcome-path').forEach(el=>{const href=el.getAttribute('href');hide(el,!state.grammar||(href==='#Alltag'&&!state.daily)||(href==='#lernwerkstatt'&&!state.lab));});
+  hide(document.querySelector('.welcome-paths'),!state.grammar);
+  document.querySelectorAll('#navbar a[href^="#"]').forEach(a=>{const h=a.hash;hide(a,(h==='#Spi'&&!state.grammar)||(h==='#Fortschritt'&&!state.grammar)||(h==='#Pruefung'&&!state.exam)||(h==='#lernwerkstatt'&&!state.lab));});
+  if($('itGuidePractice'))$('itGuidePractice').hidden=true;
+  $('itGuideTheory').hidden=state.grammar;
+  $('itGuideStatus').textContent=ready?(core?.account==='guest'?'Dein Lernweg wird auf diesem Gerät gespeichert.':'Dein Lernfortschritt wird mit deinem Konto synchronisiert.'):'Lernfortschritt wird geladen …';
+  document.documentElement.classList.remove('it-guide-loading');
+  if(lastActor!==core?.account){lastActor=core?.account;checkHash();}
+ }
+ const restricted=h=>(['#Spi','#Grammatik','#Heute','#Fortschritt'].includes(h)&&!state.grammar)||(['#Alltag'].includes(h)&&!state.daily)||(['#lernwerkstatt','#Fehleranalyse'].includes(h)&&!state.lab)||(h==='#Pruefung'&&!state.exam);
+ function checkHash(){if(restricted(location.hash)){history.replaceState(null,'','#hero');$('itGuide').scrollIntoView({block:'center'});$('itGuideStatus').textContent='Dieser Bereich öffnet sich nach deinem nächsten Lernschritt. Du kannst auch alle Bereiche anzeigen.';}}
+ document.addEventListener('click',e=>{const a=e.target.closest('a');if(a&&a.getAttribute('href')?.startsWith('#')&&restricted(a.getAttribute('href'))){e.preventDefault();e.stopImmediatePropagation();$('itGuide').scrollIntoView({block:'center'});$('itGuideStatus').textContent='Dieser Bereich öffnet sich nach deinem nächsten Lernschritt.';}},true);
+ $('itGuideToggle').onclick=()=>{const mode=state.skip?'guided':'all';if(window.FRLearning?.setGuidanceMode)window.FRLearning.setGuidanceMode(mode);else try{localStorage.setItem('it_guidance_mode:'+window.FRLearning?.account,mode)}catch{}render();};
+ function openEveryday(e){e.preventDefault();const panel=$('Alltag'),button=$('chooseEveryday');if(panel.hidden)button.click();history.replaceState(null,'','#Alltag');requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}));}
+ $('itGuideNext').addEventListener('click',e=>{if($('itGuideNext').hash==='#Alltag')openEveryday(e);else if($('itGuideNext').hash==='#Grammatik'&&$('Grammatik').hidden)$('chooseGrammar')?.click();});
+
+ window.addEventListener('hashchange',checkHash);window.addEventListener('frlearningchange',render);
+ render();
+ window.FRLearning?.ready.then(()=>{ready=true;$('itGuideToggle').disabled=false;render();checkHash();});
+})();
+</script><script>(()=>{const note=document.getElementById('itGuideSignup');function refresh(){if(note)note.hidden=!window.FRLearning||window.FRLearning.account!=='guest';}if(window.FRLearning?.ready)window.FRLearning.ready.then(refresh).catch(()=>{});window.addEventListener('frlearningchange',refresh);})();</script><script id="foxora-password-visibility-script">
 (()=>{'use strict';const english=document.documentElement.lang==='en';
 function init(){document.querySelectorAll('input[type="password"]').forEach(input=>{
  if(input.closest('.foxora-password-field'))return;
