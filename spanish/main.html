@@ -707,6 +707,38 @@ window.addEventListener('appinstalled', () => {
 #esTopicProgress .es-topic-row>a:hover{color:#fff;text-decoration:underline}#esTopicProgress .es-topic-row small{display:block;color:#9BAECF;font-size:12px}.es-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 16px}.es-stat-card{padding:18px;border:1px solid #B7944040;background:#0D143380;border-radius:8px}.es-stat-card strong{display:block;font:500 16px var(--font-body,Jost,Arial,sans-serif);color:#D4AF60}.es-stat-card p{min-height:44px}.es-stat-card a{margin-top:8px}.es-history-row{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #B7944030;color:#C0D4F2}.es-history-row a{color:#D4AF60;text-decoration:none}.es-history-row a:hover{text-decoration:underline}
 @media(max-width:700px){.es-stat-grid{grid-template-columns:1fr}.es-topic-body{padding:16px}#esTopicProgressTitle{padding:16px}#esTopicProgress .es-topic-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#esTopicProgress .es-topic-row>a{grid-column:1/-1}.es-stat-card a{width:100%}}
 </style>
+<style id="es-theory-button-style">
+#esGuide #esGuideTheory {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 1px solid #D4AF60;
+  border-radius: 4px;
+  background: #182447;
+  color: #F3D58D;
+  font-family: var(--font-body, Jost, Arial, sans-serif);
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+  transition: background .2s, color .2s;
+}
+#esGuide #esGuideTheory:hover {
+  background: #D4AF60;
+  color: #0D1433;
+}
+#esGuide #esGuideTheory:focus-visible {
+  outline: 3px solid #F3D58D;
+  outline-offset: 4px;
+  background: #D4AF60;
+  color: #0D1433;
+}
+#esGuide #esGuideTheory[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  #esGuide #esGuideTheory { transition: none; }
+}
+</style>
 </head>
 <body>
 
