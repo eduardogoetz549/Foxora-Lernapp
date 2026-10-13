@@ -16,17 +16,15 @@
  function render(){
   const core=window.FRLearning;let mode=core?.guidanceMode?.();if(!mode){try{mode=localStorage.getItem('fr_guidance_mode:'+core?.account)||'guided'}catch{mode='guided'}}state=derive(core?.summary?.()||{},(mode==='all'||mode==='free'));
   const steps=[true,state.grammar,state.daily,state.lab,state.exam];
-  document.querySelectorAll('[data-fr-step]').forEach(el=>{const n=Number(el.dataset.frStep);el.classList.toggle('done',steps[n]);el.setAttribute('aria-label', ['Erste Übung','Grammatik','Alltag','Wiederholen','Prüfung'][n]+(steps[n]?' · freigeschaltet':' · noch gesperrt'));el.textContent=['1 · Erste Übung','2 · Grammatik','3 · Alltag','4 · Wiederholen','5 · Prüfung'][n]+(steps[n]?' ✓':' 🔒');});
+  document.querySelectorAll('[data-fr-step]').forEach(el=>{const n=Number(el.dataset.esStep);el.classList.toggle('done',steps[n]);el.textContent=['1 · Erste Übung','2 · Grammatik','3 · Alltag','4 · Wiederholen','5 · Prüfung'][n]+(steps[n]?' ✓':' 🔒');});
   $('frGuideToggle').textContent=state.skip?'Geführten Lernweg anzeigen':'Alle Bereiche anzeigen';
-  const grammarFiles=["franzoesisch-verben-konjugation-1-oberstufe-mit-gemischten-schreibuebungen.html", "franzoesisch-artikel-nomen-1-oberstufe.html", "franzoesisch-adjektive-1-oberstufe.html", "franzoesisch-pronomen-1-oberstufe.html"];
-  function nextGrammar(){const modules=core?.summary?.().modules||{};return grammarFiles.find(file=>{const key=file.replace(/\.html$/,'').replace(/-/g,'_');return !Object.entries(modules).some(([id,m])=>id.includes(key)&&Number(m.completed)>0);})||grammarFiles[0];}
   let title,text,href;
   if(!state.grammar){title='Dein erster Schritt';text='Starte mit Verben und Konjugation. Eine abgeschlossene Runde öffnet die Grammatikübersicht – unabhängig vom Ergebnis.';href='franzoesisch-verben-konjugation-1-oberstufe-mit-gemischten-schreibuebungen.html';}
-  else if(!state.daily){title='Eine weitere Grammatikübung';text='Schliesse eine Runde in einem zweiten Grammatikthema ab. Danach öffnet sich Französisch im Alltag.';href=nextGrammar();}
+  else if(!state.daily){title='Eine weitere Grammatikübung';text='Schliesse eine Runde in einem zweiten Grammatikthema ab. Danach öffnet sich Französisch im Alltag.';href='#Grammatik';}
   else if(!state.lab){title='Wende dein Französisch an';text='Schliesse eine Alltagsrunde ab. Danach öffnet sich deine Lernwerkstatt.';href='franzoesisch-alltag-familie-1-oberstufe.html';}
-  else if(!state.exam){title='Vertiefe deine Grundlagen';text=`${state.count} von 4 Grammatikthemen abgeschlossen. Danach öffnet sich das Prüfungstraining.`;href=nextGrammar();}
-  else{title='Dein Lernweg ist geöffnet';text='Du kannst alle Bereiche nutzen. Niveau 2 und 3 sowie Prüfungen benötigen weiterhin Premium.';href=nextGrammar();}
-  if(state.skip){title='Alle Bereiche sind sichtbar';text='Wähle dein Thema und Niveau frei. Die Premium-Regeln gelten weiterhin.';href=nextGrammar();}
+  else if(!state.exam){title='Vertiefe deine Grundlagen';text=`${state.count} von 4 Grammatikthemen abgeschlossen. Danach öffnet sich das Prüfungstraining.`;href='#Grammatik';}
+  else{title='Dein Lernweg ist geöffnet';text='Du kannst alle Bereiche nutzen. Niveau 2 und 3 sowie Prüfungen benötigen weiterhin Premium.';href='#Spi';}
+  if(state.skip){title='Alle Bereiche sind sichtbar';text='Wähle dein Thema und Niveau frei. Die Premium-Regeln gelten weiterhin.';href='#Spi';}
   $('frGuideTitle').textContent=title;$('frGuideText').textContent=text;$('frGuideNext').href=href;
   hide($('Spi'),!state.grammar);hide($('Heute'),!state.grammar);hide($('Fortschritt'),!state.grammar);hide($('Pruefung'),!state.exam);hide($('lernwerkstatt'),!state.lab);hide($('analysisFold'),!state.lab);hide($('Pru'),!state.grammar);hide($('kompetenzlernen'),!state.lab);
   hide($('chooseEveryday')?.closest('article'),!state.daily);hide($('Alltag'),!state.daily);
@@ -34,7 +32,7 @@
   document.querySelectorAll('.welcome-path').forEach(el=>{const href=el.getAttribute('href');hide(el,!state.grammar||(href==='#Alltag'&&!state.daily)||(href==='#lernwerkstatt'&&!state.lab));});
   hide(document.querySelector('.welcome-paths'),!state.grammar);
   document.querySelectorAll('#navbar a[href^="#"]').forEach(a=>{const h=a.hash;hide(a,(h==='#Spi'&&!state.grammar)||(h==='#Fortschritt'&&!state.grammar)||(h==='#Pruefung'&&!state.exam)||(h==='#lernwerkstatt'&&!state.lab));});
-  if($('frGuidePractice'))$('frGuidePractice').hidden=true;
+  $('frGuidePractice').hidden=!state.daily||state.lab;
   $('frGuideTheory').hidden=state.grammar;
   $('frGuideStatus').textContent=ready?(core?.account==='guest'?'Dein Lernweg wird auf diesem Gerät gespeichert.':'Dein Lernfortschritt wird mit deinem Konto synchronisiert.'):'Lernfortschritt wird geladen …';
   document.documentElement.classList.remove('fr-guide-loading');
