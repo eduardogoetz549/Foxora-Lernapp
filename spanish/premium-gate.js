@@ -6,6 +6,8 @@ const title=document.getElementById('title'),message=document.getElementById('me
 async function load(){if(loading)return;loading=true;start.disabled=true;try{
 const result=await FRPremium.call('premium-access',{action:'lesson',file});if(typeof result.html!=='string')throw new Error('Die Übung konnte nicht geladen werden.');
 const lesson=new DOMParser().parseFromString(result.html,'text/html');
+const shared=[['link','spanish-shared.css','href'],['script','spanish-answer-check.js','src'],['script','spanish-planner.js','src'],['script','spanish-navigation.js','src'],['script','spanish-goals.js','src'],['script','spanish-listening-progress.js','src']];for(const [tag,file,attr]of shared){if([...lesson.querySelectorAll(tag+'['+attr+']')].some(el=>el.getAttribute(attr).split('?')[0]===file))continue;const el=lesson.createElement(tag);el.setAttribute(attr,file+'?v=20261014-es2');if(tag==='link')el.rel='stylesheet';else if(!/answer-check|planner/.test(file))el.defer=true;lesson.head.append(el);}
+
 for(const script of lesson.querySelectorAll('script[src]')){const name=new URL(script.getAttribute('src'),location.href).pathname.split('/').pop();if(name==='premium-gate.js')throw new Error('In Supabase liegt eine Zugangsseite statt der vollständigen Übung.');if(['learning-core.js','spanish-learning-core.js'].includes(name))script.remove();}
 document.open();document.write('<!doctype html>\n'+lesson.documentElement.outerHTML);document.close();window.dispatchEvent(new Event('frpremiumlessonloaded'));
 }catch(e){message.textContent=e.message;start.disabled=false;loading=false;}}
