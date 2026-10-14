@@ -1,0 +1,752 @@
+[
+  {
+    "file": "deutsch-en-adjektive-1-oberstufe.html",
+    "module": "de_en_adjektive_1",
+    "topic": "adjektive",
+    "title": "Adjektive",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-adjektive.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-akkusativ-1-oberstufe.html",
+    "module": "de_en_akkusativ_1",
+    "topic": "akkusativ",
+    "title": "Akkusativ",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-akkusativ.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-artikel-plural-1-oberstufe.html",
+    "module": "de_en_artikel-plural_1",
+    "topic": "artikel-plural",
+    "title": "Artikel Plural",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-artikel-plural.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-dativ-1-oberstufe.html",
+    "module": "de_en_dativ_1",
+    "topic": "dativ",
+    "title": "Dativ",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-dativ.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-konjunktiv-1-oberstufe.html",
+    "module": "de_en_konjunktiv_1",
+    "topic": "konjunktiv",
+    "title": "Konjunktiv",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-konjunktiv.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-modalverben-1-oberstufe.html",
+    "module": "de_en_modalverben_1",
+    "topic": "modalverben",
+    "title": "Modalverben",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-modalverben.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-perfekt-1-oberstufe.html",
+    "module": "de_en_perfekt_1",
+    "topic": "perfekt",
+    "title": "Perfekt",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-perfekt.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praepositionen-1-oberstufe.html",
+    "module": "de_en_praepositionen_1",
+    "topic": "praepositionen",
+    "title": "Praepositionen",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praepositionen.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praesens-1-oberstufe.html",
+    "module": "de_en_praesens_1",
+    "topic": "praesens",
+    "title": "Praesens",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praesens.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praeteritum-1-oberstufe.html",
+    "module": "de_en_praeteritum_1",
+    "topic": "praeteritum",
+    "title": "Praeteritum",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praeteritum.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-pronomen-1-oberstufe.html",
+    "module": "de_en_pronomen_1",
+    "topic": "pronomen",
+    "title": "Pronomen",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-pronomen.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-satzbau-1-oberstufe.html",
+    "module": "de_en_satzbau_1",
+    "topic": "satzbau",
+    "title": "Satzbau",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-satzbau.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-sein-haben-1-oberstufe.html",
+    "module": "de_en_sein-haben_1",
+    "topic": "sein-haben",
+    "title": "Sein Haben",
+    "level": 1,
+    "daily": false,
+    "theory": "deutsch-en-theorie-sein-haben.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-adjektive-2-oberstufe.html",
+    "module": "de_en_adjektive_2",
+    "topic": "adjektive",
+    "title": "Adjektive",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-adjektive.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-akkusativ-2-oberstufe.html",
+    "module": "de_en_akkusativ_2",
+    "topic": "akkusativ",
+    "title": "Akkusativ",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-akkusativ.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-einkaufen-2-oberstufe.html",
+    "module": "de_en_alltag_einkaufen_2",
+    "topic": "einkaufen",
+    "title": "Shopping",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-essen-2-oberstufe.html",
+    "module": "de_en_alltag_essen_2",
+    "topic": "essen",
+    "title": "Food & drinks",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-familie-2-oberstufe.html",
+    "module": "de_en_alltag_familie_2",
+    "topic": "familie",
+    "title": "Family",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-hobbys-2-oberstufe.html",
+    "module": "de_en_alltag_hobbys_2",
+    "topic": "hobbys",
+    "title": "Hobbies & leisure",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-reisen-2-oberstufe.html",
+    "module": "de_en_alltag_reisen_2",
+    "topic": "reisen",
+    "title": "Travel",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-schule-2-oberstufe.html",
+    "module": "de_en_alltag_schule_2",
+    "topic": "schule",
+    "title": "School & learning",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-artikel-plural-2-oberstufe.html",
+    "module": "de_en_artikel-plural_2",
+    "topic": "artikel-plural",
+    "title": "Artikel Plural",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-artikel-plural.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-dativ-2-oberstufe.html",
+    "module": "de_en_dativ_2",
+    "topic": "dativ",
+    "title": "Dativ",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-dativ.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-konjunktiv-2-oberstufe.html",
+    "module": "de_en_konjunktiv_2",
+    "topic": "konjunktiv",
+    "title": "Konjunktiv",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-konjunktiv.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-modalverben-2-oberstufe.html",
+    "module": "de_en_modalverben_2",
+    "topic": "modalverben",
+    "title": "Modalverben",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-modalverben.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-perfekt-2-oberstufe.html",
+    "module": "de_en_perfekt_2",
+    "topic": "perfekt",
+    "title": "Perfekt",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-perfekt.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praepositionen-2-oberstufe.html",
+    "module": "de_en_praepositionen_2",
+    "topic": "praepositionen",
+    "title": "Praepositionen",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praepositionen.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praesens-2-oberstufe.html",
+    "module": "de_en_praesens_2",
+    "topic": "praesens",
+    "title": "Praesens",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praesens.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praeteritum-2-oberstufe.html",
+    "module": "de_en_praeteritum_2",
+    "topic": "praeteritum",
+    "title": "Praeteritum",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praeteritum.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-pronomen-2-oberstufe.html",
+    "module": "de_en_pronomen_2",
+    "topic": "pronomen",
+    "title": "Pronomen",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-pronomen.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-satzbau-2-oberstufe.html",
+    "module": "de_en_satzbau_2",
+    "topic": "satzbau",
+    "title": "Satzbau",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-satzbau.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-sein-haben-2-oberstufe.html",
+    "module": "de_en_sein-haben_2",
+    "topic": "sein-haben",
+    "title": "Sein Haben",
+    "level": 2,
+    "daily": false,
+    "theory": "deutsch-en-theorie-sein-haben.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-adjektive-3-oberstufe.html",
+    "module": "de_en_adjektive_3",
+    "topic": "adjektive",
+    "title": "Adjektive",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-adjektive.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-akkusativ-3-oberstufe.html",
+    "module": "de_en_akkusativ_3",
+    "topic": "akkusativ",
+    "title": "Akkusativ",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-akkusativ.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-einkaufen-3-oberstufe.html",
+    "module": "de_en_alltag_einkaufen_3",
+    "topic": "einkaufen",
+    "title": "Shopping",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-essen-3-oberstufe.html",
+    "module": "de_en_alltag_essen_3",
+    "topic": "essen",
+    "title": "Food & drinks",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-familie-3-oberstufe.html",
+    "module": "de_en_alltag_familie_3",
+    "topic": "familie",
+    "title": "Family",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-hobbys-3-oberstufe.html",
+    "module": "de_en_alltag_hobbys_3",
+    "topic": "hobbys",
+    "title": "Hobbies & leisure",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-reisen-3-oberstufe.html",
+    "module": "de_en_alltag_reisen_3",
+    "topic": "reisen",
+    "title": "Travel",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-schule-3-oberstufe.html",
+    "module": "de_en_alltag_schule_3",
+    "topic": "schule",
+    "title": "School & learning",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-artikel-plural-3-oberstufe.html",
+    "module": "de_en_artikel-plural_3",
+    "topic": "artikel-plural",
+    "title": "Artikel Plural",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-artikel-plural.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-dativ-3-oberstufe.html",
+    "module": "de_en_dativ_3",
+    "topic": "dativ",
+    "title": "Dativ",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-dativ.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-konjunktiv-3-oberstufe.html",
+    "module": "de_en_konjunktiv_3",
+    "topic": "konjunktiv",
+    "title": "Konjunktiv",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-konjunktiv.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-modalverben-3-oberstufe.html",
+    "module": "de_en_modalverben_3",
+    "topic": "modalverben",
+    "title": "Modalverben",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-modalverben.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-perfekt-3-oberstufe.html",
+    "module": "de_en_perfekt_3",
+    "topic": "perfekt",
+    "title": "Perfekt",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-perfekt.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praepositionen-3-oberstufe.html",
+    "module": "de_en_praepositionen_3",
+    "topic": "praepositionen",
+    "title": "Praepositionen",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praepositionen.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praesens-3-oberstufe.html",
+    "module": "de_en_praesens_3",
+    "topic": "praesens",
+    "title": "Praesens",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praesens.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-praeteritum-3-oberstufe.html",
+    "module": "de_en_praeteritum_3",
+    "topic": "praeteritum",
+    "title": "Praeteritum",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-praeteritum.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-pronomen-3-oberstufe.html",
+    "module": "de_en_pronomen_3",
+    "topic": "pronomen",
+    "title": "Pronomen",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-pronomen.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-satzbau-3-oberstufe.html",
+    "module": "de_en_satzbau_3",
+    "topic": "satzbau",
+    "title": "Satzbau",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-satzbau.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-sein-haben-3-oberstufe.html",
+    "module": "de_en_sein-haben_3",
+    "topic": "sein-haben",
+    "title": "Sein Haben",
+    "level": 3,
+    "daily": false,
+    "theory": "deutsch-en-theorie-sein-haben.html",
+    "count": 100
+  },
+  {
+    "file": "deutsch-en-alltag-familie-1-oberstufe.html",
+    "module": "de_en_alltag_familie_1",
+    "topic": "familie",
+    "title": "Family",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-schule-1-oberstufe.html",
+    "module": "de_en_alltag_schule_1",
+    "topic": "schule",
+    "title": "School",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-essen-1-oberstufe.html",
+    "module": "de_en_alltag_essen_1",
+    "topic": "essen",
+    "title": "Food",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-einkaufen-1-oberstufe.html",
+    "module": "de_en_alltag_einkaufen_1",
+    "topic": "einkaufen",
+    "title": "Shopping",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-reisen-1-oberstufe.html",
+    "module": "de_en_alltag_reisen_1",
+    "topic": "reisen",
+    "title": "Travel",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-hobbys-1-oberstufe.html",
+    "module": "de_en_alltag_hobbys_1",
+    "topic": "hobbys",
+    "title": "Hobbies",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-familie-1-oberstufe.html",
+    "module": "de_en_alltag_lesen_familie_1",
+    "topic": "lesen-familie",
+    "title": "Reading: Family",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-schule-1-oberstufe.html",
+    "module": "de_en_alltag_lesen_schule_1",
+    "topic": "lesen-schule",
+    "title": "Reading: School & learning",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-essen-1-oberstufe.html",
+    "module": "de_en_alltag_lesen_essen_1",
+    "topic": "lesen-essen",
+    "title": "Reading: Food & drink",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-einkaufen-1-oberstufe.html",
+    "module": "de_en_alltag_lesen_einkaufen_1",
+    "topic": "lesen-einkaufen",
+    "title": "Reading: Shopping",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-reisen-1-oberstufe.html",
+    "module": "de_en_alltag_lesen_reisen_1",
+    "topic": "lesen-reisen",
+    "title": "Reading: Travel",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-hobbys-1-oberstufe.html",
+    "module": "de_en_alltag_lesen_hobbys_1",
+    "topic": "lesen-hobbys",
+    "title": "Reading: Hobbies & free time",
+    "level": 1,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-familie-2-oberstufe.html",
+    "module": "de_en_alltag_lesen_familie_2",
+    "topic": "lesen-familie",
+    "title": "Reading: Family",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-schule-2-oberstufe.html",
+    "module": "de_en_alltag_lesen_schule_2",
+    "topic": "lesen-schule",
+    "title": "Reading: School & learning",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-essen-2-oberstufe.html",
+    "module": "de_en_alltag_lesen_essen_2",
+    "topic": "lesen-essen",
+    "title": "Reading: Food & drink",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-einkaufen-2-oberstufe.html",
+    "module": "de_en_alltag_lesen_einkaufen_2",
+    "topic": "lesen-einkaufen",
+    "title": "Reading: Shopping",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-reisen-2-oberstufe.html",
+    "module": "de_en_alltag_lesen_reisen_2",
+    "topic": "lesen-reisen",
+    "title": "Reading: Travel",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-hobbys-2-oberstufe.html",
+    "module": "de_en_alltag_lesen_hobbys_2",
+    "topic": "lesen-hobbys",
+    "title": "Reading: Hobbies & free time",
+    "level": 2,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-familie-3-oberstufe.html",
+    "module": "de_en_alltag_lesen_familie_3",
+    "topic": "lesen-familie",
+    "title": "Reading: Family",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-schule-3-oberstufe.html",
+    "module": "de_en_alltag_lesen_schule_3",
+    "topic": "lesen-schule",
+    "title": "Reading: School & learning",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-essen-3-oberstufe.html",
+    "module": "de_en_alltag_lesen_essen_3",
+    "topic": "lesen-essen",
+    "title": "Reading: Food & drink",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-einkaufen-3-oberstufe.html",
+    "module": "de_en_alltag_lesen_einkaufen_3",
+    "topic": "lesen-einkaufen",
+    "title": "Reading: Shopping",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-reisen-3-oberstufe.html",
+    "module": "de_en_alltag_lesen_reisen_3",
+    "topic": "lesen-reisen",
+    "title": "Reading: Travel",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "file": "deutsch-en-alltag-lesen-hobbys-3-oberstufe.html",
+    "module": "de_en_alltag_lesen_hobbys_3",
+    "topic": "lesen-hobbys",
+    "title": "Reading: Hobbies & free time",
+    "level": 3,
+    "daily": true,
+    "theory": "main.html#theorie",
+    "count": 10
+  }
+]

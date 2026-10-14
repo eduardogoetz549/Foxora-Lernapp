@@ -1,0 +1,19 @@
+(()=>{'use strict';
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+function plan(pool,questions={},now=Date.now()){
+ const priority=q=>{const state=questions[String(q.id)];return (state.unresolvedError?100:0)+Math.min(60,(state.wrong||0)*5)+Math.min(60,Math.max(0,(now-Date.parse(state.due))/86400000));};
+ const unique=[...new Map(pool.map(q=>[String(q.id),q])).values()];pool=unique;
+ const due=pool.filter(q=>questions[String(q.id)]&&Date.parse(questions[String(q.id)].due)<=now).sort((a,b)=>priority(b)-priority(a)||Date.parse(questions[String(a.id)].due)-Date.parse(questions[String(b.id)].due)||String(a.id).localeCompare(String(b.id)));
+ const mode=new URLSearchParams(window.location?.search||'').get('review');
+ const targeted=mode==='errors'?due.filter(q=>questions[String(q.id)].unresolvedError):mode==='due'?due:[];
+ if(targeted.length)return targeted.slice(0,10);
+ const unseen=shuffle(pool.filter(q=>!questions[String(q.id)]));const selected=due.slice(0,due.some(q=>questions[String(q.id)].unresolvedError)?6:3),counts={};
+ const add=q=>{if(!selected.includes(q)){selected.push(q);counts[q.family||'fill']=(counts[q.family||'fill']||0)+1;}};
+ selected.forEach(q=>counts[q.family||'fill']=(counts[q.family||'fill']||0)+1);
+ for(const q of unseen){if(selected.length===10)break;if((counts[q.family||'fill']||0)<3)add(q)}
+ for(const list of [due,unseen,shuffle(pool)])for(const q of list){if(selected.length===10)break;add(q)}
+ return selected.slice(0,10);
+}
+window.FRLearningSupport={plan};
+})();
+(()=>{async function boot(){await window.FRLearning?.ready;const meta=window.FRPage;const map=window.DEExerciseMap;let signature='';function render(){const result=document.getElementById('result');if(!result||result.hidden||result.classList.contains('hidden')){signature='';return;}const score=document.getElementById('resultScore').textContent;if(signature===score)return;signature=score;document.getElementById('deRoundNext')?.remove();const box=document.createElement('section');box.id='deRoundNext';box.style.cssText='padding:16px;margin:18px 0;border:1px solid #B79440;border-radius:10px;background:#fbfaf6;color:#0D1433';const h=document.createElement('h3');h.textContent='Your next step';box.append(h);const numbers=score.match(/(\d+)\s*(?:of|von|\/)\s*(\d+)/);const pct=numbers?Number(numbers[1])/Math.max(1,Number(numbers[2]))*100:0;const text=document.createElement('p');text.textContent=pct<60?'Review your mistakes and the relevant theory before starting another round.':pct<85?'Practise the answers you were unsure about before moving on.':'Good work. You can practise another topic.';box.append(text);const retry=document.getElementById(meta.daily?'errorsOnly':'mistakesBtn');if(pct<85&&retry&&!retry.hidden&&retry.style.display!=='none'){const button=document.createElement('button');button.type='button';button.className='restart';button.textContent='Practise only mistakes';button.onclick=()=>retry.click();box.append(button);}const a=document.createElement('a');const peers=map.filter(x=>x.level===meta.level&&x.daily===meta.daily);const index=peers.findIndex(x=>x.file===meta.file);const next=peers[(index+1)%peers.length];a.href=pct<85?meta.theory:next.file;a.textContent=pct<85?' Review theory →':' Next: '+next.title+' →';a.className='home-btn';box.append(a);const note=document.createElement('p');note.textContent='Previously answered questions return after a time interval. Twice correct is a learning indicator, not proof of lasting mastery.';box.append(note);result.append(box);}new MutationObserver(render).observe(document.getElementById('result'),{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});render();}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});else boot();})();
