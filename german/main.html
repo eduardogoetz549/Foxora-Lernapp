@@ -842,7 +842,7 @@ window.addEventListener('appinstalled', () => {
 #deHistoryRows .es-history-row a{color:#D4AF60;text-decoration:none}
 @media(max-width:700px){#deReviewStats .es-stat-grid{grid-template-columns:1fr}}
 @media(max-width:620px){#Heute .foxora-analysis-position .fa-fold>summary{padding:1.2rem 1.3rem}}
-</style><script src="german-catalog.js?v=20261014-de2"></script><meta name="foxora-release" content="de-main-fix-20261014-1829"></head>
+</style><script src="german-catalog.js?v=20261014-de2"></script><meta name="foxora-release" content="de-main-fix-20261014-1829"><style id="foxora-workshop-style">#lernwerkstatt .lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#lernwerkstatt .lab-card{min-width:0;display:flex;flex-direction:column}#lernwerkstatt .lab-card>.lab-btn{margin-top:auto;align-self:flex-start;text-decoration:none}#lernwerkstatt .workshop-panel{margin-top:24px;border:1px solid #b7944055;border-radius:14px;padding:20px;color:inherit}#lernwerkstatt .workshop-panel>summary{cursor:pointer;font-size:1.25rem;color:#D4AF60}#lernwerkstatt .workshop-row{padding:18px 0;border-bottom:1px solid #b7944033;overflow-wrap:anywhere}#lernwerkstatt .workshop-row:last-child{border-bottom:0}#lernwerkstatt .workshop-row h4{margin:0 0 10px;color:#D4AF60;font-size:1.1rem}#lernwerkstatt .workshop-row p{line-height:1.6}#lernwerkstatt .workshop-row label{display:block;margin:14px 0 8px}#lernwerkstatt .workshop-row textarea{display:block;width:100%;box-sizing:border-box;padding:12px;margin-bottom:12px;border:1px solid #b79440;border-radius:6px;font:16px/1.5 Jost,Arial,sans-serif;color:#0d1433;background:#fff;resize:vertical}#lernwerkstatt .workshop-row .lab-btn{display:inline-block;margin:6px 10px 6px 0;text-decoration:none}@media(max-width:700px){#lernwerkstatt .lab-grid{grid-template-columns:1fr}#lernwerkstatt .workshop-panel{padding:16px}}</style></head>
 <body>
 
 
@@ -983,29 +983,7 @@ window.addEventListener('appinstalled', () => {
 
 <!-- FOOTER -->
 
-<section class="learning-lab" id="lernwerkstatt">
- <div class="lab-wrap">
-  <div class="lab-head">
-   <div class="lab-kicker">Learn how to learn</div>
-   <h2>Your learning workshop</h2>
-   <p>Here you learn German and discover <strong>how</strong> to practise effectively. Try a method and find out what helps you remember.</p>
-  </div>
-  <div class="lab-grid">
-<article class="lab-card"><div class="lab-icon">🗣️</div><h3>Apply your German</h3><p>Write your own sentences, listen to German examples and respond aloud to everyday situations. Level 1 is free; levels 2 and 3 require Premium.</p><a class="lab-btn" href="deutsch-en-jetzt-anwenden.html" style="display:inline-block;text-decoration:none">Start writing &amp; speaking</a></article>
-   <article class="lab-card"><div class="lab-icon">🧠</div><h3>Memory aids &amp; mnemonics</h3><p>Connect a difficult rule or word with an image, sentence or personal idea.</p><button class="lab-btn" data-panel="mnemo">Try it</button><div class="lab-panel" id="mnemo"><b>How it works:</b> Choose something you often forget and invent a short, memorable association.<input class="lab-input" id="mnemoText" placeholder="My memory aid …"><button class="lab-btn" onclick="saveLab(this,'mnemoText')">Save</button><div class="saved-note">Saved only on this device.</div></div></article>
-   <article class="lab-card"><div class="lab-icon">🗂️</div><h3>Flashcards</h3><p>Follow this sequence: <strong>New → Unsure → Learned → Confident</strong>. Uncertain items return sooner.</p><button class="lab-btn" onclick="location.href='deutsch-en-vokabeltrainer.html'">Start flashcards</button></article>
-   <article class="lab-card"><div class="lab-icon">✍️</div><h3>Active recall</h3><p>Cover the answer, recall it from memory and only then write it down.</p><button class="lab-btn" data-panel="recall">View the method</button><div class="lab-panel" id="recall">1. Read the question.<br>2. Keep the answer covered.<br>3. Say or write your answer.<br>4. Check it.<br>5. Recall incorrect answers again later.</div></article>
-   <article class="lab-card"><div class="lab-icon">🗺️</div><h3>Mindmap</h3><p>Organise a topic into key ideas and examples. This helps you understand rules and connections.</p><button class="lab-btn" data-panel="mindmap">Open template</button><div class="lab-panel" id="mindmap"><input class="lab-input" id="mindTopic" placeholder="Topic, e.g. pronouns"><input class="lab-input" id="mindBranches" placeholder="Branches, e.g. personal · possessive · accusative · dative"><button class="lab-btn" onclick="saveLab(this,'mindTopic','mindBranches')">Save</button></div></article>
-   <article class="lab-card"><div class="lab-icon">🔎</div><h3>Learn from mistakes</h3><p>After a mistake, ask what the correct answer is and why your answer was incorrect.</p><button class="lab-btn" data-panel="errors">Three-step method</button><div class="lab-panel" id="errors"><b>1.</b> Identify the mistake. <br><b>2.</b> Explain the rule in your own words. <br><b>3.</b> Solve a similar question. The app automatically prioritises uncertain answers.</div></article>
-   <article class="lab-card"><div class="lab-icon">💡</div><h3>Choose a strategy</h3><p><b>Verbs:</b> Person → stem → ending.<br><b>Vocabulary:</b> Cover → recall → check.<br><b>Pronouns:</b> Find the noun phrase → replace → check position.<br><b>Adjectives:</b> Identify the noun → gender, number and case → choose the ending.</p></article>
-  </div>
-  <div class="study-plan">
-   <h3>⏱️ Your 15-minute learning session</h3>
-   <div class="plan-steps"><div class="plan-step"><b>5 min.</b><br>Review due items and earlier mistakes.</div><div class="plan-step"><b>7 min.</b><br>Solve questions actively, with as little help as possible.</div><div class="plan-step"><b>3 min.</b><br>Explain mistakes and recall difficult items again.</div></div>
-   <div style="margin-top:1.3rem"><a class="lab-btn" href="deutsch-en-15-minuten-lerneinheit.html" style="display:inline-block;text-decoration:none">Open 15-minute session</a></div>
-  </div>
- </div>
-</section>
+<section class="learning-lab" id="lernwerkstatt"><div class="lab-wrap"><div class="lab-head"><div class="lab-kicker">Practise with a purpose</div><h2>Your learning workshop</h2><p>Use your flashcards, apply what you know, review due tasks and understand your mistakes.</p></div><div class="lab-grid"><article class="lab-card"><div class="lab-icon">🗂️</div><h3>Flashcards</h3><p>Create your own sets and practise difficult words.</p><a class="lab-btn" href="deutsch-en-lernkartei.html">Open flashcards</a></article><article class="lab-card"><div class="lab-icon">🗣️</div><h3>Apply your German</h3><p>Write your own sentences, listen to German examples and respond aloud to everyday situations. Level 1 is free; levels 2 and 3 require Premium.</p><a class="lab-btn" href="deutsch-en-jetzt-anwenden.html" style="display:inline-block;text-decoration:none">Start writing &amp; speaking</a></article><article class="lab-card"><div class="lab-icon">🔁</div><h3>Review</h3><p>Recall tasks that are due for review.</p><a class="lab-btn" href="#workshopReview">Show due tasks</a></article><article class="lab-card"><div class="lab-icon">🔎</div><h3>Understand mistakes</h3><p>Understand solutions and write your own memory notes.</p><a class="lab-btn" href="#workshopErrors">Understand mistakes</a></article></div><details class="workshop-panel" id="workshopReview"><summary>Due reviews</summary><div id="workshopDueList" aria-live="polite"></div></details><details class="workshop-panel" id="workshopErrors"><summary>Understand mistakes & memory notes</summary><div id="workshopErrorList"></div></details></div></section>
 
 
 <section class="v7-competence" id="kompetenzlernen"><div class="v7-comp-wrap">
@@ -1211,19 +1189,7 @@ window.addEventListener('frlearningchange',()=>{const el=document.getElementById
 </script>
 
 
-<script>
-document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>{
- const p=document.getElementById(b.dataset.panel); if(p)p.classList.toggle('open');
-}));
-function saveLab(button,...ids){
- const data={};ids.forEach(id=>{const e=document.getElementById(id);if(e)data[id]=e.value});
- try{const old=JSON.parse(localStorage.getItem('de_en_learning_methods')||'{}');Object.assign(old,data);localStorage.setItem('de_en_learning_methods',JSON.stringify(old));}catch(e){}
- const b=button;if(b){const old=b.textContent;b.textContent='✓ Saved';setTimeout(()=>b.textContent=old,1200)}
-}
-window.addEventListener('load',()=>{
- try{const d=JSON.parse(localStorage.getItem('de_en_learning_methods')||'{}');Object.entries(d).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.value=v})}catch(e){}
-});
-</script>
+
 
 
 
@@ -1572,5 +1538,5 @@ async function boot(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>boot().catch(()=>{}),{once:true});else boot().catch(()=>{});
 })();
-</script><script src="german-error-analysis.js?v=20261014-de2"></script></body>
+</script><script src="german-error-analysis.js?v=20261014-de2"></script><script id="foxoraWorkshopConfig" type="application/json">{"course": "german", "english": true, "filePrefix": "deutsch-en-", "modulePrefix": "de_en_", "catalog": "german-course-map.json"}</script><script src="foxora-workshop.js?v=20261015-1"></script><script>document.querySelectorAll('.lab-btn[href="#workshopReview"],.lab-btn[href="#workshopErrors"]').forEach(a=>a.addEventListener('click',()=>{document.querySelector(a.getAttribute('href')).open=true;}));</script></body>
 </html>
