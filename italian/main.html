@@ -890,8 +890,15 @@ window.addEventListener('appinstalled', () => {
     <div class="dash-card"><div class="dash-num" id="dStreak">0</div><div class="dash-label">Tageserie</div></div>
     <div class="dash-card"><div class="dash-num" id="dGoal">0/20</div><div class="dash-label">Tagesziel</div><div class="goal-track"><div class="goal-fill" id="dGoalFill"></div></div></div>
   </div></div>
-  <div class="daily-suggestion-wrap"><div class="today-box"><div><h3 id="todayTitle">Deine nächste Einheit</h3><p id="todayText">Die App sucht das Thema, bei dem Wiederholung gerade am meisten bringt.</p></div><a id="todayBtn" class="btn-smart" href="#Spi">Heute lernen</a>
-</div></div>
+  <div class="daily-suggestion-wrap"><details class="fa-fold" id="analysisFold"><summary>Deine Fehleranalyse</summary><div class="fa-wrap" id="Fehleranalyse">
+<p class="section-label">Aus Fehlern lernen</p><h3>Deine <em>Fehleranalyse</em></h3>
+<p>Themenübersicht kostenlos · Fehlerbeispiele und dein persönlicher Lernplan mit Premium.</p>
+<p class="fa-muted" id="analysisAccount"></p><div id="analysisBasic"></div>
+<details class="fa-plan-fold"><summary>Meinen Lernplan erstellen</summary><h4>Vertiefte Analyse <span style="font:500 .75rem var(--font-body);color:var(--gold-lt)">PREMIUM</span></h4>
+<p>Sieh, was du üben solltest, und starte deinen persönlichen Lernplan mit drei Schritten.</p>
+<div class="fa-actions"><button class="btn-smart" type="button" id="analysisRefresh">Meinen Lernplan erstellen</button><a class="btn-smart" href="#Premium">Premium ansehen</a></div>
+<p role="status" aria-live="polite" id="analysisStatus"></p><div id="analysisDetail"></div>
+</details></div></details></div>
 </section>
 <section id="Fortschritt" style="background:#0D1433">
   <div class="Spi-header reveal">
@@ -913,15 +920,7 @@ window.addEventListener('appinstalled', () => {
     </div>
   </div>
 
-<details class="fa-fold" id="analysisFold"><summary>Deine Fehleranalyse</summary><div class="fa-wrap" id="Fehleranalyse">
-<p class="section-label">Aus Fehlern lernen</p><h3>Deine <em>Fehleranalyse</em></h3>
-<p>Themenübersicht kostenlos · Fehlerbeispiele und dein persönlicher Lernplan mit Premium.</p>
-<p class="fa-muted" id="analysisAccount"></p><div id="analysisBasic"></div>
-<details class="fa-plan-fold"><summary>Meinen Lernplan erstellen</summary><h4>Vertiefte Analyse <span style="font:500 .75rem var(--font-body);color:var(--gold-lt)">PREMIUM</span></h4>
-<p>Sieh, was du üben solltest, und starte deinen persönlichen Lernplan mit drei Schritten.</p>
-<div class="fa-actions"><button class="btn-smart" type="button" id="analysisRefresh">Meinen Lernplan erstellen</button><a class="btn-smart" href="#Premium">Premium ansehen</a></div>
-<p role="status" aria-live="polite" id="analysisStatus"></p><div id="analysisDetail"></div>
-</details></div></details>
+
 <details id="itTopicProgress" aria-labelledby="itTopicProgressTitle"><summary id="itTopicProgressTitle">Deine Themen im Überblick</summary><div class="it-topic-body"><p>Unterschiedliche Aufgaben, Trefferquote und Wiederholungsbedarf pro Thema.</p><div id="itTopicProgressRows"></div><p class="it-review-note">Gefestigt: mehrfach mit zeitlichem Abstand richtig beantwortet. Auch diese Aufgaben werden später wiederholt. Offene Fehler und fällige Wiederholungen können sich überschneiden.</p></div></details>
 </section>
 <section id="Pruefung" style="background:#121E47">
@@ -1156,48 +1155,7 @@ const renderLearningDashboard = ()=>{
  byId('dGoal').textContent=Math.min(20,s.day.answered)+'/20';
  byId('dGoalFill').style.width=Math.min(100,s.day.answered/20*100)+'%';
 
- // Prüfung gilt als erledigt, sobald in ihrem lokalen Speicher ein Abschluss/Resultat vorhanden ist.
- function examDone(exam){return completedEver.has(exam.key);}
 
- // Stabile Tagesauswahl: innerhalb desselben Tages bleibt der Vorschlag gleich.
- function dayPick(arr,salt=''){
-   if(!arr.length)return null;
-   const seed=todayKey+'|'+salt;
-   let h=2166136261;
-   for(let i=0;i<seed.length;i++){h^=seed.charCodeAt(i);h=Math.imul(h,16777619)}
-   return arr[(h>>>0)%arr.length];
- }
-
- // Sobald alle 12 Übungen eines Niveaus mindestens einmal abgeschlossen sind,
- // wird zuerst die entsprechende noch nicht absolvierte Gesamtprüfung vorgeschlagen.
- let suggestion=null;
- for(const exam of examInfo){
-   const levelExercises=exercises.filter(e=>e.level===exam.level&&!e.href.includes('-alltag-'));
-   const levelComplete=levelExercises.length===13 && levelExercises.every(e=>completedEver.has(e.key));
-   if(levelComplete && !examDone(exam)){
-     suggestion={...exam,isExam:true};
-     break;
-   }
- }
-
- // Sonst bevorzugt die App Übungen, die insgesamt noch nie abgeschlossen wurden.
- if(!suggestion){
-   let pool=exercises.filter(e=>!completedEver.has(e.key) && !completedToday.has(e.key));
-   if(!pool.length) pool=exercises.filter(e=>!completedToday.has(e.key));
-   if(!pool.length) pool=exercises;
-   const state=s.modules||{};const due=exercises.map(e=>({...e,n:Object.values(state[e.key]?.questions||{}).filter(q=>q.due&&Date.parse(q.due)<=Date.now()&&q.strength<2).length})).filter(e=>e.n>0).sort((a,b)=>b.n-a.n);suggestion=due[0]||dayPick(pool,'daily-exercise');
- }
-
- if(suggestion){
-   byId('todayBtn').href=suggestion.href;
-   byId('todayTitle').textContent=suggestion.title;
-   byId('todayText').textContent=suggestion.isExam
-     ? `Du hast alle 13 Grammatikübungen von Niveau ${suggestion.level} abgeschlossen. Jetzt ist die Gesamtprüfung dieses Niveaus dran.`
-     : completedEver.has(suggestion.key)
-       ? 'Diese Übung hast du heute noch nicht gemacht. Morgen erhältst du wieder einen neuen zufälligen Vorschlag.'
-       : 'Diese Übung hast du insgesamt noch nicht abgeschlossen. Der Vorschlag wechselt jeden Tag.';
-   byId('todayBtn').textContent=suggestion.isExam?'Prüfung starten':'Übung starten';
- }
 };
 window.addEventListener('load',renderLearningDashboard);
 window.addEventListener('frlearningchange',renderLearningDashboard);
@@ -1446,7 +1404,7 @@ window.addEventListener('load',()=>{
   else{title='Dein Lernweg ist geöffnet';text='Du kannst alle Bereiche nutzen. Niveau 2 und 3 sowie Prüfungen benötigen weiterhin Premium.';href=nextGrammar();}
   if(state.skip){title='Alle Bereiche sind sichtbar';text='Wähle dein Thema und Niveau frei. Die Premium-Regeln gelten weiterhin.';href=nextGrammar();}
   $('itGuideTitle').textContent=title;$('itGuideText').textContent=text;$('itGuideNext').href=href;
-  hide($('Spi'),!state.grammar);hide($('Heute'),!state.grammar);hide($('Fortschritt'),!state.grammar);hide($('Pruefung'),!state.exam);hide($('lernwerkstatt'),!state.lab);hide($('analysisFold'),!state.lab);hide($('Pru'),!state.grammar);hide($('kompetenzlernen'),!state.lab);
+  hide($('Spi'),!state.grammar);hide($('Heute'),!state.grammar);hide($('Fortschritt'),!state.grammar);hide($('Pruefung'),!state.exam);hide($('lernwerkstatt'),!state.lab);hide($('analysisFold'),!state.grammar);hide($('Pru'),!state.grammar);hide($('kompetenzlernen'),!state.lab);
   hide($('chooseEveryday')?.closest('article'),!state.daily);hide($('Alltag'),!state.daily);
   document.querySelectorAll('#Theoriekarten a').forEach(a=>hide(a,!state.grammar&&!a.href.includes('italienisch-theorie-verben-konjugation.html')));
   document.querySelectorAll('.welcome-path').forEach(el=>{const href=el.getAttribute('href');hide(el,!state.grammar||(href==='#Alltag'&&!state.daily)||(href==='#lernwerkstatt'&&!state.lab));});
@@ -1458,7 +1416,7 @@ window.addEventListener('load',()=>{
   document.documentElement.classList.remove('it-guide-loading');
   if(lastActor!==core?.account){lastActor=core?.account;checkHash();}
  }
- const restricted=h=>(['#Spi','#Grammatik','#Heute','#Fortschritt'].includes(h)&&!state.grammar)||(['#Alltag'].includes(h)&&!state.daily)||(['#lernwerkstatt','#Fehleranalyse'].includes(h)&&!state.lab)||(h==='#Pruefung'&&!state.exam);
+ const restricted=h=>(['#Spi','#Grammatik','#Heute','#Fortschritt','#Fehleranalyse'].includes(h)&&!state.grammar)||(['#Alltag'].includes(h)&&!state.daily)||(['#lernwerkstatt'].includes(h)&&!state.lab)||(h==='#Pruefung'&&!state.exam);
  function checkHash(){if(restricted(location.hash)){history.replaceState(null,'','#hero');$('itGuide').scrollIntoView({block:'center'});$('itGuideStatus').textContent='Dieser Bereich öffnet sich nach deinem nächsten Lernschritt. Du kannst auch alle Bereiche anzeigen.';}}
  document.addEventListener('click',e=>{const a=e.target.closest('a');if(a&&a.getAttribute('href')?.startsWith('#')&&restricted(a.getAttribute('href'))){e.preventDefault();e.stopImmediatePropagation();$('itGuide').scrollIntoView({block:'center'});$('itGuideStatus').textContent='Dieser Bereich öffnet sich nach deinem nächsten Lernschritt.';}},true);
  $('itGuideToggle').onclick=()=>{const mode=state.skip?'guided':'all';if(window.FRLearning?.setGuidanceMode)window.FRLearning.setGuidanceMode(mode);else try{localStorage.setItem('it_guidance_mode:'+window.FRLearning?.account,mode)}catch{}render();};
