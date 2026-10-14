@@ -38,8 +38,12 @@ function paint(){if(!ready)return;const {summary,topics,errors}=data();paintRevi
  $('analysisRefresh').disabled=!premium;$('analysisRefresh').hidden=!premium;$('analysisPremiumLink').hidden=premium;
  $('analysisStatus').textContent=premium?'Erstelle einen kurzen Plan aus deinem aktuellen Wiederholungsbedarf.':'Der persönliche Lernplan gehört zu Premium.';
 }
-$('analysisRefresh').onclick=()=>{const {topics}=data();const selected=topics.filter(t=>t.wrong>0).slice(0,3);$('analysisDetail').replaceChildren();if(!premium)return;if(!selected.length){$('analysisDetail').append(make('p','Kein offener Fehlerschwerpunkt. Starte ein neues Thema oder wiederhole bekannte Inhalte.'));return}
- selected.forEach((t,i)=>{const row=make('div');row.className='fa-clean-plan-step';row.append(make('h4','Schritt '+(i+1)+' · '+t.title),make('p','Eine Runde mit 10 Aufgaben. Wiederhole danach bei Bedarf nur die Fehler.'),link('Runde starten',t.file+'?smart=1'));$('analysisDetail').append(row)});$('analysisStatus').textContent='Dein Plan wurde aus den zuletzt falsch beantworteten Aufgaben erstellt.';
+$('analysisRefresh').onclick=()=>{
+ $('analysisDetail').replaceChildren();if(!premium)return;
+ const selected=FRPlan.build(FRLearning.summary(),catalog);
+ if(!selected.length){$('analysisDetail').append(make('p','Aktuell ist nichts fällig. Deine gefestigten Inhalte werden zu ihrem nächsten Termin wieder angeboten.'));return;}
+ selected.forEach((t,i)=>{const row=make('div');row.className='fa-clean-plan-step';row.append(make('h4','Schritt '+(i+1)+' · '+t.title+' · Niveau '+t.level),make('p',t.reason+'. '+(t.ids.length?t.ids.length+' gezielt ausgewählte Aufgaben.':'Eine Runde mit neuen und bekannten Aufgaben.')),link('Runde starten',t.href));$('analysisDetail').append(row);});
+ $('analysisStatus').textContent='Priorität: fällige Fehler → überfällige Aufgaben → Abwechslung → neue Inhalte. Gefestigte Aufgaben kehren erst zu ihrem Wiederholungstermin zurück.';
 };
 async function refreshPremium(){premium=false;try{if(FRLearning.account!=='guest')premium=!!(await FRPremium.status()).premium}catch{}paint()}
 (async()=>{try{const r=await fetch('french-course-map.json?v=1');if(r.ok)catalog=await r.json()}catch{}await FRLearning.ready;ready=true;await refreshPremium();window.addEventListener('frlearningchange',()=>{paint()});let actor=FRLearning.account;window.addEventListener('frlearningchange',()=>{if(actor!==FRLearning.account){actor=FRLearning.account;void refreshPremium()}});})();
