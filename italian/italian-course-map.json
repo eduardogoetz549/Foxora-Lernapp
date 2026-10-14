@@ -568,5 +568,185 @@
     "topic": "verneinungen",
     "theory": "italienisch-theorie-verneinungen.html",
     "count": null
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_familie_1_oberstufe",
+    "file": "italienisch-alltag-lesen-familie-1-oberstufe.html",
+    "title": "Lesen: Familie",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-familie",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_schule_1_oberstufe",
+    "file": "italienisch-alltag-lesen-schule-1-oberstufe.html",
+    "title": "Lesen: Schule & Lernen",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-schule",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_essen_1_oberstufe",
+    "file": "italienisch-alltag-lesen-essen-1-oberstufe.html",
+    "title": "Lesen: Essen & Trinken",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-essen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_einkaufen_1_oberstufe",
+    "file": "italienisch-alltag-lesen-einkaufen-1-oberstufe.html",
+    "title": "Lesen: Einkaufen",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-einkaufen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_reisen_1_oberstufe",
+    "file": "italienisch-alltag-lesen-reisen-1-oberstufe.html",
+    "title": "Lesen: Reisen & Unterwegs",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-reisen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_hobbys_1_oberstufe",
+    "file": "italienisch-alltag-lesen-hobbys-1-oberstufe.html",
+    "title": "Lesen: Hobbys & Freizeit",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-hobbys",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_familie_2_oberstufe",
+    "file": "italienisch-alltag-lesen-familie-2-oberstufe.html",
+    "title": "Lesen: Familie",
+    "level": 2,
+    "daily": true,
+    "topic": "lesen-familie",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_schule_2_oberstufe",
+    "file": "italienisch-alltag-lesen-schule-2-oberstufe.html",
+    "title": "Lesen: Schule & Lernen",
+    "level": 2,
+    "daily": true,
+    "topic": "lesen-schule",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_essen_2_oberstufe",
+    "file": "italienisch-alltag-lesen-essen-2-oberstufe.html",
+    "title": "Lesen: Essen & Trinken",
+    "level": 2,
+    "daily": true,
+    "topic": "lesen-essen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_einkaufen_2_oberstufe",
+    "file": "italienisch-alltag-lesen-einkaufen-2-oberstufe.html",
+    "title": "Lesen: Einkaufen",
+    "level": 2,
+    "daily": true,
+    "topic": "lesen-einkaufen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_reisen_2_oberstufe",
+    "file": "italienisch-alltag-lesen-reisen-2-oberstufe.html",
+    "title": "Lesen: Reisen & Unterwegs",
+    "level": 2,
+    "daily": true,
+    "topic": "lesen-reisen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_hobbys_2_oberstufe",
+    "file": "italienisch-alltag-lesen-hobbys-2-oberstufe.html",
+    "title": "Lesen: Hobbys & Freizeit",
+    "level": 2,
+    "daily": true,
+    "topic": "lesen-hobbys",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_familie_3_oberstufe",
+    "file": "italienisch-alltag-lesen-familie-3-oberstufe.html",
+    "title": "Lesen: Familie",
+    "level": 3,
+    "daily": true,
+    "topic": "lesen-familie",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_schule_3_oberstufe",
+    "file": "italienisch-alltag-lesen-schule-3-oberstufe.html",
+    "title": "Lesen: Schule & Lernen",
+    "level": 3,
+    "daily": true,
+    "topic": "lesen-schule",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_essen_3_oberstufe",
+    "file": "italienisch-alltag-lesen-essen-3-oberstufe.html",
+    "title": "Lesen: Essen & Trinken",
+    "level": 3,
+    "daily": true,
+    "topic": "lesen-essen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_einkaufen_3_oberstufe",
+    "file": "italienisch-alltag-lesen-einkaufen-3-oberstufe.html",
+    "title": "Lesen: Einkaufen",
+    "level": 3,
+    "daily": true,
+    "topic": "lesen-einkaufen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_reisen_3_oberstufe",
+    "file": "italienisch-alltag-lesen-reisen-3-oberstufe.html",
+    "title": "Lesen: Reisen & Unterwegs",
+    "level": 3,
+    "daily": true,
+    "topic": "lesen-reisen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "it_italienisch_alltag_lesen_hobbys_3_oberstufe",
+    "file": "italienisch-alltag-lesen-hobbys-3-oberstufe.html",
+    "title": "Lesen: Hobbys & Freizeit",
+    "level": 3,
+    "daily": true,
+    "topic": "lesen-hobbys",
+    "theory": "main.html#theorie",
+    "count": 10
   }
 ]
