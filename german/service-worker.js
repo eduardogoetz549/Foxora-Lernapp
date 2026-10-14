@@ -1,5 +1,5 @@
 'use strict';
-const PREFIX='foxora-de-en:'+self.registration.scope+':',CACHE=PREFIX+'german20261014',ROOT=new URL('./',self.registration.scope);
+const PREFIX='foxora-de-en:'+self.registration.scope+':',CACHE=PREFIX+'german20261014-mainfix3',ROOT=new URL('./',self.registration.scope);
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);await Promise.allSettled(['main.html','german-learning-core.js','german-answer-check.js','german-planner.js','german-navigation.js','german-goals.js','german-shared.css','german-listening-progress.js','german-flashcard-sync.js','fuchs-idle.png'].map(p=>cache.add(new URL(p,ROOT))));await self.skipWaiting();})());});
 self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith(PREFIX)&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener('fetch',event=>{const url=new URL(event.request.url),relative=url.pathname.slice(ROOT.pathname.length);if(event.request.method!=='GET'||url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname)||relative.includes('/'))return;

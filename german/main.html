@@ -842,7 +842,7 @@ window.addEventListener('appinstalled', () => {
 #deHistoryRows .es-history-row a{color:#D4AF60;text-decoration:none}
 @media(max-width:700px){#deReviewStats .es-stat-grid{grid-template-columns:1fr}}
 @media(max-width:620px){#Heute .foxora-analysis-position .fa-fold>summary{padding:1.2rem 1.3rem}}
-</style><script src="german-catalog.js?v=20261014-de2"></script></head>
+</style><script src="german-catalog.js?v=20261014-de2"></script><meta name="foxora-release" content="de-main-fix-20261014-1829"></head>
 <body>
 
 
@@ -909,21 +909,20 @@ window.addEventListener('appinstalled', () => {
 
 
 <section id="Heute" style="background:#0D1433;padding-top:5rem">
-  <div class="Spi-header reveal"><p class="section-label">Your personal learning plan</p><h2 class="section-title">Today <em>learn</em></h2><div class="gold-bar"></div>
+  <div class="Spi-header reveal"><p class="section-label">Your personal learning plan</p><h2 class="section-title">Learn <em>today</em></h2><div class="gold-bar"></div>
   <p class="section-body">The app prioritises due reviews, earlier mistakes and uncertain answers.</p></div>
   <div class="learning-dashboard"><div class="dash-grid">
     <div class="dash-card"><div class="dash-num" id="dStreak">0</div><div class="dash-label">Daily streak</div></div>
     <div class="dash-card"><div class="dash-num" id="dGoal">0/20</div><div class="dash-label">Daily goal</div><div class="goal-track"><div class="goal-fill" id="dGoalFill"></div></div></div>
   </div></div>
-  <div class="daily-suggestion-wrap"><div class="today-box"><div><h3 id="todayTitle">Your next session</h3><p id="todayText">The app looks for the topic that would benefit most from review.</p></div><a id="todayBtn" class="btn-smart" href="#Spi">Learn today</a>
-</div></div>
+<div class="daily-suggestion-wrap foxora-analysis-position"><details class="fa-fold" id="analysisFold"><summary>Your error analysis</summary><div class="fa-wrap fa-clean" id="Fehleranalyse"><div id="deReviewStats" aria-live="polite"></div><div id="analysisBasic" aria-live="polite"><p>Loading your recommendation …</p></div><details class="fa-clean-fold"><summary>Mistake details <span id="analysisErrorCount"></span></summary><div id="analysisErrorList"></div></details><details class="fa-clean-fold"><summary>Past mistakes <span id="deHistoryCount"></span></summary><p>These questions were answered incorrectly in the past. Your confidence may have improved since then.</p><div id="deHistoryRows"></div></details><details class="fa-clean-fold"><summary>Personal learning plan <span class="fa-clean-premium">Premium</span></summary><p>Up to three suitable exercise rounds based on your review needs.</p><div class="fa-clean-actions"><button type="button" class="fa-clean-btn" id="analysisRefresh" hidden>Create a learning plan</button><a class="fa-clean-btn secondary" href="#Premium" id="analysisPremiumLink">View Premium</a></div><p id="analysisStatus" role="status"></p><div id="analysisDetail"></div></details><p class="fa-muted" id="analysisAccount"></p></div></details></div>
 </section>
 <section id="Fortschritt" style="background:#0D1433">
   <div class="Spi-header reveal">
-    <p class="section-label">Dein Lernstand</p>
-    <h2 class="section-title">Mein <em>Fortschritt</em></h2>
+    <p class="section-label">Your learning progress</p>
+    <h2 class="section-title">My <em>progress</em></h2>
     <div class="gold-bar"></div>
-    <p class="section-body">Hier wird der Fortschritt deiner tatsächlichen Übungen automatisch zusammengefasst. Oben siehst du, was du heute erledigt hast und welche Übungen du insgesamt bereits abgeschlossen hast.</p>
+    <p class="section-body">Your completed rounds are shown here. Completed means a round has ended; consolidated means you answered correctly repeatedly with time between reviews.</p>
   </div>
   <div style="max-width:1200px;margin:0 auto 2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem">
     <div class="analytics" style="margin:0">
@@ -938,7 +937,7 @@ window.addEventListener('appinstalled', () => {
     </div>
   </div>
 
-<div class="daily-suggestion-wrap foxora-analysis-position"><details class="fa-fold" id="analysisFold"><summary>Your error analysis</summary><div class="fa-wrap fa-clean" id="Fehleranalyse"><div id="deReviewStats" aria-live="polite"></div><div id="analysisBasic" aria-live="polite"><p>Loading your recommendation …</p></div><details class="fa-clean-fold"><summary>Mistake details <span id="analysisErrorCount"></span></summary><div id="analysisErrorList"></div></details><details class="fa-clean-fold"><summary>Past mistakes <span id="deHistoryCount"></span></summary><p>These questions were answered incorrectly in the past. Your confidence may have improved since then.</p><div id="deHistoryRows"></div></details><details class="fa-clean-fold"><summary>Personal learning plan <span class="fa-clean-premium">Premium</span></summary><p>Up to three suitable exercise rounds based on your review needs.</p><div class="fa-clean-actions"><button type="button" class="fa-clean-btn" id="analysisRefresh" hidden>Create a learning plan</button><a class="fa-clean-btn secondary" href="#Premium" id="analysisPremiumLink">View Premium</a></div><p id="analysisStatus" role="status"></p><div id="analysisDetail"></div></details><p class="fa-muted" id="analysisAccount"></p></div></details></div><details id="deTopicProgress" aria-labelledby="deTopicProgressTitle"><summary id="deTopicProgressTitle">Your topics at a glance</summary><div class="de-topic-body"><p>Distinct questions, accuracy and review needs for each topic.</p><div id="deTopicProgressRows"></div><p class="de-review-note">Consolidated: answered correctly several times with time gaps. These questions also return later. Open mistakes and due questions may overlap.</p></div></details>
+<details id="deTopicProgress" aria-labelledby="deTopicProgressTitle"><summary id="deTopicProgressTitle">Your topics at a glance</summary><div class="de-topic-body"><p>Distinct questions, accuracy and review needs for each topic.</p><div id="deTopicProgressRows"></div><p class="de-review-note">Consolidated: answered correctly several times with time gaps. These questions also return later. Open mistakes and due questions may overlap.</p></div></details>
 </section>
 <section id="Pruefung" style="background:#121E47">
   <div class="Spi-header reveal">
@@ -951,17 +950,17 @@ window.addEventListener('appinstalled', () => {
     <a href="deutsch-en-grammatik-pruefung-1-oberstufe.html" class="service-card">
       <div class="service-num">01</div>
       <div class="service-title">Comprehensive grammar exam · Level 1</div>
-      <div class="service-desc">26 mixed questions · 13 topics · 30 minutes · results at the end.</div>
+      <div class="service-desc">39 mixed questions · 13 topics · 30 minutes · results at the end.</div>
     </a>
     <a href="deutsch-en-grammatik-pruefung-2-oberstufe.html" class="service-card">
       <div class="service-num">02</div>
       <div class="service-title">Comprehensive grammar exam · Level 2</div>
-      <div class="service-desc">26 mixed questions · 13 topics · 35 minutes · results at the end.</div>
+      <div class="service-desc">39 mixed questions · 13 topics · 35 minutes · results at the end.</div>
     </a>
     <a href="deutsch-en-grammatik-pruefung-3-oberstufe.html" class="service-card">
       <div class="service-num">03</div>
       <div class="service-title">Comprehensive grammar exam · Level 3</div>
-      <div class="service-desc">26 mixed questions · 13 topics · 40 minutes · results at the end.</div>
+      <div class="service-desc">39 mixed questions · 13 topics · 40 minutes · results at the end.</div>
     </a>
   </div>
 <div class="Spi-grid"><a href="deutsch-en-alltag-pruefung-1-oberstufe.html" class="service-card"><div class="service-num">04</div><div class="service-title">Comprehensive everyday exam · Level 1</div><div class="service-desc">30 questions · 5 per topic including reading · 30 minutes · Premium · results at the end.</div></a><a href="deutsch-en-alltag-pruefung-2-oberstufe.html" class="service-card"><div class="service-num">05</div><div class="service-title">Comprehensive everyday exam · Level 2</div><div class="service-desc">30 questions · 5 per topic including reading · 35 minutes · Premium · results at the end.</div></a><a href="deutsch-en-alltag-pruefung-3-oberstufe.html" class="service-card"><div class="service-num">06</div><div class="service-title">Comprehensive everyday exam · Level 3</div><div class="service-desc">30 questions · 5 per topic including reading · 40 minutes · Premium · results at the end.</div></a></div></section>
@@ -1204,16 +1203,7 @@ const renderLearningDashboard = ()=>{
    const state=s.modules||{};const due=exercises.map(e=>({...e,n:Object.values(state[e.key]?.questions||{}).filter(q=>q.due&&Date.parse(q.due)<=Date.now()&&q.strength<2).length})).filter(e=>e.n>0).sort((a,b)=>b.n-a.n);suggestion=due[0]||dayPick(pool,'daily-exercise');
  }
 
- if(suggestion){
-   byId('todayBtn').href=suggestion.href;
-   byId('todayTitle').textContent=suggestion.title;
-   byId('todayText').textContent=suggestion.isExam
-     ? `You have completed all 13 grammar exercises at level ${suggestion.level}. Try the comprehensive exam next.`
-     : completedEver.has(suggestion.key)
-       ? 'You have not completed this exercise today. Your suggestion changes daily.'
-       : 'You have not completed this exercise yet. Your suggestion changes daily.';
-   byId('todayBtn').textContent=suggestion.isExam?'Start exam':'Start exercise';
- }
+
 };
 window.addEventListener('load',renderLearningDashboard);
 window.addEventListener('frlearningchange',renderLearningDashboard);
@@ -1462,7 +1452,7 @@ window.addEventListener('load',()=>{
   else{title='Your learning path is open';text='You can explore all areas. Levels 2 and 3 and exams still require Premium.';href=nextGrammar();}
   if(state.skip){title='All areas are visible';text='Choose your topic and level freely. Premium rules still apply.';href=nextGrammar();}
   $('deGuideTitle').textContent=title;$('deGuideText').textContent=text;$('deGuideNext').href=href;
-  hide($('Spi'),!state.grammar);hide($('Heute'),!state.grammar);hide($('Fortschritt'),!state.grammar);hide($('Pruefung'),!state.exam);hide($('lernwerkstatt'),!state.lab);hide($('analysisFold'),!state.lab);hide($('Pru'),!state.grammar);hide($('kompetenzlernen'),!state.lab);
+  hide($('Spi'),!state.grammar);hide($('Heute'),!state.grammar);hide($('Fortschritt'),!state.grammar);hide($('Pruefung'),!state.exam);hide($('lernwerkstatt'),!state.lab);hide($('analysisFold'),!state.grammar);hide($('Pru'),!state.grammar);hide($('kompetenzlernen'),!state.lab);
   hide($('chooseEveryday')?.closest('article'),!state.daily);hide($('Alltag'),!state.daily);
   document.querySelectorAll('#Theoriekarten a').forEach(a=>hide(a,!state.grammar&&!a.href.includes('deutsch-en-theorie-sein-haben.html')));
   document.querySelectorAll('.welcome-path').forEach(el=>{const href=el.getAttribute('href');hide(el,!state.grammar||(href==='#Alltag'&&!state.daily)||(href==='#lernwerkstatt'&&!state.lab));});
