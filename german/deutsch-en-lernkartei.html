@@ -55,7 +55,7 @@ body{padding-top:84px!important}
 @media(max-width:480px){#navbar .wordmark{font-size:.7rem;letter-spacing:.09em}#navbar .nav-cta{font-size:.68rem!important;padding:.5rem .8rem!important}.exercise-levels a{font-size:.75rem;padding:.65rem .75rem}}
 @media(prefers-reduced-motion:reduce){#navbar,#navbar a,.exercise-levels a{transition:none!important}.exercise-levels a:hover{transform:none}}
 
-#navbar a,#navbar a:hover,#navbar a:focus-visible{text-decoration:none!important}#navbar .nav-links a::after{display:none!important}</style><script src="german-learning-core.js?v=cards-exact1"></script></head>
+#navbar a,#navbar a:hover,#navbar a:focus-visible{text-decoration:none!important}#navbar .nav-links a::after{display:none!important}</style><script src="german-learning-core.js?v=20261014-de2"></script><link rel="stylesheet" href="german-shared.css?v=20261014-de2"><script src="german-answer-check.js?v=20261014-de2"></script><script src="german-planner.js?v=20261014-de2"></script><script defer src="german-navigation.js?v=20261014-de2"></script><script defer src="german-goals.js?v=20261014-de2"></script><script defer src="german-listening-progress.js?v=20261014-de2"></script></head>
 <body>
 <nav id="navbar" class="site-header">
   <a href="main.html#hero" class="nav-logo">
@@ -116,7 +116,7 @@ $('addCard').onclick=()=>{const f=$('front').value.trim(),b=$('back').value.trim
 $('cards').onclick=e=>{const b=e.target.closest('[data-del]');if(b){draft.splice(Number(b.dataset.del),1);renderCards()}};
 $('saveDeck').onclick=async()=>{
  const owner=actor,name=$('deckName').value.trim();if(!name||name.length>200)return alert('Enter a set name of up to 200 characters.');if(!draft.length)return alert('Add at least one card.');
- const savedId=current?.id;const d={id:savedId||uid(),name,source:'English',cards:draft.map(c=>({...c})),updated:Date.now()};
+ const savedId=current?.id;const d={...(current||{}),id:savedId||uid(),name,source:'English',cards:draft.map(c=>({...c})),updated:Date.now()};
  $('saveDeck').disabled=true;try{await saveAccountDeck(d);if(owner!==actor)return;const ix=decks.findIndex(x=>x.id===d.id);if(ix>=0)decks[ix]=d;else decks.unshift(d);current=d;persist();renderDecks();alert('Set saved.');}catch(e){alert(e.message);}finally{$('saveDeck').disabled=false;}
 };
 $('newDeck').onclick=newDeck;
@@ -132,11 +132,10 @@ $('exportDeck').onclick=exportCurrent;
 $('nativeShare').onclick=async()=>{if(!current)return;const text=`Flashcard set “${current.name}” (${current.source} → German, ${current.cards.length} cards). Export the file to share the complete set.`;if(navigator.share){try{await navigator.share({title:current.name,text,url:location.href});}catch(e){}}else{try{await navigator.clipboard.writeText(text+' '+location.href);alert('Share text and link copied. Export the file to share the complete set.')}catch(e){alert('Use Export as a file to share the set.')}}};
 $('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;const owner=actor;try{if(f.size>5*1024*1024)throw Error('The file is too large.');const obj=JSON.parse(await f.text()),x=obj.deck||obj;if(!x.name||!Array.isArray(x.cards))throw Error('Invalid flashcard file.');const d={id:uid(),name:String(x.name).slice(0,200),source:'English',cards:x.cards.map(c=>({front:String(c.front||''),back:String(c.back||''),known:0,missed:0}))};await saveAccountDeck(d);if(owner!==actor)return;decks.unshift(d);persist();renderDecks();editDeck(d.id);alert('Set imported.');}catch(err){alert(err.message);}e.target.value='';};
-newDeck();load();FRLearning.ready.then(loadAccount);window.addEventListener("frlearningchange",()=>{if(actor!==FRLearning.account)loadAccount();});
+newDeck();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
 
 function validateCards(d){if(!d.cards.length||d.cards.length>5000)throw Error('Invalid number of cards.');for(const c of d.cards)if(!c.front.trim()||!c.back.trim()||c.front.length>2000||c.back.length>2000)throw Error('Each card needs two texts of up to 2000 characters.');}
-async function saveAccountDeck(d){validateCards(d);if(!d.id.startsWith('de_en_'))throw Error('Invalid German set ID.');if(actor==='guest'){if((!decks.some(x=>x.id===d.id)&&decks.length>=3)||d.cards.length>30)throw Error('Free: up to 3 sets with 30 cards each.');return;}const {error}=await FRLearning.client.rpc('fr_save_flashcard_deck',{p_id:d.id,p_name:d.name,p_cards:d.cards.map(c=>({front:c.front,back:c.back}))});if(error)throw Error('Could not save the set. Free accounts share a limit of 3 sets with 30 cards across languages. '+(error.message||''));}
-async function loadAccount(){const owner=FRLearning.account;actor=owner;current=null;newDeck();load();if(owner==='guest')return;try{const local=decks;const {data,error}=await FRLearning.client.from('fr_flashcard_decks').select('id,name,cards').eq('user_id',owner).like('id','de\\_en\\_%');if(error)throw error;if(owner!==FRLearning.account||actor!==owner)return;decks=(data||[]).map(d=>({...d,source:'English',cards:d.cards.map((c,i)=>({...c,known:local.find(x=>x.id===d.id)?.cards[i]?.known||0,missed:local.find(x=>x.id===d.id)?.cards[i]?.missed||0}))}));persist();renderDecks();}catch(e){if(owner===actor)alert('Cloud connection failed. Showing local copies.');}}
+async function saveAccountDeck(d){validateCards(d);if(!d.id.startsWith('de_en_'))throw Error('Invalid German set ID.');if(actor==='guest'&&((!decks.some(x=>x.id===d.id)&&decks.length>=3)||d.cards.length>30))throw Error('Free: up to 3 sets with 30 cards each.');}
 </script>
-</body></html>
+<script src="german-flashcard-sync.js?v=20261014-de2"></script></body></html>
