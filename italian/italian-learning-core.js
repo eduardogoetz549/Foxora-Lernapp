@@ -106,7 +106,7 @@
   }
   let readyResolve;
   const ready=new Promise(resolve=>readyResolve=resolve);
-  const api={ready,summary,level:xp=>Math.floor(Math.max(0,xp)/100)+1,
+  const api={ready,summary,events:()=>ordered().map(e=>({...e})),level:xp=>Math.floor(Math.max(0,xp)/100)+1,
     get client(){return client;},get status(){return status;},get account(){return actor;},sync,
     record(module,id,ok,review=false,text='',details=null) {
       add({kind:'answer',module,question:String(id),ok:!!ok,review:!!review,text:String(text).slice(0,500),...(details ? {details:Object.fromEntries(['own','right','prompt','explanation','topic','file','type'].map(k=>[k,String(details[k]??'').replace(/<[^>]*>/g,'').slice(0,800)]).concat([['unanswered',!!details.unanswered],['quality',['assisted','hard','normal'].includes(details.quality)?details.quality:'normal']]))} : {})});
