@@ -1,7 +1,7 @@
 (() => {
  'use strict';
  function derive(summary,skip=false){
-  const completed=Object.entries(summary.modules||{}).filter(([id,m])=>id.startsWith('fr_') && Number(m.completed)>0 && !/guidance|pruefung|prüfung|exam|15_minuten/.test(id));
+  const completed=Object.entries(summary.modules||{}).filter(([id,m])=>id.startsWith('fr_franzoesisch_') && Number(m.completed)>0 && !/guidance|pruefung|prüfung|exam|15_minuten/.test(id));
   const daily=completed.filter(([id])=>/alltag|daily|jetzt.?anwenden/.test(id));
   const grammar=completed.filter(([id])=>!daily.some(([other])=>other===id));
   const topics=new Set(grammar.map(([id])=>id.replace(/_[123]_(?:oberstufe|level).*$/,'').replace(/_[123]$/,'')));

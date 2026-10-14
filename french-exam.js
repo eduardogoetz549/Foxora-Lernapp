@@ -10,22 +10,28 @@ function reads(level,daily){
  return texts[level].map((x,i)=>({kind:'reading',q:'Lies den Dialog oder Text und wähle die passende Aussage.',ctx:x[0],readingQuestion:x[1],a:x[2],c:x[3],answer:x[2][x[3]],topic:daily?'Textverständnis':'Lesen im Zusammenhang',file:'main.html#Heute',theory:'main.html#theorie',sourceId:'reading'+i,e:'Die richtige Aussage ergibt sich direkt aus dem Text.'}));
 }
 function build(pools,level,daily){
- const result=[],seen=new Set();let cursor=0;
- const kinds=[...Array(10).fill('write'),...Array(6).fill('choice'),...Array(6).fill('bank'),...Array(4).fill('correction')];
- for(const kind of kinds){let selected=null;
-  for(let n=0;n<pools.length;n++){const group=pools[(cursor+n)%pools.length];const candidates=shuffle(group.questions).filter(q=>{const key=group.file+'|'+q.sourceId;if(seen.has(key))return false;const right=answer(q);if(!right)return false;if(['bank','correction'].includes(kind))return /_{2,}/.test(plain(q.ctx))&&q.a?.length>=2&&q.a.some(v=>norm(v)!==norm(right));if(kind==='choice')return q.a?.length>=2;return true});if(candidates.length){selected={...candidates[0],topic:group.title,file:group.file,theory:group.theory,kind};cursor=(cursor+n+1)%pools.length;break}}
-  if(!selected)throw new Error('Für diese Aufgabenform fehlen geeignete Aufgaben.');
-  seen.add(selected.file+'|'+selected.sourceId);selected.answer=answer(selected);
-  if(kind==='correction'){const wrong=shuffle(selected.a.filter(v=>norm(v)!==norm(selected.answer)))[0];selected.originalContext=plain(selected.ctx);selected.ctx=selected.originalContext.replace(/_{2,}/,'«'+plain(wrong)+'»');selected.q='Korrigiere nur den Ausdruck in «…». Beachte die Hinweise im Satz.';}
-  if(kind==='bank')selected.q='Setze die passende Antwort in die Lücke.';
-  if(kind==='write'&&selected.type!=='write')selected.q='Schreibe die passende Antwort selbst. '+plain(selected.q);
-  result.push(selected);
+ if(pools.length!==(daily?6:13))throw new Error('Die Themenzuordnung ist unvollständig.');
+ const result=[],seen=new Set();
+ for(const group of shuffle(pools)){
+  const kinds=daily?['choice','write','bank','correction']:['choice','write',level===1?'bank':'correction'];
+  for(let kind of kinds){
+   const suitable=q=>{const key=group.file+'|'+q.sourceId;if(seen.has(key)||!answer(q))return false;const choices=q.a?.length>=2;if(kind==='choice')return choices;if(['bank','correction'].includes(kind))return /_{2,}/.test(plain(q.ctx))&&choices&&q.a.some(v=>norm(v)!==norm(answer(q)));return true;};
+   let candidates=shuffle(group.questions).filter(suitable);
+   if(!candidates.length){kind='write';candidates=shuffle(group.questions).filter(suitable);}
+   if(!candidates.length)throw new Error('Zu wenige unterschiedliche Aufgaben in '+group.title+'.');
+   const q={...candidates[0],topic:group.title,file:group.file,theory:group.theory,kind};q.answer=answer(q);seen.add(group.file+'|'+q.sourceId);
+   if(kind==='correction'){const wrong=shuffle(q.a.filter(v=>norm(v)!==norm(q.answer)))[0];q.originalContext=plain(q.ctx);q.ctx=q.originalContext.replace(/_{2,}/,'«'+plain(wrong)+'»');q.q='Korrigiere nur den Ausdruck in «…». Beachte die Hinweise im Satz.';}
+   if(kind==='bank')q.q='Setze die passende Antwort in die Lücke.';
+   if(kind==='write'&&q.type!=='write')q.q='Schreibe die passende Antwort selbst. '+plain(q.q);
+   result.push(q);
+  }
+  if(daily){const reading=shuffle(group.readings||[])[0];if(!reading)throw new Error('Textverständnis fehlt für '+group.title+'.');result.push({...reading,kind:'reading',topic:group.title,theory:group.theory});}
  }
- return shuffle([...result,...reads(level,daily)]);
+ return shuffle(result);
 }
 window.FRExamBuilder={build,evaluate};
 if(!cfg)return;
-let questions=[],pos=0,answers={},done=false,review=false,seconds=1800,timer=null,errors=[],picked=null,submitted=false;
+let questions=[],pos=0,answers={},done=false,review=false,seconds=1800,deadline=0,timer=null,errors=[],picked=null,submitted=false;
 function button(text,fn,cls='option'){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=text;b.onclick=fn;return b}
 function setValue(value){answers[pos]=String(value);$('answered').textContent=Object.values(answers).filter(x=>x.trim()).length+' / '+questions.length+' beantwortet';$('questionMap').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('answered',!!answers[i]?.trim()))}
 function render(){if(!questions.length)return;const q=questions[pos];submitted=false;picked=null;$('step').textContent='Aufgabe '+(pos+1)+' von '+questions.length;$('topic').textContent=q.topic;$('fill').style.width=(pos/questions.length*100)+'%';$('question').textContent=plain(q.q);$('context').textContent=plain(q.ctx);$('readingQuestion').textContent=q.readingQuestion||'';$('options').replaceChildren();$('feedback').replaceChildren();$('feedback').hidden=true;$('prev').disabled=pos===0;$('next').disabled=pos===questions.length-1;$('check').hidden=!review;
@@ -38,7 +44,7 @@ function render(){if(!questions.length)return;const q=questions[pos];submitted=f
  }else{for(const text of q.a){const v=plain(text);const b=button(v,()=>{setValue(v);render()});b.classList.toggle('selected',answers[pos]===v);b.setAttribute('aria-pressed',String(answers[pos]===v));$('options').append(b)}}
  $('questionMap').querySelectorAll('button').forEach((b,i)=>{b.setAttribute('aria-current',i===pos?'step':'false');b.classList.toggle('answered',!!answers[i]?.trim())});$('answered').textContent=Object.values(answers).filter(x=>x.trim()).length+' / '+questions.length+' beantwortet';
 }
-function evaluate(q,value){return [q.answer,...(q.accepted||[])].some(a=>norm(a)===norm(value))}
+function evaluate(q,value){return window.FRAnswers.check(value,q.answer,q.accepted||[],{...q,instruction:q.q,strict:q.kind==='bank'||q.kind==='correction'});}
 function explain(q){const t=plain(q.e).replace(/^Regel:\s*/,'').split(/\s+(?:Hier|Beispiel|Lösung):/)[0];return t.length<=170?t:'Richtige Antwort: '+q.answer+'.'}
 function practiceCheck(){const q=questions[pos];if(submitted||!answers[pos]?.trim())return;submitted=true;const ok=evaluate(q,answers[pos]);$('feedback').hidden=false;const strong=document.createElement('strong');strong.textContent=ok?'✓ Richtig!':'✗ Noch nicht richtig.';$('feedback').append(strong);if(!ok){const p=document.createElement('p');p.append('Richtige Lösung: ');const b=document.createElement('strong');b.textContent=q.answer;p.append(b);$('feedback').append(p)}const p=document.createElement('p');p.textContent=explain(q);$('feedback').append(p);$('options').querySelectorAll('input,button').forEach(x=>x.disabled=true)}
 function finish(auto=false){if(done)return;const blank=questions.filter((q,i)=>!answers[i]?.trim()).length;if(!auto&&!review&&blank&&!confirm(blank+' Aufgaben sind unbeantwortet. Prüfung trotzdem abgeben?'))return;done=true;clearInterval(timer);$('exam').hidden=true;$('result').hidden=false;$('result').focus();const by={},wrong=[];let correct=0;questions.forEach((q,i)=>{const ok=evaluate(q,answers[i]);if(ok)correct++;else wrong.push(q);by[q.topic]??={correct:0,total:0,file:q.file};by[q.topic].total++;by[q.topic].correct+=Number(ok)});errors=wrong;const pct=Math.round(correct/questions.length*100);$('resultScore').textContent=correct+' von '+questions.length+' richtig · '+pct+' %';$('resultNote').textContent=review?'Fehlerwiederholung abgeschlossen.':auto?'Die Zeit ist abgelaufen. Unbeantwortete Aufgaben zählen als falsch.':'Prüfung abgeschlossen. Schau dir zuerst die Themen mit Wiederholungsbedarf an.';
@@ -46,7 +52,7 @@ function finish(auto=false){if(done)return;const blank=questions.filter((q,i)=>!
  $('solutions').replaceChildren();questions.forEach((q,i)=>{const ok=evaluate(q,answers[i]);const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent=(ok?'✓ ':'✗ ')+(i+1)+'. '+q.topic;const context=document.createElement('p');context.textContent=plain(q.ctx);const own=document.createElement('p');own.textContent='Deine Antwort: '+(answers[i]||'Keine Antwort');const right=document.createElement('p');right.append('Richtige Lösung: ');const b=document.createElement('strong');b.textContent=q.answer;right.append(b);const hint=document.createElement('p');hint.textContent=explain(q);detail.append(summary,context,own,right,hint);$('solutions').append(detail)});$('errorsOnly').hidden=!wrong.length;
  if(!review&&window.FRLearning){questions.forEach((q,i)=>FRLearning.record(cfg.module,q.file+'|'+q.sourceId,evaluate(q,answers[i]),false,plain(q.ctx),{own:answers[i]||'',right:q.answer,prompt:plain(q.q)+' '+plain(q.ctx),explanation:explain(q),topic:q.topic,file:q.file,type:'exam'}));FRLearning.finish(cfg.module,pct);}
 }
-function start(list=null){questions=list?shuffle(list):build(cfg.pools,cfg.level,cfg.daily);review=!!list;answers={};pos=0;done=false;seconds=1800;$('exam').hidden=false;$('result').hidden=true;$('examMode').textContent=review?'Fehler üben · mit Rückmeldung':'Prüfung · Lösungen erst am Schluss';$('timer').hidden=review;$('questionMap').replaceChildren();questions.forEach((q,i)=>{const b=button(String(i+1),()=>{pos=i;render()},'question-number');b.setAttribute('aria-label','Aufgabe '+(i+1));$('questionMap').append(b)});clearInterval(timer);$('timer').textContent='30:00';if(!review)timer=setInterval(()=>{seconds--;$('timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');if(seconds<=0)finish(true)},1000);render();}
+function start(list=null){questions=list?shuffle(list):build(cfg.pools,cfg.level,cfg.daily);review=!!list;answers={};pos=0;done=false;seconds=(cfg.durationMinutes||30)*60;deadline=Date.now()+seconds*1000;$('exam').hidden=false;$('result').hidden=true;$('examMode').textContent=review?'Fehler üben · mit Rückmeldung':'Prüfung · Lösungen erst am Schluss';$('timer').hidden=review;$('questionMap').replaceChildren();questions.forEach((q,i)=>{const b=button(String(i+1),()=>{pos=i;render()},'question-number');b.setAttribute('aria-label','Aufgabe '+(i+1));$('questionMap').append(b)});clearInterval(timer);$('timer').textContent=String(cfg.durationMinutes||30)+':00';if(!review)timer=setInterval(()=>{seconds=Math.max(0,Math.ceil((deadline-Date.now())/1000));$('timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');if(seconds<=0)finish(true)},1000);render();}
 $('prev').onclick=()=>{if(pos>0){pos--;render()}};$('next').onclick=()=>{if(pos<questions.length-1){pos++;render()}};$('submit').onclick=()=>finish();$('check').onclick=practiceCheck;$('errorsOnly').onclick=()=>start(errors);$('restart').onclick=()=>start();window.addEventListener('beforeunload',e=>{if(!done&&questions.length){e.preventDefault();e.returnValue=''}});
 try{start();}catch(e){$('loadError').textContent='Die Prüfung konnte nicht gestartet werden: '+e.message;}
 })();

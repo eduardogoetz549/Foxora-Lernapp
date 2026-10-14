@@ -2,7 +2,7 @@
  'use strict';
  if (window.__foxoraLearningCoreStarted) return;
  window.__foxoraLearningCoreStarted = true;
-/* Spanish learning progress; shared Foxora account and Supabase session. */
+/* French learning progress; shared Foxora account and Supabase session. */
 (() => {
   'use strict';
   const URL = 'https://npbiccwpyetefnlmjihd.supabase.co';
@@ -107,6 +107,11 @@
   let readyResolve;
   const ready=new Promise(resolve=>readyResolve=resolve);
   const api={ready,summary,
+    events:()=>ordered().map(e=>({...e})),
+    setting(key,fallback=null){const entry=ordered().filter(e=>e.kind==='setting'&&e.module==='fr_settings'&&e.key===key).at(-1);return entry?entry.value:fallback;},
+    setSetting(key,value){add({kind:'setting',module:'fr_settings',key,value});},
+    activeSeconds(seconds){if(Number.isFinite(seconds)&&seconds>0)add({kind:'activity',module:'fr_activity',seconds:Math.min(60,Math.floor(seconds))});},
+    todaySeconds(){return events().filter(e=>e.kind==='activity'&&e.date===dayKey()).reduce((n,e)=>n+Math.max(0,Math.min(60,Number(e.seconds)||0)),0);},
     guidanceMode(){const e=ordered().filter(e=>e.kind==='guidance'&&e.module==='fr_guidance').at(-1);return e?.mode==='all'?'all':'guided';},
     setGuidanceMode(mode){add({kind:'guidance',module:'fr_guidance',mode:mode==='all'?'all':'guided'});},
     level:xp=>Math.floor(Math.max(0,xp)/100)+1,

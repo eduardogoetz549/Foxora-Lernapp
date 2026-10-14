@@ -27,7 +27,7 @@ label{display:block;font-size:.76rem;font-weight:600;letter-spacing:.06em;text-t
 .sharebox{display:none;margin-top:1rem;padding:1rem;background:#fff;border:1px solid var(--line)}.sharebox.open{display:block}.notice{font-size:.82rem;color:#756c5a;margin-top:.6rem;line-height:1.5}
 @media(max-width:900px){nav.site-header{padding:1rem 1.2rem}.nav-links li:not(:last-child){display:none}.layout{grid-template-columns:1fr}.pair,.card-row{grid-template-columns:1fr}.wordmark{font-size:.76rem}.hero{padding-top:3.5rem}}
 </style>
-</head>
+<script src="learning-core.js?v=20261014"></script><link rel="stylesheet" href="french-shared.css?v=20261014"><script src="french-answer-check.js?v=20261014"></script><script src="french-planner.js?v=20261014"></script><script defer src="french-navigation.js?v=20261014"></script><script defer src="french-goals.js?v=20261014"></script><script defer src="french-listening-progress.js?v=20261014"></script></head>
 <body>
 <nav id="navbar" class="site-header">
  <a href="main.html" class="nav-logo"><div class="monogram">FR</div><span class="wordmark">Französisch lernen</span></a>
@@ -38,7 +38,7 @@ label{display:block;font-size:.76rem;font-weight:600;letter-spacing:.06em;text-t
   <li><a href="main.html" class="nav-cta">Startseite</a></li>
  </ul>
 </nav>
-<section class="hero"><div class="ey">Lernkartei · selbst erstellen</div><h1>Meine <span>Lernkarten</span></h1><p>Erstelle eigene Deutsch-Französisch-Kartensets, speichere sie auf deinem Gerät und teile sie mit anderen.</p></section>
+<section class="hero"><div class="ey">Lernkartei · selbst erstellen</div><h1>Meine <span>Lernkarten</span></h1><p>Erstelle eigene Deutsch-Französisch-Kartensets, synchronisiere sie mit deinem Konto und teile sie mit anderen.</p></section>
 <main class="wrap">
  <div class="toolbar">
   <button class="btn" id="newDeck">+ Neues Kartenset</button>
@@ -46,13 +46,13 @@ label{display:block;font-size:.76rem;font-weight:600;letter-spacing:.06em;text-t
   <input type="file" id="importFile" accept=".json,application/json" hidden>
  </div>
  <div class="layout">
-  <aside class="panel"><h2>Meine Sets</h2><p class="panel-sub">Deine Lernkarteien werden lokal in diesem Browser gespeichert.</p><div id="deckList" class="deck-list"></div></aside>
+  <aside class="panel"><h2>Meine Sets</h2><p class="panel-sub">Angemeldet werden deine Sets und dein Kartenlernstand synchronisiert. Als Gast speicherst du auf diesem Gerät.</p><div id="deckList" class="deck-list"></div></aside>
   <section class="panel">
    <div id="editor">
     <h2>Kartenset erstellen</h2><p class="panel-sub">Erstelle dein eigenes Lernkartenset und füge beliebig viele Deutsch-Französisch-Karten hinzu.</p>
-    <label>Name des Sets</label><input id="deckName" placeholder="z. B. Unité 3 – Schule">
+    <label>Name des Sets</label><input id="deckName" maxlength="200" placeholder="z. B. Unité 3 – Schule">
     
-    <div class="pair"><div><label>Deutsch</label><input id="front" placeholder="z. B. das Haus"></div><div><label>Französisch</label><input id="back" placeholder="z. B. la maison"></div></div>
+    <div class="pair"><div><label>Deutsch</label><input id="front" maxlength="2000" placeholder="z. B. das Haus"></div><div><label>Französisch</label><input id="back" maxlength="2000" placeholder="z. B. la maison"></div></div>
     <div class="form-actions"><button class="btn" id="addCard">Karte hinzufügen</button><button class="btn secondary" id="saveDeck">Set speichern</button></div>
     <div id="cards" class="cards-table"></div>
    </div>
@@ -92,12 +92,12 @@ $('reveal').onclick=()=>{$('studyAnswer').classList.add('show');$('reveal').styl
 $('rating').onclick=e=>{const b=e.target.closest('[data-rate]');if(!b)return;const c=current.cards[studyOrder[studyIndex]];if(b.dataset.rate==='know')c.known=(c.known||0)+1;else{c.missed=(c.missed||0)+1;studyOrder.splice(Math.min(studyIndex+4,studyOrder.length),0,studyOrder[studyIndex])}persist();studyIndex++;showStudy()};
 $('backEdit').onclick=()=>editDeck(current.id);
 function openShare(id){current=decks.find(d=>d.id===id);if(!current)return;editDeck(id);$('sharebox').classList.add('open');$('sharebox').scrollIntoView({behavior:'smooth',block:'nearest'})}
-function exportCurrent(){if(!current)return;const blob=new Blob([JSON.stringify({app:'Franzoesisch lernen',version:1,deck:current},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(current.name||'lernkarten').replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function exportCurrent(){if(!current)return;const blob=new Blob([JSON.stringify({app:'Franzoesisch lernen',version:1,deck:{id:current.id,name:current.name,source:'Deutsch',cards:current.cards.map(c=>({front:c.front,back:c.back,known:c.known||0,missed:c.missed||0}))}},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(current.name||'lernkarten').replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
 $('exportDeck').onclick=exportCurrent;
 $('nativeShare').onclick=async()=>{if(!current)return;const text=`Kartenset „${current.name}“ (${current.source} → Französisch, ${current.cards.length} Karten). Exportiere die Datei in der Lernapp, um das vollständige Set zu teilen.`;if(navigator.share){try{await navigator.share({title:current.name,text,url:location.href});}catch(e){}}else{try{await navigator.clipboard.writeText(text+' '+location.href);alert('Teilen-Text und Link wurden kopiert. Für das vollständige Kartenset nutze „Als Datei exportieren“.')}catch(e){alert('Nutze „Als Datei exportieren“, um das Kartenset zu teilen.')}}};
 $('importBtn').onclick=()=>$('importFile').click();
-$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text()),d=obj.deck||obj;if(!d.name||!Array.isArray(d.cards))throw 0;d.id=uid();d.cards=d.cards.filter(c=>c.front&&c.back).map(c=>({front:String(c.front),back:String(c.back),known:c.known||0,missed:c.missed||0}));decks.unshift(d);persist();renderDecks();editDeck(d.id);alert('Kartenset importiert.')}catch(err){alert('Diese Datei ist kein gültiges Kartenset.')}e.target.value=''};
-newDeck();load();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text()),d=obj.deck||obj;if(typeof d.name!=='string'||!d.name.trim()||d.name.length>200||!Array.isArray(d.cards)||!d.cards.length||d.cards.length>10000)throw 0;d.id=uid();d.cards=d.cards.filter(c=>c.front&&c.back).map(c=>({front:String(c.front).slice(0,2000),back:String(c.back).slice(0,2000),known:c.known||0,missed:c.missed||0}));decks.unshift(d);persist();renderDecks();editDeck(d.id);alert('Kartenset importiert.')}catch(err){alert('Diese Datei ist kein gültiges Kartenset.')}e.target.value=''};
+newDeck();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
 </script>
-</body></html>
+<script src="french-flashcard-sync.js?v=20261014"></script></body></html>
