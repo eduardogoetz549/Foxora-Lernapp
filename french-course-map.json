@@ -568,5 +568,65 @@
     "daily": false,
     "count": 32,
     "theory": "franzoesisch-theorie-verneinungen.html"
+  },
+  {
+    "module": "fr_franzoesisch_alltag_lesen_familie_1_oberstufe",
+    "file": "franzoesisch-alltag-lesen-familie-1-oberstufe.html",
+    "title": "Lesen: Familie",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-familie",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "fr_franzoesisch_alltag_lesen_schule_1_oberstufe",
+    "file": "franzoesisch-alltag-lesen-schule-1-oberstufe.html",
+    "title": "Lesen: Schule & Lernen",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-schule",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "fr_franzoesisch_alltag_lesen_essen_1_oberstufe",
+    "file": "franzoesisch-alltag-lesen-essen-1-oberstufe.html",
+    "title": "Lesen: Essen & Trinken",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-essen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "fr_franzoesisch_alltag_lesen_einkaufen_1_oberstufe",
+    "file": "franzoesisch-alltag-lesen-einkaufen-1-oberstufe.html",
+    "title": "Lesen: Einkaufen",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-einkaufen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "fr_franzoesisch_alltag_lesen_reisen_1_oberstufe",
+    "file": "franzoesisch-alltag-lesen-reisen-1-oberstufe.html",
+    "title": "Lesen: Reisen & Unterwegs",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-reisen",
+    "theory": "main.html#theorie",
+    "count": 10
+  },
+  {
+    "module": "fr_franzoesisch_alltag_lesen_hobbys_1_oberstufe",
+    "file": "franzoesisch-alltag-lesen-hobbys-1-oberstufe.html",
+    "title": "Lesen: Hobbys & Freizeit",
+    "level": 1,
+    "daily": true,
+    "topic": "lesen-hobbys",
+    "theory": "main.html#theorie",
+    "count": 10
   }
 ]
