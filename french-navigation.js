@@ -10,6 +10,6 @@ document.addEventListener('click',event=>{menus.forEach(menu=>{if(menu.open&&!me
 document.addEventListener('keydown',event=>{if(event.key==='Escape')menus.forEach(menu=>{if(menu.open){menu.open=false;menu.querySelector('summary').focus()}})});
 document.querySelectorAll('header .learning-goals').forEach(section=>{if(section.tagName==='DETAILS')return;const details=document.createElement('details'),summary=document.createElement('summary');details.className=section.className;summary.textContent=section.querySelector('h2')?.textContent||'Deine Lernziele';section.querySelector('h2')?.remove();details.append(summary,...section.childNodes);section.replaceWith(details)});
 const file=decodeURIComponent(location.pathname.split('/').pop());document.querySelectorAll('.exercise-levels a,.levels>a,.reading-levels a').forEach(a=>{a.textContent=a.textContent.replace(/\s*·\s*(kostenlos|Premium)/gi,'');if(a.getAttribute('href')===file)a.setAttribute('aria-current','page')});
-const offset=()=>{document.body.style.setProperty('padding-top',(nav.offsetHeight+12)+'px','important');document.documentElement.style.scrollPaddingTop=(nav.offsetHeight+24)+'px'};offset();new ResizeObserver(offset).observe(nav);
+const offset=()=>{document.body.style.setProperty('padding-top',(nav.offsetHeight+(main?0:12))+'px','important');document.documentElement.style.scrollPaddingTop=(nav.offsetHeight+24)+'px'};offset();new ResizeObserver(offset).observe(nav);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot()})();
