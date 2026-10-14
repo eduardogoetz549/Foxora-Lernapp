@@ -6,6 +6,8 @@ const title=document.getElementById('title'),message=document.getElementById('me
 async function load(){if(loading)return;loading=true;start.disabled=true;try{
 const result=await FRPremium.call('premium-access',{action:'lesson',file});if(typeof result.html!=='string')throw new Error('The lesson could not be loaded.');
 const lesson=new DOMParser().parseFromString(result.html,'text/html');
+const shared=[['link','german-shared.css','href'],['script','german-answer-check.js','src'],['script','german-planner.js','src'],['script','german-navigation.js','src'],['script','german-goals.js','src'],['script','german-listening-progress.js','src']];for(const [tag,file,attr]of shared){if([...lesson.querySelectorAll(tag+'['+attr+']')].some(el=>el.getAttribute(attr).split('?')[0]===file))continue;const el=lesson.createElement(tag);el.setAttribute(attr,file+'?v=20261014-de2');if(tag==='link')el.rel='stylesheet';else if(!/answer-check|planner/.test(file))el.defer=true;lesson.head.append(el);}
+
 for(const script of lesson.querySelectorAll('script[src]')){const name=new URL(script.getAttribute('src'),location.href).pathname.split('/').pop();if(name==='premium-gate.js')throw new Error('The stored file is an access page instead of the full lesson.');if(['learning-core.js','german-learning-core.js'].includes(name))script.remove();}
 document.open();document.write('<!doctype html>\n'+lesson.documentElement.outerHTML);document.close();window.dispatchEvent(new Event('frpremiumlessonloaded'));
 }catch(e){message.textContent=e.message;start.disabled=false;loading=false;}}

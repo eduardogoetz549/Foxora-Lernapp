@@ -19,7 +19,7 @@ function paintReview(summary){
   if(target)card.append(link(action,target.meta.file+'?smart=1&review='+mode));else card.append(make('p',summary.total?'No questions currently in this category.':'Your numbers appear here after your first exercises.'));
   grid.append(card);
  }
- host.append(grid,make('p','Eine Aufgabe kann einen offenen Fehler haben und gleichzeitig zur Review due sein.'));
+ host.append(grid,make('p','A task can have an unresolved mistake and be due for review at the same time.'));
  const history=$('deHistoryRows');if(!history)return;history.replaceChildren();let total=0;
  for(const x of entries){const count=x.qs.filter(q=>q.wrong>0).length;if(!count)continue;total+=count;const row=make('div');row.className='de-history-row';const title=(x.meta?.title||x.id)+' · Level '+(x.meta?.level||'–');if(x.meta?.file){const a=make('a',title);a.href=x.meta.file;row.append(a)}else row.append(make('span',title));row.append(make('span',count+' questions'));history.append(row)}
  $('deHistoryCount').textContent=total+' questions';if(!total)history.append(make('p','No past mistakes recorded yet.'));
@@ -32,14 +32,17 @@ function paint(){if(!ready)return;const {summary,topics,errors}=data();paintRevi
  box.append(actions);$('analysisBasic').append(box);
  $('analysisAccount').textContent=FRLearning.account==='guest'?'As a guest, you learn on this device. An account synchronises your progress.':'';
  $('analysisErrorCount').textContent=errors.length?errors.length+' open mistakes':'No open mistakes';
- if(!errors.length)$('analysisErrorList').append(make('p','Hier erscheinen Beispiele, sobald du questions falsch beantwortet hast.'));
+ if(!errors.length)$('analysisErrorList').append(make('p','Examples appear here after you answer questions incorrectly.'));
  else if(!premium){$('analysisErrorList').append(make('p','The recommendation above is free. Your answers, solutions and explanations are available with Premium.'),link('View Premium','#Premium',true));}
  else for(const e of errors.slice(0,10)){const card=make('article');card.className='fa-clean-error';card.append(make('p',e.details.prompt||e.text),make('p','Your answer: '+(e.details.own||'No answer')),make('strong','Correct answer: '+e.details.right),make('p',e.details.explanation||'Review the relevant theory.'));$('analysisErrorList').append(card)}
  $('analysisRefresh').disabled=!premium;$('analysisRefresh').hidden=!premium;$('analysisPremiumLink').hidden=premium;
  $('analysisStatus').textContent=premium?'Create a short plan from your current review needs.':'The personal learning plan requires Premium.';
 }
-$('analysisRefresh').onclick=()=>{const {topics}=data();const selected=topics.filter(t=>t.wrong>0).slice(0,3);$('analysisDetail').replaceChildren();if(!premium)return;if(!selected.length){$('analysisDetail').append(make('p','No open mistake focus. Start another topic or review familiar questions.'));return}
- selected.forEach((t,i)=>{const row=make('div');row.className='fa-clean-plan-step';row.append(make('h4','Step '+(i+1)+' · '+t.title),make('p','Eine Runde mit 10 questions. Wiederhole danach bei Bedarf nur die Fehler.'),link('Start round',t.file+'?smart=1'));$('analysisDetail').append(row)});$('analysisStatus').textContent='Dein Plan wurde aus den zuletzt falsch beantworteten questions erstellt.';
+$('analysisRefresh').onclick=()=>{
+ $('analysisDetail').replaceChildren();if(!premium)return;const selected=DEPlan.build(FRLearning.summary(),catalog);
+ if(!selected.length){$('analysisDetail').append(make('p','Nothing is due right now. Consolidated tasks return at their next review date.'));return;}
+ selected.forEach((t,i)=>{const row=make('div');row.className='fa-clean-plan-step';row.append(make('h4','Step '+(i+1)+' · '+t.title+' · Level '+t.level),make('p',t.reason+'. '+(t.ids.length?t.ids.length+' selected tasks.':'A round with new and familiar tasks.')),link('Start round',t.href));$('analysisDetail').append(row);});
+ $('analysisStatus').textContent='Priority: due mistakes → overdue reviews → variety → new content.';
 };
 async function refreshPremium(){premium=false;try{if(FRLearning.account!=='guest')premium=!!(await FRPremium.status()).premium}catch{}paint()}
 (async()=>{await FRLearning.ready;ready=true;await refreshPremium();window.addEventListener('frlearningchange',()=>{paint()});let actor=FRLearning.account;window.addEventListener('frlearningchange',()=>{if(actor!==FRLearning.account){actor=FRLearning.account;void refreshPremium()}});})();

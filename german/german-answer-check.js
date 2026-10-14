@@ -1,1 +1,27 @@
-(()=>{const normalize=s=>String(s??'').normalize('NFC').replace(/[’‘]/g,"'").replace(/\s+/g,' ').trim().replace(/[.!?]+$/,'');window.FRAnswers={normalize,check:(own,right,accepted=[])=>[right,...accepted].some(x=>normalize(own)===normalize(x))};})();
+/* Exact German checking with curated equivalent formulations; no fuzzy grammar matching. */
+(()=>{'use strict';
+const normalize=v=>String(v??'').normalize('NFC').toLocaleLowerCase('de').replace(/[’‘`ʼ]/g,"'").replace(/[‐‑–]/g,'-').replace(/ß/g,'ss').replace(/\s*'\s*/g,"'").replace(/\s*-\s*/g,'-').replace(/\s*([,;:!?])\s*/g,'$1').trim().replace(/[.!?]+$/,'').replace(/\s+/g,' ');
+const groups=[["Wo ist der Bahnhof?", "Wo befindet sich der Bahnhof?"], ["Wie viel kostet das?", "Was kostet das?"], ["Kann ich mit Karte bezahlen?", "Kann ich mit Karte zahlen?"], ["Wie heißen Sie?", "Wie ist Ihr Name?"], ["Wie heißt du?", "Wie ist dein Name?"]].map(g=>g.map(normalize));
+function variants(answer,context={}){
+ const n=normalize(answer);const exact=[answer];
+ // Rephrasing is inappropriate when the instruction demands a particular construction.
+ const instruction=String(context.instruction||context.q||context.prompt||'');
+ if(!context.strict&&!/inversion|est-ce que|intonation|vernein|pronomen|pronom|négation|konjug|conjug|zeitform|konjunktiv|imperativ|perfekt|präteritum|nominativ|akkusativ|dativ|genitiv|artikel|adjektiv|wörtlich|wortwörtlich|genau|satzbau|ordne|reihenfolge|ersetze|ne\s*…|ne\s*\.\.\./i.test(instruction)){
+  const group=groups.find(g=>g.includes(n));if(group)exact.push(...group);
+ }
+ return exact;
+}
+function check(value,answer,accepted=[],context={}){
+ if(!normalize(value))return false;
+ const candidates=[answer,...(Array.isArray(accepted)?accepted:[])].flatMap(a=>variants(a,context));
+ const own=normalize(value);const caseTask=/capitalisation|capitalization|case-sensitive|großschreibung|grossschreibung|anrede|höflich|formal address|polite form/i.test(String(context.instruction||context.q||context.prompt||''));const caseNorm=v=>String(v??'').normalize('NFC').replace(/[’‘`ʼ]/g,"'").replace(/ß/g,'ss').trim().replace(/[.!?]+$/,'').replace(/\s+/g,' ');if(caseTask)return candidates.some(a=>caseNorm(a)===caseNorm(value));
+ if(candidates.some(a=>normalize(a)===own))return true;
+ // A learner may supply the whole completed sentence for a single-gap exercise.
+ if(!context.strict){
+  let sentence=String(context.ctx||context.prompt||'').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/\s*\([^)]*\)\s*$/,'').trim();
+  if((sentence.match(/_{2,}/g)||[]).length===1){if(sentence.includes(':'))sentence=sentence.slice(sentence.lastIndexOf(':')+1).trim();return candidates.some(a=>normalize(sentence.replace(/_{2,}/,a))===own);}
+ }
+ return false;
+}
+window.FRAnswers={normalize,check,variants};
+})();

@@ -1,6 +1,7 @@
 (()=>{'use strict';
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
 function plan(pool,questions={},now=Date.now()){
+ const requested=new URLSearchParams(location.search).get('review_ids');if(requested){const ids=new Set(requested.split(','));const chosen=pool.filter(q=>ids.has(String(q.id)));if(chosen.length)return chosen.slice(0,10);}
  const priority=q=>{const state=questions[String(q.id)];return (state.unresolvedError?100:0)+Math.min(60,(state.wrong||0)*5)+Math.min(60,Math.max(0,(now-Date.parse(state.due))/86400000));};
  const unique=[...new Map(pool.map(q=>[String(q.id),q])).values()];pool=unique;
  const due=pool.filter(q=>questions[String(q.id)]&&Date.parse(questions[String(q.id)].due)<=now).sort((a,b)=>priority(b)-priority(a)||Date.parse(questions[String(a.id)].due)-Date.parse(questions[String(b.id)].due)||String(a.id).localeCompare(String(b.id)));
