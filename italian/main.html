@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de" class="it-guide-loading">
-<head><script id="foxora-password-recovery">(()=>{'use strict';
+<head><script>if(['#analysisFold','#Fehleranalyse'].includes(location.hash)||(!location.hash&&new URLSearchParams(location.search).get('bereich')==='fehleranalyse'))document.documentElement.classList.add('foxora-analysis-route');</script><style>html.foxora-analysis-route #Heute,html.foxora-analysis-route #analysisFold{display:block!important}#analysisFold{scroll-margin-top:110px}</style><script id="foxora-password-recovery">(()=>{'use strict';
  const query=new URLSearchParams(location.search);
  // Older redirects included #Konto before Supabase's own fragment.
  const fragment=new URLSearchParams(location.hash.replace(/^#(?:Konto[#&])?/,''));
@@ -1498,5 +1498,5 @@ async function boot(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>boot().catch(()=>{}),{once:true});else boot().catch(()=>{});
 })();
-</script><script src="italienisch-start-bei-null.js?v=20261015-4"></script></body>
+</script><script src="italienisch-start-bei-null.js?v=20261015-8"></script><script id="foxora-analysis-direct-link">(()=>{function target(){return ['#analysisFold','#Fehleranalyse'].includes(location.hash)||(!location.hash&&new URLSearchParams(location.search).get('bereich')==='fehleranalyse');}function openAnalysis(){if(!target())return;const panel=document.getElementById('analysisFold');if(!panel)return;document.documentElement.classList.add('foxora-analysis-route');panel.open=true;for(const el of [document.getElementById('Heute'),panel])if(el)el.style.setProperty('display','block','important');requestAnimationFrame(()=>requestAnimationFrame(()=>{panel.scrollIntoView({block:'start',behavior:'auto'});const summary=panel.querySelector('summary');if(summary){summary.tabIndex=-1;summary.focus({preventScroll:true});}}));}window.addEventListener('hashchange',()=>{if(target())openAnalysis();else{document.documentElement.classList.remove('foxora-analysis-route');for(const id of ['Heute','analysisFold'])document.getElementById(id)?.style.removeProperty('display');}});if(document.readyState==='complete')openAnalysis();else window.addEventListener('load',openAnalysis,{once:true});Promise.resolve(window.FRLearning?.ready).then(openAnalysis);})();</script></body>
 </html>
