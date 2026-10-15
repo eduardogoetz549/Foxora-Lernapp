@@ -106,7 +106,7 @@
   }
   let readyResolve;
   const ready=new Promise(resolve=>readyResolve=resolve);
-  const api={ready,summary,events:()=>ordered().map(e=>({...e})),
+  const api={ready,summary,beginnerCheckpoint(lesson,step){if(!Number.isInteger(lesson)||lesson<0||lesson>=6||!Number.isInteger(step)||step<0||step>6)return;const previous=ordered().filter(e=>e.kind==='beginnerCheckpoint'&&e.module==='es_beginner_progress').at(-1);const stamp=Math.max(Date.now(),(Date.parse(previous?.at)||0)+1);add({kind:'beginnerCheckpoint',module:'es_beginner_progress',lesson,step,at:new Date(stamp).toISOString()});return stamp;},events:()=>ordered().map(e=>({...e})),
     guidanceMode(){const e=ordered().filter(e=>e.kind==='guidance'&&e.module==='es_guidance').at(-1);return e?.mode==='all'?'all':'guided';},
     setGuidanceMode(mode){add({kind:'guidance',module:'es_guidance',mode:mode==='all'?'all':'guided'});},
     level:xp=>Math.floor(Math.max(0,xp)/100)+1,

@@ -1,11 +1,12 @@
 (() => {
  'use strict';
  function derive(summary,skip=false){
-  const completed=Object.entries(summary.modules||{}).filter(([id,m])=>id.startsWith('es_') && Number(m.completed)>0 && !/guidance|pruefung|prüfung|exam|15_minuten/.test(id));
+  const completed=Object.entries(summary.modules||{}).filter(([id,m])=>id.startsWith('es_') && Number(m.completed)>0 && !/guidance|beginner|pruefung|prüfung|exam|15_minuten/.test(id));
   const daily=completed.filter(([id])=>/alltag|daily|jetzt.?anwenden/.test(id));
   const grammar=completed.filter(([id])=>!daily.some(([other])=>other===id));
   const topics=new Set(grammar.map(([id])=>id.replace(/_[123]_(?:oberstufe|level).*$/,'').replace(/_[123]$/,'')));
-  return {grammar:skip||grammar.length>=1,daily:skip||topics.size>=2,lab:skip||(topics.size>=2&&daily.length>=1),exam:skip||(topics.size>=4&&daily.length>=1),count:topics.size,dailyCount:daily.length,skip};
+  const beginner=Array.from({length:6},(_,i)=>Number(summary.modules?.['es_beginner_'+String(i+1).padStart(2,'0')]?.completed)>0);
+  return {grammar:skip||grammar.length>=1||beginner.every(Boolean),daily:skip||topics.size>=2,lab:skip||beginner.some(Boolean)||(topics.size>=2&&daily.length>=1),exam:skip||(topics.size>=4&&daily.length>=1),count:topics.size,dailyCount:daily.length,skip};
  }
  window.ESGuidance={derive};
  if(!document.getElementById('esGuide'))return;
@@ -21,7 +22,8 @@
   const grammarFiles=["spanisch-ser-estar-1-oberstufe.html", "spanisch-articulos-sustantivos-1-oberstufe.html", "spanisch-presente-1-oberstufe.html", "spanisch-adjetivos-1-oberstufe.html"];
   function nextGrammar(){const modules=core?.summary?.().modules||{};return grammarFiles.find(file=>{const key=file.replace(/\.html$/,'').replace(/-/g,'_');return !Object.entries(modules).some(([id,m])=>id.includes(key)&&Number(m.completed)>0);})||grammarFiles[0];}
   let title,text,href;
-  if(!state.grammar){title='Dein erster Schritt';text='Starte mit Ser und estar. Eine abgeschlossene Runde öffnet die Grammatikübersicht – unabhängig vom Ergebnis.';href='spanisch-ser-estar-1-oberstufe.html';}
+  if(!state.grammar){title='Dein Einstieg bei null';text='Sechs kurze Lektionen führen dich von Hola bis zu deinem ersten kleinen Dialog. Du brauchst keine Vorkenntnisse.';href='spanisch-start-bei-null.html';}
+  else if(state.count===0&&!state.skip){title='Jetzt die Grammatik entdecken';text='Dein Einstieg ist abgeschlossen. Übe als Nächstes Ser und estar mit den Satzbausteinen, die du schon kennst.';href='spanisch-ser-estar-1-oberstufe.html';}
   else if(!state.daily){title='Eine weitere Grammatikübung';text='Schliesse eine Runde in einem zweiten Grammatikthema ab. Danach öffnet sich Spanisch im Alltag.';href=nextGrammar();}
   else if(!state.lab){title='Wende dein Spanisch an';text='Schliesse eine Alltagsrunde ab. Danach öffnet sich deine Lernwerkstatt.';href='spanisch-alltag-familie-1-oberstufe.html';}
   else if(!state.exam){title='Vertiefe deine Grundlagen';text=`${state.count} von 4 Grammatikthemen abgeschlossen. Danach öffnet sich das Prüfungstraining.`;href=nextGrammar();}
