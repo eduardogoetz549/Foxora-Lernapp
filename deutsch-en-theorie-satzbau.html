@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"><head><title>Word order &amp; questions · Theory | Foxora</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&amp;family=Jost:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0D1433,#121E47);font-family:Jost,sans-serif;color:#18213d}nav:not(.main-nav){position:sticky;top:0;z-index:5;background:#0D1433ee;border-bottom:1px solid #B7944055;padding:1rem 4rem;display:flex;justify-content:space-between;align-items:center}.brand{color:#fff;text-decoration:none;font-weight:600;letter-spacing:.15em}.home{color:#D4AF60;border:1px solid #B79440;padding:.5rem 1rem;text-decoration:none}.hero{text-align:center;color:#fff;padding:55px 20px 30px}.hero small{color:#D4AF60;letter-spacing:.18em}.hero h1{font:400 clamp(38px,7vw,62px) 'Cormorant Garamond';margin:10px}.hero h1 span{color:#D4AF60}.hero p{max-width:700px;margin:auto;color:#C0D4F2;line-height:1.7}.wrap{max-width:900px;margin:auto;padding:0 20px 70px}.tabs{display:flex;justify-content:center;gap:8px;margin:0 0 18px}.tab{border:1px solid #B79440;background:#fff;color:#0D1433;padding:11px 16px;font-weight:700;cursor:pointer}.tab.active{background:#B79440}.panel{display:none}.panel.active{display:block}.card{background:#fff;border:1px solid #e8dcc0;border-radius:18px;padding:clamp(22px,5vw,38px);box-shadow:0 18px 50px #0003}.block{border-bottom:1px solid #e5e9f5;padding:17px 0}.block:last-child{border:0}.block h3{margin:0 0 7px;font-family:'Cormorant Garamond';font-size:26px}.block p{margin:0;color:#566078;line-height:1.7}.example{margin-top:10px;background:#f7f0df;border-left:3px solid #B79440;padding:12px;color:#0D1433}.fox{background:#fff8e9;border-radius:12px;padding:14px;margin-top:10px}.warn{background:#fff3f3;border-radius:12px;padding:14px;margin-top:10px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.btn{background:#B79440;color:#0D1433;padding:12px 17px;text-decoration:none;font-weight:800;border-radius:3px;transition:.2s}.btn:hover{background:#D4AF60;transform:translateY(-2px)}.back{background:#fff;border:1px solid #B79440}@media(max-width:700px){nav{padding:1rem}.tabs{flex-direction:column}.tab{width:100%}}
+
+/* Header identisch zur Hauptseite */
+:root{--navy:#0D1433;--midnight:#121E47;--gold:#B79440;--gold-lt:#D4AF60;--ice:#C0D4F2;--white:#FFFFFF;--ease:cubic-bezier(.4,0,.2,1)}
+nav.main-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 4rem;background:rgba(13,20,51,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(183,148,64,.2);transition:padding .3s var(--ease)}
+.main-nav .nav-logo{display:flex;align-items:center;gap:.75rem;color:inherit;text-decoration:none}
+.main-nav .monogram{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:1rem;color:var(--navy);flex-shrink:0}
+.main-nav .wordmark{font-family:Jost,sans-serif;font-weight:600;letter-spacing:.18em;font-size:.9rem;color:#fff}
+.main-nav .nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none;margin:0;padding:0}
+.main-nav .nav-links a{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice);font-weight:400;position:relative;padding-bottom:3px;text-decoration:none;transition:color .2s}
+.main-nav .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s var(--ease)}
+.main-nav .nav-links a:hover{color:#fff}.main-nav .nav-links a:hover::after{width:100%}
+.main-nav .nav-cta{background:transparent;border:1px solid var(--gold);color:var(--gold)!important;padding:.5rem 1.4rem;border-radius:2px;transition:all .25s!important}
+.main-nav .nav-cta:hover{background:var(--gold)!important;color:var(--navy)!important}.main-nav .nav-cta::after{display:none!important}
+body{padding-top:76px}
+@media(max-width:900px){nav.main-nav{padding:1rem 2rem}.main-nav .nav-links{display:none}}
+
+</style><style id="unified-header-inline">/* Header aus main.html, rechts ausschliesslich Startseite. */
+body{padding-top:84px!important}
+#navbar{--navy:#0D1433;--gold:#B79440;--white:#fff;--ice:#C0D4F2;--font-body:Jost,Arial,sans-serif;--font-display:'Cormorant Garamond',Georgia,serif;position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:100!important;display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;gap:1rem!important;min-height:0!important;height:auto!important;padding:1.2rem 4rem!important;background:rgba(13,20,51,.92)!important;backdrop-filter:blur(12px);border-bottom:1px solid rgba(183,148,64,.2)!important;font-family:var(--font-body)!important;transition:padding .3s cubic-bezier(.4,0,.2,1)}
+#navbar.scrolled{padding:.8rem 4rem!important}
+#navbar a{display:inline-block;margin:0!important;text-decoration:none!important;border-radius:0;line-height:1.4;font:inherit;box-shadow:none!important;transform:none!important}
+#navbar .nav-logo{display:flex!important;align-items:center;gap:.75rem!important;padding:0!important;border:0!important;background:transparent!important;flex-shrink:0}
+#navbar .monogram{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--font-display)!important;font-weight:600;font-size:1rem;color:var(--navy)!important;flex-shrink:0}
+#navbar .wordmark{font-family:var(--font-body)!important;font-weight:600;letter-spacing:.18em;font-size:.9rem;color:var(--white)!important}
+#navbar .nav-links{display:flex!important;align-items:center;gap:2.5rem!important;list-style:none!important;margin:0!important;padding:0!important}
+#navbar .nav-links li{margin:0;padding:0}
+#navbar .nav-links a{font-size:.78rem!important;letter-spacing:.12em;text-transform:uppercase;color:var(--ice)!important;font-weight:400!important;position:relative;padding:0 0 3px!important;background:transparent!important;border:0!important;transition:color .2s}
+#navbar .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
+#navbar .nav-links a:hover,#navbar .nav-links a:focus-visible{color:var(--white)!important}
+#navbar .nav-links a:hover::after{width:100%}
+#navbar .nav-account-actions{display:flex!important;align-items:center;flex-shrink:0;margin:0!important;gap:0!important}
+#navbar .nav-cta{background:transparent!important;border:1px solid var(--gold)!important;color:var(--gold)!important;padding:.5rem 1.4rem!important;border-radius:2px!important;font-size:.78rem!important;font-weight:400!important;letter-spacing:.12em;text-transform:uppercase;transition:background .25s,color .25s!important}
+#navbar .nav-cta:hover,#navbar .nav-cta:focus-visible{background:var(--gold)!important;color:var(--navy)!important}
+#navbar .nav-cta::after{display:none!important}
+#navbar a:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.exercise-levels{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin:1.5rem auto 0}
+.exercise-levels a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #B79440;border-radius:2px;background:transparent;color:#D4AF60!important;padding:.7rem 1.1rem;text-decoration:none;font:500 .85rem Jost,Arial,sans-serif;transition:background .2s,color .2s,transform .2s}
+.exercise-levels a[aria-current="page"]{background:#B79440;color:#0D1433!important}
+.exercise-levels a:hover,.exercise-levels a:focus-visible{background:#D4AF60;color:#0D1433!important;border-color:#D4AF60;transform:translateY(-2px)}
+.exercise-levels a:focus-visible{outline:2px solid #D4AF60;outline-offset:3px}
+@media(max-width:1200px){#navbar .nav-links{display:none!important}#navbar,#navbar.scrolled{padding:.9rem 1.2rem!important}body{padding-top:76px!important}}
+@media(max-width:480px){#navbar .wordmark{font-size:.7rem;letter-spacing:.09em}#navbar .nav-cta{font-size:.68rem!important;padding:.5rem .8rem!important}.exercise-levels a{font-size:.75rem;padding:.65rem .75rem}}
+@media(prefers-reduced-motion:reduce){#navbar,#navbar a,.exercise-levels a{transition:none!important}.exercise-levels a:hover{transform:none}}
+
+#navbar a,#navbar a:hover,#navbar a:focus-visible{text-decoration:none!important}#navbar .nav-links a::after{display:none!important}</style><script src="german-learning-core.js?v=20261016-1"></script><link rel="stylesheet" href="german-shared.css?v=20261016-1"><script src="german-answer-check.js?v=20261016-1"></script><script src="german-planner.js?v=20261016-1"></script><script defer src="german-navigation.js?v=20261016-1"></script><script defer src="german-goals.js?v=20261016-1"></script><script defer src="german-listening-progress.js?v=20261016-1"></script></head><body><nav id="navbar" class="site-header">
+  <a href="main.html#hero" class="nav-logo">
+    <div class="monogram">DE</div>
+    <span class="wordmark">Learn German</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="main.html#theorie">Theory</a></li>
+    <li><a href="main.html#Spi">Exercises</a></li>
+    <li><a href="main.html#Fortschritt">My progress</a></li><li><a href="main.html#Pruefung">Exams</a></li><li><a href="main.html#lernwerkstatt">Learning workshop</a></li>
+  </ul>
+  <div class="nav-account-actions"><a href="main.html" class="account-link nav-cta">Home</a></div>
+</nav>
+<header class="hero"><small>📖 THEORY OVERVIEW</small><h1>Word order &amp; questions <span>explained</span></h1><p>Choose your level. Start with the basics, then work towards more advanced uses.</p></header>
+<div class="wrap"><div class="tabs"><button class="tab active" data-tab="1">Level 1</button><button class="tab" data-tab="2">Level 2</button><button class="tab" data-tab="3">Level 3</button></div>
+<section class="panel active" data-level="1">
+<div class="card">
+<div class="block"><h3>📖 Statements and yes/no questions</h3><p>In a statement the finite verb is second. A phrase such as Heute counts as the first unit. Yes/no questions begin with the finite verb.</p><div class="example" lang="de"><b lang="en">Example: </b>Heute lerne ich Deutsch.</div></div>
+<div class="block"><h3>🦊 Remember!</h3><div class="fox">The finite verb is the second unit in a statement, not always the second word.</div></div>
+<div class="block"><h3>⚠️ Common mistake</h3><div class="warn">Say Heute lerne ich Deutsch, not Heute ich lerne Deutsch.</div></div>
+<div class="actions"><a class="btn" href="deutsch-en-satzbau-1-oberstufe.html">✏️ Practise Level 1</a><a class="btn back" href="main.html#theorie">← Theory overview</a></div>
+</div></section><section class="panel " data-level="2">
+<div class="card">
+<div class="block"><h3>📖 Questions and verb brackets</h3><p>A wh-question usually starts with a question word followed by the finite verb. Non-finite verb parts remain at the end.</p><div class="example" lang="de"><b lang="en">Example: </b>Wann lernst du Deutsch?</div></div>
+<div class="block"><h3>🦊 Remember!</h3><div class="fox">Put the question word first, then the finite verb.</div></div>
+<div class="block"><h3>⚠️ Common mistake</h3><div class="warn">Say Wann lernst du?, not Wann du lernst?</div></div>
+<div class="actions"><a class="btn" href="deutsch-en-satzbau-2-oberstufe.html">✏️ Practise Level 2</a><a class="btn back" href="main.html#theorie">← Theory overview</a></div>
+</div></section><section class="panel " data-level="3">
+<div class="card">
+<div class="block"><h3>📖 Subordinate clauses</h3><p>weil, dass and obwohl send the finite verb to the end. With a subordinate clause first, the main clause begins with its finite verb.</p><div class="example" lang="de"><b lang="en">Example: </b>Ich lerne Deutsch, weil ich in Berlin arbeiten möchte.</div></div>
+<div class="block"><h3>🦊 Remember!</h3><div class="fox">After weil, dass and obwohl, put the finite verb at the end.</div></div>
+<div class="block"><h3>⚠️ Common mistake</h3><div class="warn">Say weil ich arbeiten möchte, not weil ich möchte arbeiten.</div></div>
+<div class="actions"><a class="btn" href="deutsch-en-satzbau-3-oberstufe.html">✏️ Practise Level 3</a><a class="btn back" href="main.html#theorie">← Theory overview</a></div>
+</div></section></div>
+<script>document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector('.panel[data-level="'+b.dataset.tab+'"]').classList.add('active')})</script><script src="foxora-learning-links.js?v=20261016-1"></script></body></html>
