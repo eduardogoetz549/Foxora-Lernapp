@@ -226,7 +226,7 @@ box-shadow:0 8px 24px rgba(13,20,51,.06)}
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#0D1433">
-<script src="learning-core.js?v=analysis1"></script>
+<script src="learning-core.js?v=20261016-1"></script>
 
 <style id="fox-mascot-style">
 .fox-coach{position:fixed;right:5px;bottom:14px;z-index:90;width:min(180px,27vw);
@@ -432,7 +432,7 @@ async function boot(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>boot().catch(()=>{}),{once:true});else boot().catch(()=>{});
 })();
-</script><link rel="stylesheet" href="french-shared.css?v=20261014"><script src="french-answer-check.js?v=20261014"></script><script src="french-planner.js?v=20261014"></script><script defer src="french-navigation.js?v=20261014"></script><script defer src="french-goals.js?v=20261014"></script><script defer src="french-listening-progress.js?v=20261014"></script></head>
+</script><link rel="stylesheet" href="french-shared.css?v=20261016-1"><script src="french-answer-check.js?v=20261016-1"></script><script src="french-planner.js?v=20261016-1"></script><script defer src="french-navigation.js?v=20261016-1"></script><script defer src="french-goals.js?v=20261016-1"></script><script defer src="french-listening-progress.js?v=20261016-1"></script></head>
 <body>
 <nav id="navbar" class="site-header" aria-label="Seitennavigation"><a href="main.html" class="nav-logo"><img src="fuchs-idle.png" alt="" width="40" height="40" style="width:40px;height:40px;object-fit:contain;margin-right:12px"><span class="wordmark">Foxora Lernapp</span></a><div class="nav-account-actions"><a href="main.html" class="account-link nav-cta">Startseite</a></div></nav>
 <header class="hero">
@@ -653,6 +653,6 @@ const status=document.createElement('p');status.setAttribute('role','status');st
 link.parentElement.querySelectorAll('button').forEach(old=>{if(/kopier|copy/i.test(old.textContent))old.hidden=true;});link.hidden=true;b.addEventListener('click',async()=>{if(!input.value.trim()){status.textContent=english?'Write your answer first.':'Schreibe zuerst deine Antwort.';input.focus();return;}const tab=window.open('about:blank','_blank');if(tab)tab.opener=null;let copied=false;try{await navigator.clipboard.writeText(input.value);copied=true;}catch(_){input.focus();input.select();try{copied=document.execCommand('copy');}catch(_){}}if(!copied){if(tab)tab.close();link.hidden=false;status.textContent=english?'Copy the selected text manually, then open LanguageTool.':'Kopiere den markierten Text manuell und öffne danach LanguageTool.';return;}if(tab)tab.location.replace(urls[lang]);else link.hidden=false;status.textContent=english?'Copied. Paste in LanguageTool with Ctrl + V or Paste. Check that German is selected.':'Kopiert. In LanguageTool mit Strg + V oder «Einfügen» einfügen. Prüfe dort die gewählte Sprache.';});link.before(b);link.after(status);});}
 const observer=new MutationObserver(enhance);observer.observe(document.body,{childList:true,subtree:true});enhance();
 })();
-</script><script id="fr-fox-fallback">(()=>{for(const img of document.querySelectorAll('#foxCoachImg,#coachImage'))img.addEventListener('error',()=>{const fallback=new URL('fuchs-idle.png',location.href).href;if(img.src!==fallback)img.src=fallback;});})();</script></body>
+</script><script id="fr-fox-fallback">(()=>{for(const img of document.querySelectorAll('#foxCoachImg,#coachImage'))img.addEventListener('error',()=>{const fallback=new URL('fuchs-idle.png',location.href).href;if(img.src!==fallback)img.src=fallback;});})();</script><script src="foxora-learning-links.js?v=20261016-1"></script></body>
 </html>
 <style>html,body{margin-top:0!important;} nav.site-header{top:0!important;}</style>
