@@ -46,7 +46,7 @@
     "level": 1,
     "daily": true,
     "topic": "familie",
-    "theory": "spanisch-theorie-presente.html",
+    "theory": "spanisch-theorie-alltag-familie.html",
     "count": 60
   },
   {
@@ -66,7 +66,7 @@
     "level": 1,
     "daily": true,
     "topic": "essen",
-    "theory": "spanisch-theorie-presente.html",
+    "theory": "spanisch-theorie-alltag-essen.html",
     "count": 60
   },
   {
@@ -96,7 +96,7 @@
     "level": 1,
     "daily": true,
     "topic": "einkaufen",
-    "theory": "spanisch-theorie-presente.html",
+    "theory": "spanisch-theorie-alltag-einkaufen.html",
     "count": 60
   },
   {
@@ -146,7 +146,7 @@
     "level": 1,
     "daily": true,
     "topic": "schule",
-    "theory": "spanisch-theorie-presente.html",
+    "theory": "spanisch-theorie-alltag-schule.html",
     "count": 60
   },
   {
@@ -156,7 +156,7 @@
     "level": 1,
     "daily": true,
     "topic": "hobbys",
-    "theory": "spanisch-theorie-presente.html",
+    "theory": "spanisch-theorie-alltag-hobbys.html",
     "count": 60
   },
   {
@@ -186,7 +186,7 @@
     "level": 1,
     "daily": true,
     "topic": "reisen",
-    "theory": "spanisch-theorie-presente.html",
+    "theory": "spanisch-theorie-alltag-reisen.html",
     "count": 60
   },
   {
@@ -236,7 +236,7 @@
     "level": 3,
     "daily": true,
     "topic": "hobbys",
-    "theory": "spanisch-theorie-condicional.html",
+    "theory": "spanisch-theorie-alltag-hobbys.html",
     "count": 60
   },
   {
@@ -276,7 +276,7 @@
     "level": 2,
     "daily": true,
     "topic": "hobbys",
-    "theory": "spanisch-theorie-indefinido-imperfecto.html",
+    "theory": "spanisch-theorie-alltag-hobbys.html",
     "count": 60
   },
   {
@@ -286,7 +286,7 @@
     "level": 3,
     "daily": true,
     "topic": "einkaufen",
-    "theory": "spanisch-theorie-condicional.html",
+    "theory": "spanisch-theorie-alltag-einkaufen.html",
     "count": 60
   },
   {
@@ -376,7 +376,7 @@
     "level": 2,
     "daily": true,
     "topic": "familie",
-    "theory": "spanisch-theorie-indefinido-imperfecto.html",
+    "theory": "spanisch-theorie-alltag-familie.html",
     "count": 60
   },
   {
@@ -386,7 +386,7 @@
     "level": 2,
     "daily": true,
     "topic": "reisen",
-    "theory": "spanisch-theorie-indefinido-imperfecto.html",
+    "theory": "spanisch-theorie-alltag-reisen.html",
     "count": 60
   },
   {
@@ -416,7 +416,7 @@
     "level": 3,
     "daily": true,
     "topic": "essen",
-    "theory": "spanisch-theorie-condicional.html",
+    "theory": "spanisch-theorie-alltag-essen.html",
     "count": 60
   },
   {
@@ -436,7 +436,7 @@
     "level": 3,
     "daily": true,
     "topic": "schule",
-    "theory": "spanisch-theorie-condicional.html",
+    "theory": "spanisch-theorie-alltag-schule.html",
     "count": 60
   },
   {
@@ -476,7 +476,7 @@
     "level": 3,
     "daily": true,
     "topic": "familie",
-    "theory": "spanisch-theorie-condicional.html",
+    "theory": "spanisch-theorie-alltag-familie.html",
     "count": 60
   },
   {
@@ -486,7 +486,7 @@
     "level": 2,
     "daily": true,
     "topic": "schule",
-    "theory": "spanisch-theorie-indefinido-imperfecto.html",
+    "theory": "spanisch-theorie-alltag-schule.html",
     "count": 60
   },
   {
@@ -496,7 +496,7 @@
     "level": 3,
     "daily": true,
     "topic": "reisen",
-    "theory": "spanisch-theorie-condicional.html",
+    "theory": "spanisch-theorie-alltag-reisen.html",
     "count": 60
   },
   {
@@ -506,7 +506,7 @@
     "level": 2,
     "daily": true,
     "topic": "einkaufen",
-    "theory": "spanisch-theorie-indefinido-imperfecto.html",
+    "theory": "spanisch-theorie-alltag-einkaufen.html",
     "count": 60
   },
   {
@@ -556,7 +556,7 @@
     "level": 2,
     "daily": true,
     "topic": "essen",
-    "theory": "spanisch-theorie-indefinido-imperfecto.html",
+    "theory": "spanisch-theorie-alltag-essen.html",
     "count": 60
   },
   {
@@ -576,7 +576,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-familie",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-familie.html",
     "count": 10
   },
   {
@@ -586,7 +586,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-schule",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-schule.html",
     "count": 10
   },
   {
@@ -596,7 +596,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-essen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-essen.html",
     "count": 10
   },
   {
@@ -606,7 +606,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-einkaufen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-einkaufen.html",
     "count": 10
   },
   {
@@ -616,7 +616,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-reisen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-reisen.html",
     "count": 10
   },
   {
@@ -626,7 +626,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-hobbys",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-hobbys.html",
     "count": 10
   },
   {
@@ -636,7 +636,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-familie",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-familie.html",
     "count": 10
   },
   {
@@ -646,7 +646,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-schule",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-schule.html",
     "count": 10
   },
   {
@@ -656,7 +656,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-essen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-essen.html",
     "count": 10
   },
   {
@@ -666,7 +666,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-einkaufen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-einkaufen.html",
     "count": 10
   },
   {
@@ -676,7 +676,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-reisen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-reisen.html",
     "count": 10
   },
   {
@@ -686,7 +686,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-hobbys",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-hobbys.html",
     "count": 10
   },
   {
@@ -696,7 +696,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-familie",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-familie.html",
     "count": 10
   },
   {
@@ -706,7 +706,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-schule",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-schule.html",
     "count": 10
   },
   {
@@ -716,7 +716,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-essen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-essen.html",
     "count": 10
   },
   {
@@ -726,7 +726,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-einkaufen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-einkaufen.html",
     "count": 10
   },
   {
@@ -736,7 +736,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-reisen",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-reisen.html",
     "count": 10
   },
   {
@@ -746,7 +746,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-hobbys",
-    "theory": "main.html#theorie",
+    "theory": "spanisch-theorie-alltag-hobbys.html",
     "count": 10
   }
 ]
