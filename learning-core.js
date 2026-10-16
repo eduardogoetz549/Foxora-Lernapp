@@ -106,7 +106,7 @@
   }
   let readyResolve;
   const ready=new Promise(resolve=>readyResolve=resolve);
-  const api={ready,summary,
+  const api={ready,summary,beginnerCheckpoint(lesson,step){if(!Number.isInteger(lesson)||lesson<0||lesson>=6||!Number.isInteger(step)||step<0||step>6)return;const previous=ordered().filter(e=>e.kind==='beginnerCheckpoint'&&e.module==='fr_beginner_progress').at(-1);const stamp=Math.max(Date.now(),(Date.parse(previous?.at)||0)+1);add({kind:'beginnerCheckpoint',module:'fr_beginner_progress',lesson,step,at:new Date(stamp).toISOString()});return stamp;},
     events:()=>ordered().map(e=>({...e})),
     setting(key,fallback=null){const entry=ordered().filter(e=>e.kind==='setting'&&e.module==='fr_settings'&&e.key===key).at(-1);return entry?entry.value:fallback;},
     setSetting(key,value){add({kind:'setting',module:'fr_settings',key,value});},
