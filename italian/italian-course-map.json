@@ -16,7 +16,7 @@
     "level": 1,
     "daily": true,
     "topic": "alltag-einkaufen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-einkaufen.html",
     "count": 24
   },
   {
@@ -26,7 +26,7 @@
     "level": 1,
     "daily": true,
     "topic": "alltag-essen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-essen.html",
     "count": 24
   },
   {
@@ -36,7 +36,7 @@
     "level": 1,
     "daily": true,
     "topic": "alltag-familie",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-familie.html",
     "count": 24
   },
   {
@@ -46,7 +46,7 @@
     "level": 1,
     "daily": true,
     "topic": "alltag-hobbys",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-hobbys.html",
     "count": 24
   },
   {
@@ -56,7 +56,7 @@
     "level": 1,
     "daily": true,
     "topic": "alltag-reisen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-reisen.html",
     "count": 24
   },
   {
@@ -66,7 +66,7 @@
     "level": 1,
     "daily": true,
     "topic": "alltag-schule",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-schule.html",
     "count": 24
   },
   {
@@ -206,7 +206,7 @@
     "level": 2,
     "daily": true,
     "topic": "alltag-einkaufen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-einkaufen.html",
     "count": 24
   },
   {
@@ -216,7 +216,7 @@
     "level": 2,
     "daily": true,
     "topic": "alltag-essen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-essen.html",
     "count": 24
   },
   {
@@ -226,7 +226,7 @@
     "level": 2,
     "daily": true,
     "topic": "alltag-hobbys",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-hobbys.html",
     "count": 24
   },
   {
@@ -236,7 +236,7 @@
     "level": 2,
     "daily": true,
     "topic": "alltag-schule",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-schule.html",
     "count": 24
   },
   {
@@ -306,7 +306,7 @@
     "level": 3,
     "daily": true,
     "topic": "alltag-einkaufen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-einkaufen.html",
     "count": 24
   },
   {
@@ -316,7 +316,7 @@
     "level": 3,
     "daily": true,
     "topic": "alltag-essen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-essen.html",
     "count": 24
   },
   {
@@ -326,7 +326,7 @@
     "level": 3,
     "daily": true,
     "topic": "alltag-familie",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-familie.html",
     "count": 24
   },
   {
@@ -336,7 +336,7 @@
     "level": 3,
     "daily": true,
     "topic": "alltag-schule",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-schule.html",
     "count": 24
   },
   {
@@ -416,7 +416,7 @@
     "level": 2,
     "daily": true,
     "topic": "alltag-reisen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-reisen.html",
     "count": null
   },
   {
@@ -426,7 +426,7 @@
     "level": 3,
     "daily": true,
     "topic": "alltag-reisen",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-reisen.html",
     "count": null
   },
   {
@@ -476,7 +476,7 @@
     "level": 3,
     "daily": true,
     "topic": "alltag-hobbys",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-hobbys.html",
     "count": null
   },
   {
@@ -516,7 +516,7 @@
     "level": 2,
     "daily": true,
     "topic": "alltag-familie",
-    "theory": "main.html#Theorie",
+    "theory": "italienisch-theorie-alltag-familie.html",
     "count": null
   },
   {
@@ -576,7 +576,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-familie",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-familie.html",
     "count": 10
   },
   {
@@ -586,7 +586,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-schule",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-schule.html",
     "count": 10
   },
   {
@@ -596,7 +596,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-essen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-essen.html",
     "count": 10
   },
   {
@@ -606,7 +606,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-einkaufen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-einkaufen.html",
     "count": 10
   },
   {
@@ -616,7 +616,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-reisen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-reisen.html",
     "count": 10
   },
   {
@@ -626,7 +626,7 @@
     "level": 1,
     "daily": true,
     "topic": "lesen-hobbys",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-hobbys.html",
     "count": 10
   },
   {
@@ -636,7 +636,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-familie",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-familie.html",
     "count": 10
   },
   {
@@ -646,7 +646,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-schule",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-schule.html",
     "count": 10
   },
   {
@@ -656,7 +656,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-essen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-essen.html",
     "count": 10
   },
   {
@@ -666,7 +666,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-einkaufen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-einkaufen.html",
     "count": 10
   },
   {
@@ -676,7 +676,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-reisen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-reisen.html",
     "count": 10
   },
   {
@@ -686,7 +686,7 @@
     "level": 2,
     "daily": true,
     "topic": "lesen-hobbys",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-hobbys.html",
     "count": 10
   },
   {
@@ -696,7 +696,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-familie",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-familie.html",
     "count": 10
   },
   {
@@ -706,7 +706,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-schule",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-schule.html",
     "count": 10
   },
   {
@@ -716,7 +716,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-essen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-essen.html",
     "count": 10
   },
   {
@@ -726,7 +726,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-einkaufen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-einkaufen.html",
     "count": 10
   },
   {
@@ -736,7 +736,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-reisen",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-reisen.html",
     "count": 10
   },
   {
@@ -746,7 +746,7 @@
     "level": 3,
     "daily": true,
     "topic": "lesen-hobbys",
-    "theory": "main.html#theorie",
+    "theory": "italienisch-theorie-alltag-hobbys.html",
     "count": 10
   }
 ]
