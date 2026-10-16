@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Foxora · Italienisch",
+  "short_name": "Foxora IT",
+  "lang": "de-CH",
+  "start_url": "./main.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0D1433",
+  "theme_color": "#0D1433",
+  "icons": [
+    {
+      "src": "foxora-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

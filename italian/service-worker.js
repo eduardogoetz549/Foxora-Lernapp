@@ -1,5 +1,5 @@
 'use strict';
-const PREFIX='foxora-it:'+self.registration.scope+':',CACHE=PREFIX+'workshop20261015-1',ROOT=new URL('./',self.registration.scope);
+const PREFIX='foxora-it:'+self.registration.scope+':',CACHE=PREFIX+'alignment20261016-1',ROOT=new URL('./',self.registration.scope);
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);await Promise.allSettled(['main.html','learning-core.js','italian-answer-check.js','italian-planner.js','italian-navigation.js','italian-goals.js','italian-shared.css','italian-listening-progress.js','italian-flashcard-sync.js','fuchs-idle.png'].map(p=>cache.add(new URL(p,ROOT))));await self.skipWaiting();})());});
 self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith(PREFIX)&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener('fetch',event=>{const url=new URL(event.request.url),relative=url.pathname.slice(ROOT.pathname.length);if(event.request.method!=='GET'||url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname)||relative.includes('/'))return;
