@@ -55,7 +55,7 @@ body{padding-top:84px!important}
 @media(max-width:480px){#navbar .wordmark{font-size:.7rem;letter-spacing:.09em}#navbar .nav-cta{font-size:.68rem!important;padding:.5rem .8rem!important}.exercise-levels a{font-size:.75rem;padding:.65rem .75rem}}
 @media(prefers-reduced-motion:reduce){#navbar,#navbar a,.exercise-levels a{transition:none!important}.exercise-levels a:hover{transform:none}}
 
-#navbar a,#navbar a:hover,#navbar a:focus-visible{text-decoration:none!important}#navbar .nav-links a::after{display:none!important}</style><script src="german-learning-core.js?v=20261014-de2"></script><link rel="stylesheet" href="german-shared.css?v=20261014-de2"><script src="german-answer-check.js?v=20261014-de2"></script><script src="german-planner.js?v=20261014-de2"></script><script defer src="german-navigation.js?v=20261014-de2"></script><script defer src="german-goals.js?v=20261014-de2"></script><script defer src="german-listening-progress.js?v=20261014-de2"></script></head>
+#navbar a,#navbar a:hover,#navbar a:focus-visible{text-decoration:none!important}#navbar .nav-links a::after{display:none!important}</style><script src="german-learning-core.js?v=20261016-1"></script><link rel="stylesheet" href="german-shared.css?v=20261016-1"><script src="german-answer-check.js?v=20261016-1"></script><script src="german-planner.js?v=20261016-1"></script><script defer src="german-navigation.js?v=20261016-1"></script><script defer src="german-goals.js?v=20261016-1"></script><script defer src="german-listening-progress.js?v=20261016-1"></script></head>
 <body>
 <nav id="navbar" class="site-header">
   <a href="main.html#hero" class="nav-logo">
@@ -138,4 +138,4 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
 function validateCards(d){if(!d.cards.length||d.cards.length>5000)throw Error('Invalid number of cards.');for(const c of d.cards)if(!c.front.trim()||!c.back.trim()||c.front.length>2000||c.back.length>2000)throw Error('Each card needs two texts of up to 2000 characters.');}
 async function saveAccountDeck(d){validateCards(d);if(!d.id.startsWith('de_en_'))throw Error('Invalid German set ID.');if(actor==='guest'&&((!decks.some(x=>x.id===d.id)&&decks.length>=3)||d.cards.length>30))throw Error('Free: up to 3 sets with 30 cards each.');}
 </script>
-<script src="german-flashcard-sync.js?v=20261014-de2"></script></body></html>
+<script src="german-flashcard-sync.js?v=20261016-1"></script><script src="foxora-learning-links.js?v=20261016-1"></script></body></html>
