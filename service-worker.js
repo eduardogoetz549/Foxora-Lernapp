@@ -1,8 +1,1 @@
-'use strict';
-const PREFIX='foxora-fr:'+self.registration.scope+':',CACHE=PREFIX+'pathfix20261016-2',ROOT=new URL('./',self.registration.scope);
-self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);await Promise.allSettled(['main.html','learning-core.js','french-answer-check.js','french-planner.js','french-navigation.js','french-goals.js','french-shared.css','french-listening-progress.js','french-flashcard-sync.js','fuchs-idle.png'].map(p=>cache.add(new URL(p,ROOT))));await self.skipWaiting();})());});
-self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith(PREFIX)&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
-self.addEventListener('fetch',event=>{const url=new URL(event.request.url),relative=url.pathname.slice(ROOT.pathname.length);if(event.request.method!=='GET'||url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname)||relative.includes('/'))return;
-if(['reset','code','token_hash','access_token'].some(k=>url.searchParams.has(k)))return;
-if(!/\.(html|js|css|png|webmanifest)$/.test(url.pathname))return;
-event.respondWith((async()=>{const cache=await caches.open(CACHE);try{const response=await fetch(event.request);if(response.ok)await cache.put(event.request,response.clone());return response;}catch{const saved=await cache.match(event.request);return saved||new Response('Diese Seite ist noch nicht offline verfügbar. Premium und Kontosynchronisierung benötigen eine Internetverbindung.',{status:503,headers:{'Content-Type':'text/plain;charset=utf-8'}});}})());});
+self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));/* Network remains authoritative for English lessons and account state. */
