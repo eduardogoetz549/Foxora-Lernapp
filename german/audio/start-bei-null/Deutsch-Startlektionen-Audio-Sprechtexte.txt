@@ -1,0 +1,326 @@
+DEUTSCH – NUR DIE SECHS STARTLEKTIONEN
+39 Aufnahmen: 27 Beispiele, 6 Dialoge und 6 Musterantworten.
+Dies sind Sprechtexte und Dateinamen zur Aufnahme, keine erzeugten MP3-Dateien.
+
+================================================================
+
+UPLOADORDNER
+german/audio/start-bei-null/
+Alle unten genannten MP3-Dateien kommen direkt in diesen Ordner auf GitHub.
+
+================================================================
+
+AUFNAHMEHINWEISE
+Nur den deutschen Sprechtext sprechen, keine Überschriften, Dateinamen oder Rollennamen. Jeden Dialog vollständig als eine MP3 aufnehmen; zwischen den Rollen kurz pausieren. Die Rollennamen Anna/Lukas dienen nur zur Orientierung. Ein Gedankenstrich in einer Musterantwort bedeutet eine Pause und wird nicht mitgesprochen. Die Dateinamen mit deutsch-en beibehalten, da die Seiten genau diese Namen aufrufen.
+
+================================================================
+
+LEKTION 1 – Begrüssen und sich vorstellen
+
+================================================================
+
+DATEI: deutsch-en-01-beispiel-01.mp3
+SPRECHTEXT:
+Hallo!
+
+================================================================
+
+DATEI: deutsch-en-01-beispiel-02.mp3
+SPRECHTEXT:
+Guten Morgen.
+
+================================================================
+
+DATEI: deutsch-en-01-beispiel-03.mp3
+SPRECHTEXT:
+Ich heiße Anna.
+
+================================================================
+
+DATEI: deutsch-en-01-beispiel-04.mp3
+SPRECHTEXT:
+Wie heißt du?
+
+================================================================
+
+DATEI: deutsch-en-01-dialog.mp3
+SPRECHTEXT (Rollennamen nicht mitsprechen):
+Anna: Hallo! Ich heiße Anna. Wie heißt du?
+Lukas: Hallo, ich heiße Lukas.
+
+================================================================
+
+DATEI: deutsch-en-01-muster.mp3
+SPRECHTEXT:
+Hallo! Ich heiße Anna.
+
+================================================================
+
+LEKTION 2 – Nach dem Befinden fragen
+
+================================================================
+
+DATEI: deutsch-en-02-beispiel-01.mp3
+SPRECHTEXT:
+Wie geht es dir?
+
+================================================================
+
+DATEI: deutsch-en-02-beispiel-02.mp3
+SPRECHTEXT:
+Mir geht es gut.
+
+================================================================
+
+DATEI: deutsch-en-02-beispiel-03.mp3
+SPRECHTEXT:
+Mir geht es schlecht.
+
+================================================================
+
+DATEI: deutsch-en-02-beispiel-04.mp3
+SPRECHTEXT:
+Danke. Und dir?
+
+================================================================
+
+DATEI: deutsch-en-02-dialog.mp3
+SPRECHTEXT (Rollennamen nicht mitsprechen):
+Anna: Hallo, Lukas! Wie geht es dir?
+Lukas: Mir geht es gut, danke. Und dir?
+
+================================================================
+
+DATEI: deutsch-en-02-muster.mp3
+SPRECHTEXT:
+Wie geht es dir? — Mir geht es gut, danke.
+
+================================================================
+
+LEKTION 3 – Zahlen und Alter
+
+================================================================
+
+DATEI: deutsch-en-03-beispiel-01.mp3
+SPRECHTEXT:
+eins, zwei, drei, vier, fünf
+
+================================================================
+
+DATEI: deutsch-en-03-beispiel-02.mp3
+SPRECHTEXT:
+sechs, sieben, acht, neun, zehn
+
+================================================================
+
+DATEI: deutsch-en-03-beispiel-03.mp3
+SPRECHTEXT:
+zwanzig, einundzwanzig, zweiundzwanzig
+
+================================================================
+
+DATEI: deutsch-en-03-beispiel-04.mp3
+SPRECHTEXT:
+Ich bin zwanzig Jahre alt.
+
+================================================================
+
+DATEI: deutsch-en-03-beispiel-05.mp3
+SPRECHTEXT:
+Wie alt bist du?
+
+================================================================
+
+DATEI: deutsch-en-03-dialog.mp3
+SPRECHTEXT (Rollennamen nicht mitsprechen):
+Anna: Wie alt bist du?
+Lukas: Ich bin zwanzig Jahre alt. Und du?
+Anna: Ich bin zweiundzwanzig Jahre alt.
+
+================================================================
+
+DATEI: deutsch-en-03-muster.mp3
+SPRECHTEXT:
+Ich bin zwanzig Jahre alt.
+
+================================================================
+
+LEKTION 4 – Über Familie sprechen
+
+================================================================
+
+DATEI: deutsch-en-04-beispiel-01.mp3
+SPRECHTEXT:
+meine Mutter
+
+================================================================
+
+DATEI: deutsch-en-04-beispiel-02.mp3
+SPRECHTEXT:
+mein Vater
+
+================================================================
+
+DATEI: deutsch-en-04-beispiel-03.mp3
+SPRECHTEXT:
+meine Schwester
+
+================================================================
+
+DATEI: deutsch-en-04-beispiel-04.mp3
+SPRECHTEXT:
+mein Bruder
+
+================================================================
+
+DATEI: deutsch-en-04-beispiel-05.mp3
+SPRECHTEXT:
+Das ist meine Schwester.
+
+================================================================
+
+DATEI: deutsch-en-04-dialog.mp3
+SPRECHTEXT (Rollennamen nicht mitsprechen):
+Anna: Das ist meine Schwester. Sie heißt Emma.
+Lukas: Hallo, Emma!
+
+================================================================
+
+DATEI: deutsch-en-04-muster.mp3
+SPRECHTEXT:
+Das ist meine Schwester. Sie heißt Emma.
+
+================================================================
+
+LEKTION 5 – Einfache Wünsche ausdrücken
+
+================================================================
+
+DATEI: deutsch-en-05-beispiel-01.mp3
+SPRECHTEXT:
+Ich möchte Wasser.
+
+================================================================
+
+DATEI: deutsch-en-05-beispiel-02.mp3
+SPRECHTEXT:
+einen Kaffee
+
+================================================================
+
+DATEI: deutsch-en-05-beispiel-03.mp3
+SPRECHTEXT:
+bitte
+
+================================================================
+
+DATEI: deutsch-en-05-beispiel-04.mp3
+SPRECHTEXT:
+danke
+
+================================================================
+
+DATEI: deutsch-en-05-beispiel-05.mp3
+SPRECHTEXT:
+Ich möchte einen Kaffee.
+
+================================================================
+
+DATEI: deutsch-en-05-dialog.mp3
+SPRECHTEXT (Rollennamen nicht mitsprechen):
+Anna: Guten Morgen. Ich möchte einen Kaffee, bitte.
+Lukas: Bitte schön.
+Anna: Danke.
+
+================================================================
+
+DATEI: deutsch-en-05-muster.mp3
+SPRECHTEXT:
+Ich möchte einen Kaffee, bitte. Danke.
+
+================================================================
+
+LEKTION 6 – Der erste kurze Dialog
+
+================================================================
+
+DATEI: deutsch-en-06-beispiel-01.mp3
+SPRECHTEXT:
+Hallo! Ich heiße Anna.
+
+================================================================
+
+DATEI: deutsch-en-06-beispiel-02.mp3
+SPRECHTEXT:
+Mir geht es gut, danke.
+
+================================================================
+
+DATEI: deutsch-en-06-beispiel-03.mp3
+SPRECHTEXT:
+Und dir?
+
+================================================================
+
+DATEI: deutsch-en-06-beispiel-04.mp3
+SPRECHTEXT:
+Ich möchte Wasser, bitte.
+
+================================================================
+
+DATEI: deutsch-en-06-dialog.mp3
+SPRECHTEXT (Rollennamen nicht mitsprechen):
+Anna: Hallo! Ich heiße Anna. Wie heißt du?
+Lukas: Ich heiße Lukas. Wie geht es dir?
+Anna: Mir geht es gut, danke. Und dir?
+Lukas: Gut, danke.
+Anna: Ich möchte Wasser, bitte.
+
+================================================================
+
+DATEI: deutsch-en-06-muster.mp3
+SPRECHTEXT:
+Hallo! Ich heiße Anna. Wie geht es dir? — Mir geht es gut, danke. Ich möchte Wasser, bitte.
+
+================================================================
+
+CHECKLISTE
+[ ] deutsch-en-01-beispiel-01.mp3
+[ ] deutsch-en-01-beispiel-02.mp3
+[ ] deutsch-en-01-beispiel-03.mp3
+[ ] deutsch-en-01-beispiel-04.mp3
+[ ] deutsch-en-01-dialog.mp3
+[ ] deutsch-en-01-muster.mp3
+[ ] deutsch-en-02-beispiel-01.mp3
+[ ] deutsch-en-02-beispiel-02.mp3
+[ ] deutsch-en-02-beispiel-03.mp3
+[ ] deutsch-en-02-beispiel-04.mp3
+[ ] deutsch-en-02-dialog.mp3
+[ ] deutsch-en-02-muster.mp3
+[ ] deutsch-en-03-beispiel-01.mp3
+[ ] deutsch-en-03-beispiel-02.mp3
+[ ] deutsch-en-03-beispiel-03.mp3
+[ ] deutsch-en-03-beispiel-04.mp3
+[ ] deutsch-en-03-beispiel-05.mp3
+[ ] deutsch-en-03-dialog.mp3
+[ ] deutsch-en-03-muster.mp3
+[ ] deutsch-en-04-beispiel-01.mp3
+[ ] deutsch-en-04-beispiel-02.mp3
+[ ] deutsch-en-04-beispiel-03.mp3
+[ ] deutsch-en-04-beispiel-04.mp3
+[ ] deutsch-en-04-beispiel-05.mp3
+[ ] deutsch-en-04-dialog.mp3
+[ ] deutsch-en-04-muster.mp3
+[ ] deutsch-en-05-beispiel-01.mp3
+[ ] deutsch-en-05-beispiel-02.mp3
+[ ] deutsch-en-05-beispiel-03.mp3
+[ ] deutsch-en-05-beispiel-04.mp3
+[ ] deutsch-en-05-beispiel-05.mp3
+[ ] deutsch-en-05-dialog.mp3
+[ ] deutsch-en-05-muster.mp3
+[ ] deutsch-en-06-beispiel-01.mp3
+[ ] deutsch-en-06-beispiel-02.mp3
+[ ] deutsch-en-06-beispiel-03.mp3
+[ ] deutsch-en-06-beispiel-04.mp3
+[ ] deutsch-en-06-dialog.mp3
+[ ] deutsch-en-06-muster.mp3
